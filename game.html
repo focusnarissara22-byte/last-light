@@ -1,1791 +1,2401 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>LAST LIGHT — Survival City</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>BANGKOK: LAST LIGHT</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
 html,body{
-margin:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:#090b14;
-color:#fff;
-font-family:monospace;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#10131a;
+    font-family:Arial,sans-serif;
+    color:white;
 }
 
-body{
-image-rendering:pixelated;
+canvas{
+    display:block;
+    width:100vw;
+    height:100vh;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+    background:#17201c;
 }
 
-button{
-font-family:monospace;
-cursor:pointer;
-}
-
-#game{
-position:relative;
-width:100vw;
-height:100vh;
-overflow:hidden;
-background:#111522;
-}
-
-/* =========================
-   WORLD
-========================= */
-
-#world{
-position:absolute;
-width:3200px;
-height:2200px;
-background:
-linear-gradient(#252b3b 2px,transparent 2px),
-linear-gradient(90deg,#252b3b 2px,transparent 2px);
-background-size:32px 32px;
-}
-
-/* roads */
-
-.road{
-position:absolute;
-background:#464b5b;
-border-top:5px solid #252a38;
-border-bottom:5px solid #252a38;
-}
-
-.road.horizontal{
-height:170px;
-width:100%;
-}
-
-.road.vertical{
-width:170px;
-height:100%;
-border-left:5px solid #252a38;
-border-right:5px solid #252a38;
-}
-
-.road.horizontal:after{
-content:"";
-position:absolute;
-left:0;
-right:0;
-top:82px;
-height:5px;
-background:repeating-linear-gradient(
-90deg,
-#d6cfae 0 55px,
-transparent 55px 110px
-);
-}
-
-.road.vertical:after{
-content:"";
-position:absolute;
-top:0;
-bottom:0;
-left:82px;
-width:5px;
-background:repeating-linear-gradient(
-0deg,
-#d6cfae 0 55px,
-transparent 55px 110px
-);
-}
-
-/* city blocks */
-
-.building{
-position:absolute;
-border:7px solid #151928;
-box-shadow:12px 12px 0 rgba(0,0,0,.35);
-overflow:hidden;
-}
-
-.building:before{
-content:"";
-position:absolute;
-inset:20px;
-background:
-repeating-linear-gradient(
-90deg,
-#ffd56b 0 18px,
-transparent 18px 38px
-),
-repeating-linear-gradient(
-0deg,
-#ffd56b 0 17px,
-transparent 17px 37px
-);
-opacity:.65;
-}
-
-/* different buildings */
-
-.b1{left:70px;top:70px;width:430px;height:300px;background:#765d72}
-.b2{left:650px;top:60px;width:390px;height:340px;background:#596c80}
-.b3{left:1190px;top:70px;width:450px;height:300px;background:#805a62}
-.b4{left:1780px;top:60px;width:390px;height:350px;background:#5c6680}
-.b5{left:2310px;top:80px;width:500px;height:300px;background:#765f62}
-
-.b6{left:80px;top:590px;width:400px;height:320px;background:#566f78}
-.b7{left:620px;top:620px;width:430px;height:280px;background:#7a5e78}
-.b8{left:1190px;top:590px;width:390px;height:330px;background:#596f83}
-.b9{left:1740px;top:610px;width:450px;height:290px;background:#7c6265}
-.b10{left:2340px;top:600px;width:420px;height:320px;background:#606a83}
-
-.b11{left:60px;top:1130px;width:450px;height:300px;background:#6d6178}
-.b12{left:650px;top:1110px;width:380px;height:350px;background:#536c7d}
-.b13{left:1190px;top:1140px;width:440px;height:290px;background:#795f66}
-.b14{left:1780px;top:1110px;width:420px;height:340px;background:#586a7d}
-.b15{left:2320px;top:1140px;width:470px;height:300px;background:#755e70}
-
-.b16{left:80px;top:1690px;width:430px;height:330px;background:#536c78}
-.b17{left:650px;top:1660px;width:420px;height:350px;background:#786072}
-.b18{left:1210px;top:1690px;width:400px;height:320px;background:#596d82}
-.b19{left:1760px;top:1660px;width:450px;height:350px;background:#765d67}
-.b20{left:2350px;top:1700px;width:430px;height:300px;background:#59677b}
-
-/* windows */
-
-.window{
-position:absolute;
-width:28px;
-height:24px;
-background:#ffd86c;
-border:4px solid #1b2030;
-box-shadow:0 0 12px rgba(255,216,108,.4);
-}
-
-/* signs */
-
-.sign{
-position:absolute;
-z-index:8;
-padding:10px 14px;
-border:4px solid #161a28;
-box-shadow:6px 6px 0 #111522;
-font-size:12px;
-font-weight:bold;
-}
-
-.sign.pink{background:#ed6385}
-.sign.blue{background:#55aee0}
-.sign.yellow{background:#e5bd5c;color:#292318}
-.sign.purple{background:#a477df}
-.sign.green{background:#55a97e}
-
-/* city props */
-
-.tree{
-position:absolute;
-width:60px;
-height:90px;
-z-index:5;
-}
-
-.tree:before{
-content:"";
-position:absolute;
-width:54px;
-height:54px;
-left:3px;
-top:0;
-background:#3f8e68;
-border:6px solid #17251f;
-border-radius:10px;
-box-shadow:
-20px 9px 0 #327455,
--12px 15px 0 #327455;
-}
-
-.tree:after{
-content:"";
-position:absolute;
-left:24px;
-top:52px;
-width:14px;
-height:38px;
-background:#704b3f;
-border:4px solid #2b2020;
-}
-
-/* cars */
-
-.car{
-position:absolute;
-width:95px;
-height:46px;
-border:5px solid #151927;
-border-radius:8px;
-z-index:6;
-}
-
-.car:before{
-content:"";
-position:absolute;
-width:42px;
-height:20px;
-left:21px;
-top:-20px;
-background:#7fa4bf;
-border:5px solid #151927;
-}
-
-.car:after{
-content:"●     ●";
-position:absolute;
-left:8px;
-bottom:-20px;
-font-size:18px;
-color:#10131c;
-}
-
-/* =========================
-   PLAYER
-========================= */
-
-#player{
-position:absolute;
-width:44px;
-height:58px;
-z-index:50;
-transform:translate(-50%,-50%);
-}
-
-.p-head{
-position:absolute;
-left:7px;
-top:0;
-width:30px;
-height:29px;
-background:#efbd96;
-border:4px solid #151927;
-}
-
-.p-hair{
-position:absolute;
-left:7px;
-top:0;
-width:30px;
-height:12px;
-background:#30252a;
-border:4px solid #151927;
-z-index:3;
-}
-
-.p-body{
-position:absolute;
-left:5px;
-top:26px;
-width:34px;
-height:26px;
-background:#e36c8e;
-border:4px solid #151927;
-}
-
-.p-leg{
-position:absolute;
-bottom:0;
-width:10px;
-height:14px;
-background:#2c3143;
-border:3px solid #151927;
-}
-
-.p-l{left:7px}
-.p-r{right:7px}
-
-/* =========================
-   NPC
-========================= */
-
-.npc{
-position:absolute;
-width:38px;
-height:56px;
-z-index:40;
-}
-
-.n-head{
-position:absolute;
-left:5px;
-top:0;
-width:28px;
-height:27px;
-background:#e9b58f;
-border:4px solid #171b29;
-}
-
-.n-body{
-position:absolute;
-left:3px;
-top:25px;
-width:32px;
-height:27px;
-background:#55a8d5;
-border:4px solid #171b29;
-}
-
-/* =========================
-   ZOMBIES
-========================= */
-
-.zombie{
-position:absolute;
-width:40px;
-height:58px;
-z-index:45;
-}
-
-.z-head{
-position:absolute;
-left:5px;
-top:0;
-width:30px;
-height:28px;
-background:#8aa67e;
-border:4px solid #17201b;
-}
-
-.z-body{
-position:absolute;
-left:4px;
-top:26px;
-width:32px;
-height:28px;
-background:#495b50;
-border:4px solid #17201b;
-}
-
-.zombie.danger .z-head{
-background:#b25b65;
-}
-
-/* =========================
-   HUD
-========================= */
+/* HUD */
 
 #hud{
-position:fixed;
-top:14px;
-left:14px;
-z-index:200;
-width:320px;
-padding:16px;
-background:rgba(9,12,23,.94);
-border:4px solid #ead9a7;
-box-shadow:8px 8px 0 rgba(0,0,0,.45);
+    position:fixed;
+    top:14px;
+    left:14px;
+    width:280px;
+    padding:14px;
+    background:rgba(12,15,22,.88);
+    border:2px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    box-shadow:0 8px 30px rgba(0,0,0,.4);
+    z-index:10;
 }
 
-#logo{
-font-size:17px;
-color:#ffd86b;
-margin-bottom:14px;
-}
-
-.day{
-font-size:10px;
-margin-bottom:12px;
-color:#bfc5d8;
-}
-
-.stat{
-font-size:9px;
-margin-top:7px;
+#hud h1{
+    font-size:18px;
+    letter-spacing:2px;
+    margin-bottom:8px;
 }
 
 .bar{
-height:13px;
-margin-top:4px;
-background:#252a39;
-border:2px solid #111522;
+    height:12px;
+    background:#252a33;
+    border-radius:8px;
+    margin:5px 0;
+    overflow:hidden;
 }
 
 .fill{
-height:100%;
-transition:width .25s;
+    height:100%;
+    width:100%;
+    transition:.2s;
 }
 
-.health{background:#e86173}
-.hunger{background:#e8aa4e}
-.thirst{background:#55b8e8}
-.energy{background:#8dd25e}
-.infection{background:#b46bdd}
+.hp{background:#ef476f}
+.food{background:#f4a261}
+.water{background:#4cc9f0}
+.energy{background:#b8de29}
 
-#money{
-margin-top:13px;
-color:#ffd86b;
-font-size:10px;
+.stat{
+    font-size:11px;
+    opacity:.85;
 }
 
-/* objective */
+/* weapon */
 
-#objective{
-position:fixed;
-top:14px;
-right:14px;
-z-index:200;
-width:330px;
-padding:16px;
-background:rgba(9,12,23,.94);
-border:4px solid #ead9a7;
-box-shadow:8px 8px 0 rgba(0,0,0,.45);
-font-size:9px;
-line-height:1.8;
+#weapon{
+    position:fixed;
+    right:18px;
+    top:16px;
+    background:rgba(12,15,22,.9);
+    border:2px solid rgba(255,255,255,.12);
+    padding:12px 15px;
+    border-radius:12px;
+    z-index:10;
+    text-align:right;
 }
 
-#objectiveTitle{
-color:#ffd86b;
-font-size:11px;
-margin-bottom:10px;
+#weaponName{
+    font-size:15px;
+    font-weight:bold;
 }
 
-/* bottom UI */
-
-#bottom{
-position:fixed;
-bottom:14px;
-left:50%;
-transform:translateX(-50%);
-z-index:200;
-display:flex;
-gap:8px;
+#ammo{
+    font-size:13px;
+    opacity:.8;
 }
 
-.action{
-background:#171c2d;
-color:white;
-border:3px solid #8b91a7;
-padding:12px 15px;
-font-size:8px;
+/* mission */
+
+#mission{
+    position:fixed;
+    left:50%;
+    top:18px;
+    transform:translateX(-50%);
+    background:rgba(18,20,28,.9);
+    padding:10px 18px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.15);
+    z-index:10;
+    font-size:13px;
+    min-width:250px;
+    text-align:center;
 }
 
-.action:hover{
-background:#ffd86b;
-color:#111;
+/* buttons */
+
+#buttons{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    display:grid;
+    grid-template-columns:repeat(2,70px);
+    gap:9px;
+    z-index:20;
 }
 
-/* message */
-
-#message{
-position:fixed;
-left:50%;
-bottom:90px;
-transform:translateX(-50%);
-z-index:300;
-background:#111727;
-border:4px solid #ffd86b;
-padding:14px 20px;
-font-size:9px;
-opacity:0;
-pointer-events:none;
-transition:.2s;
+.btn{
+    height:58px;
+    border:none;
+    border-radius:15px;
+    background:rgba(15,18,26,.88);
+    color:white;
+    border:2px solid rgba(255,255,255,.14);
+    font-size:11px;
+    font-weight:bold;
+    touch-action:none;
 }
 
-#message.show{
-opacity:1;
-}
-
-/* dialogue */
-
-#dialogue{
-position:fixed;
-left:50%;
-bottom:105px;
-transform:translateX(-50%);
-width:min(720px,90vw);
-background:rgba(10,13,25,.97);
-border:5px solid #e7d9b1;
-z-index:500;
-padding:20px;
-display:none;
-box-shadow:10px 10px 0 rgba(0,0,0,.5);
-}
-
-#dialogueName{
-color:#ffd86b;
-font-size:11px;
-margin-bottom:12px;
-}
-
-#dialogueText{
-font-size:9px;
-line-height:2;
-min-height:50px;
-}
-
-.dialogueButtons{
-margin-top:15px;
-display:flex;
-flex-wrap:wrap;
-gap:7px;
-}
-
-.dialogueButtons button{
-background:#252c42;
-color:white;
-border:3px solid #69718a;
-padding:11px;
-}
-
-.dialogueButtons button:hover{
-background:#ffd86b;
-color:#111;
+.btn:active{
+    transform:scale(.94);
+    background:#303746;
 }
 
 /* inventory */
 
-#inventory{
-position:fixed;
-right:20px;
-bottom:75px;
-z-index:350;
-width:300px;
-background:rgba(9,12,23,.97);
-border:4px solid #ead9a7;
-padding:17px;
-display:none;
-box-shadow:9px 9px 0 rgba(0,0,0,.5);
+.panel{
+    position:fixed;
+    inset:50% auto auto 50%;
+    transform:translate(-50%,-50%);
+    width:min(760px,92vw);
+    max-height:85vh;
+    overflow:auto;
+    background:rgba(13,16,24,.97);
+    border:2px solid rgba(255,255,255,.15);
+    border-radius:20px;
+    padding:24px;
+    z-index:50;
+    display:none;
+    box-shadow:0 20px 80px rgba(0,0,0,.65);
 }
 
-#inventory h2{
-font-size:12px;
-color:#ffd86b;
-margin:0 0 14px;
+.panel.active{
+    display:block;
 }
 
-.item{
-display:flex;
-justify-content:space-between;
-font-size:9px;
-padding:8px 0;
-border-bottom:1px solid #30364a;
+.panel h2{
+    margin-bottom:15px;
+    letter-spacing:1px;
 }
 
-/* shop */
-
-#shop{
-position:fixed;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-z-index:600;
-width:min(520px,92vw);
-background:#0b0f1c;
-border:5px solid #ead9a7;
-padding:20px;
-display:none;
-box-shadow:12px 12px 0 rgba(0,0,0,.6);
+.close{
+    float:right;
+    border:0;
+    background:#252b36;
+    color:white;
+    border-radius:8px;
+    padding:7px 11px;
 }
 
-#shop h2{
-font-size:14px;
-color:#ffd86b;
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
 }
 
-.shopItem{
-display:flex;
-align-items:center;
-justify-content:space-between;
-border:2px solid #343b50;
-padding:12px;
-margin:8px 0;
-font-size:9px;
+.card{
+    background:#1b202b;
+    padding:15px;
+    border-radius:13px;
+    border:1px solid #303744;
 }
 
-.shopItem button{
-background:#ffd86b;
-border:3px solid #171b28;
-padding:8px;
+.card button{
+    margin-top:10px;
+    padding:7px 10px;
+    border:0;
+    border-radius:7px;
+    background:#4d658d;
+    color:white;
 }
 
-/* phone */
-
-#phone{
-position:fixed;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-width:300px;
-height:520px;
-background:#141827;
-border:8px solid #080a12;
-border-radius:28px;
-z-index:700;
-display:none;
-box-shadow:15px 15px 0 rgba(0,0,0,.5);
-padding:22px;
+#message{
+    position:fixed;
+    left:50%;
+    bottom:20px;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.85);
+    padding:12px 20px;
+    border-radius:20px;
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
 }
 
-.phoneHead{
-font-size:10px;
-color:#ffd86b;
-margin-bottom:20px;
+#message.show{
+    opacity:1;
 }
 
-.phoneApp{
-background:#242b40;
-border:3px solid #555e77;
-padding:13px;
-margin:10px 0;
-font-size:8px;
-}
+/* mobile */
 
-/* minimap */
+@media(max-width:700px){
 
-#minimap{
-position:fixed;
-right:15px;
-top:170px;
-z-index:200;
-width:190px;
-height:130px;
-background:#1b2030;
-border:4px solid #ead9a7;
-overflow:hidden;
-}
+    #hud{
+        width:205px;
+        padding:9px;
+        top:8px;
+        left:8px;
+    }
 
-.mapRoad{
-position:absolute;
-background:#50576a;
-}
+    #hud h1{
+        font-size:13px;
+    }
 
-.mapPlayer{
-position:absolute;
-width:8px;
-height:8px;
-background:#ff708e;
-z-index:5;
-}
+    #mission{
+        top:8px;
+        font-size:10px;
+        min-width:170px;
+    }
 
-/* weather */
+    #weapon{
+        top:8px;
+        right:8px;
+        padding:8px;
+    }
 
-#rain{
-position:fixed;
-inset:0;
-z-index:100;
-pointer-events:none;
-opacity:0;
-background:
-repeating-linear-gradient(
-110deg,
-transparent 0 25px,
-rgba(130,190,255,.22) 26px 28px
-);
-animation:rain .45s linear infinite;
-}
+    #buttons{
+        right:9px;
+        bottom:9px;
+        grid-template-columns:repeat(2,58px);
+    }
 
-@keyframes rain{
-from{background-position:0 0}
-to{background-position:-30px 60px}
-}
-
-/* vignette */
-
-#vignette{
-position:fixed;
-inset:0;
-z-index:90;
-pointer-events:none;
-background:radial-gradient(
-ellipse at center,
-transparent 45%,
-rgba(0,0,0,.35)
-);
+    .btn{
+        height:50px;
+        font-size:9px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div id="game">
+<canvas id="game"></canvas>
 
-<div id="world">
-
-<!-- ROADS -->
-<div class="road horizontal" style="top:430px"></div>
-<div class="road horizontal" style="top:970px"></div>
-<div class="road horizontal" style="top:1510px"></div>
-
-<div class="road vertical" style="left:470px"></div>
-<div class="road vertical" style="left:1080px"></div>
-<div class="road vertical" style="left:1660px"></div>
-<div class="road vertical" style="left:2240px"></div>
-
-<!-- BUILDINGS -->
-<div class="building b1"></div>
-<div class="building b2"></div>
-<div class="building b3"></div>
-<div class="building b4"></div>
-<div class="building b5"></div>
-<div class="building b6"></div>
-<div class="building b7"></div>
-<div class="building b8"></div>
-<div class="building b9"></div>
-<div class="building b10"></div>
-<div class="building b11"></div>
-<div class="building b12"></div>
-<div class="building b13"></div>
-<div class="building b14"></div>
-<div class="building b15"></div>
-<div class="building b16"></div>
-<div class="building b17"></div>
-<div class="building b18"></div>
-<div class="building b19"></div>
-<div class="building b20"></div>
-
-<!-- SIGNS -->
-<div class="sign pink" style="left:145px;top:330px">NIGHT MARKET</div>
-<div class="sign blue" style="left:740px;top:330px">CAFE 24H</div>
-<div class="sign yellow" style="left:1300px;top:315px">CITY CLINIC</div>
-<div class="sign purple" style="left:1880px;top:335px">ARCADE</div>
-<div class="sign green" style="left:2460px;top:330px">MINI MART</div>
-
-<div class="sign pink" style="left:180px;top:900px">RAMEN</div>
-<div class="sign blue" style="left:740px;top:910px">HOTEL</div>
-<div class="sign yellow" style="left:1280px;top:900px">PHARMACY</div>
-<div class="sign purple" style="left:1880px;top:910px">MUSIC CLUB</div>
-<div class="sign green" style="left:2450px;top:900px">BOOK STORE</div>
-
-<div class="sign blue" style="left:180px;top:1440px">APARTMENTS</div>
-<div class="sign pink" style="left:760px;top:1450px">BAKERY</div>
-<div class="sign yellow" style="left:1290px;top:1440px">SUPERMARKET</div>
-<div class="sign purple" style="left:1880px;top:1450px">CINEMA</div>
-
-<!-- TREES -->
-<div class="tree" style="left:560px;top:170px"></div>
-<div class="tree" style="left:1130px;top:200px"></div>
-<div class="tree" style="left:1710px;top:180px"></div>
-<div class="tree" style="left:2280px;top:210px"></div>
-
-<div class="tree" style="left:550px;top:720px"></div>
-<div class="tree" style="left:1130px;top:760px"></div>
-<div class="tree" style="left:1710px;top:740px"></div>
-<div class="tree" style="left:2290px;top:760px"></div>
-
-<div class="tree" style="left:560px;top:1280px"></div>
-<div class="tree" style="left:1130px;top:1300px"></div>
-<div class="tree" style="left:1710px;top:1280px"></div>
-<div class="tree" style="left:2280px;top:1310px"></div>
-
-<!-- CARS -->
-<div class="car" style="left:300px;top:500px;background:#d75a69"></div>
-<div class="car" style="left:760px;top:560px;background:#55a9d2"></div>
-<div class="car" style="left:1350px;top:500px;background:#e1a94e"></div>
-<div class="car" style="left:1940px;top:560px;background:#a879d8"></div>
-<div class="car" style="left:2500px;top:500px;background:#6fb778"></div>
-
-<!-- NPC -->
-<div class="npc" id="npc1" style="left:560px;top:510px">
-<div class="n-head"></div><div class="n-body"></div>
-</div>
-
-<div class="npc" id="npc2" style="left:1160px;top:530px">
-<div class="n-head"></div><div class="n-body" style="background:#d06a89"></div>
-</div>
-
-<div class="npc" id="npc3" style="left:1720px;top:510px">
-<div class="n-head"></div><div class="n-body" style="background:#75bd78"></div>
-</div>
-
-<div class="npc" id="npc4" style="left:2290px;top:520px">
-<div class="n-head"></div><div class="n-body" style="background:#9d79d5"></div>
-</div>
-
-<div class="npc" id="npc5" style="left:850px;top:1040px">
-<div class="n-head"></div><div class="n-body" style="background:#d39b56"></div>
-</div>
-
-<div class="npc" id="npc6" style="left:1450px;top:1040px">
-<div class="n-head"></div><div class="n-body" style="background:#58a9bd"></div>
-</div>
-
-<!-- ZOMBIES -->
-<div class="zombie danger" id="z1" style="left:1960px;top:700px">
-<div class="z-head"></div><div class="z-body"></div>
-</div>
-
-<div class="zombie" id="z2" style="left:2500px;top:1250px">
-<div class="z-head"></div><div class="z-body"></div>
-</div>
-
-<div class="zombie danger" id="z3" style="left:1450px;top:1800px">
-<div class="z-head"></div><div class="z-body"></div>
-</div>
-
-<!-- PLAYER -->
-<div id="player">
-<div class="p-head"></div>
-<div class="p-hair"></div>
-<div class="p-body"></div>
-<div class="p-leg p-l"></div>
-<div class="p-leg p-r"></div>
-</div>
-
-</div>
-
-<!-- ATMOSPHERE -->
-<div id="rain"></div>
-<div id="vignette"></div>
-
-<!-- HUD -->
 <div id="hud">
+    <h1>🌃 LAST LIGHT</h1>
 
-<div id="logo">✦ LAST LIGHT</div>
+    <div class="stat">❤️ HEALTH</div>
+    <div class="bar"><div id="hp" class="fill hp"></div></div>
 
-<div class="day">
-DAY <span id="day">01</span>
-&nbsp;&nbsp;
-<span id="clock">07:00</span>
+    <div class="stat">🍖 HUNGER</div>
+    <div class="bar"><div id="food" class="fill food"></div></div>
+
+    <div class="stat">💧 THIRST</div>
+    <div class="bar"><div id="water" class="fill water"></div></div>
+
+    <div class="stat">⚡ ENERGY</div>
+    <div class="bar"><div id="energy" class="fill energy"></div></div>
+
+    <div style="margin-top:8px;font-size:12px">
+        💰 ฿<span id="money">500</span>
+        &nbsp; | &nbsp;
+        ☠️ <span id="kills">0</span>
+    </div>
 </div>
 
-<div class="stat">❤️ HEALTH</div>
-<div class="bar">
-<div class="fill health" id="healthBar"></div>
+<div id="mission">
+    <b>OBJECTIVE</b><br>
+    เดินทางไปยังจุดปลอดภัย
 </div>
 
-<div class="stat">🍖 HUNGER</div>
-<div class="bar">
-<div class="fill hunger" id="hungerBar"></div>
+<div id="weapon">
+    <div id="weaponName">🔫 PISTOL</div>
+    <div id="ammo">12 / 60</div>
 </div>
 
-<div class="stat">💧 THIRST</div>
-<div class="bar">
-<div class="fill thirst" id="thirstBar"></div>
+<div id="buttons">
+    <button class="btn" id="shoot">🔫<br>ยิง</button>
+    <button class="btn" id="lock">🎯<br>LOCK</button>
+    <button class="btn" id="run">🏃<br>วิ่ง</button>
+    <button class="btn" id="bag">🎒<br>ของ</button>
+    <button class="btn" id="med">💊<br>ยา</button>
+    <button class="btn" id="mapBtn">🗺️<br>MAP</button>
 </div>
 
-<div class="stat">⚡ ENERGY</div>
-<div class="bar">
-<div class="fill energy" id="energyBar"></div>
-</div>
-
-<div class="stat">🦠 INFECTION</div>
-<div class="bar">
-<div class="fill infection" id="infectionBar"></div>
-</div>
-
-<div id="money">💰 $ <span id="moneyValue">120</span></div>
-
-</div>
-
-<!-- OBJECTIVE -->
-<div id="objective">
-
-<div id="objectiveTitle">CURRENT OBJECTIVE</div>
-
-Find water and food before nightfall.
-
-<br><br>
-
-<i>Explore the city. Talk to people.</i>
-
-</div>
-
-<!-- MINIMAP -->
-<div id="minimap">
-
-<div class="mapRoad" style="left:0;top:58px;width:190px;height:14px"></div>
-<div class="mapRoad" style="left:85px;top:0;width:14px;height:130px"></div>
-<div class="mapRoad" style="left:145px;top:0;width:14px;height:130px"></div>
-
-<div class="mapPlayer" id="mapPlayer"></div>
-
-</div>
-
-<!-- CONTROLS -->
-<div id="bottom">
-
-<button class="action" onclick="openInventory()">🎒 BAG</button>
-<button class="action" onclick="openPhone()">📱 PHONE</button>
-<button class="action" onclick="rest()">🛏 REST</button>
-<button class="action" onclick="searchArea()">🔎 SEARCH</button>
-<button class="action" onclick="saveGame()">💾 SAVE</button>
-
-</div>
-
-<!-- MESSAGE -->
 <div id="message"></div>
 
-<!-- DIALOGUE -->
-<div id="dialogue">
-
-<div id="dialogueName">NPC</div>
-
-<div id="dialogueText">
-...
-</div>
-
-<div class="dialogueButtons">
-
-<button onclick="dialogueChoice(1)">ถามเรื่องเมือง</button>
-
-<button onclick="dialogueChoice(2)">ถามเรื่องงาน</button>
-
-<button onclick="dialogueChoice(3)">ถามเรื่องการติดเชื้อ</button>
-
-<button onclick="closeDialogue()">เดินออกมา</button>
-
-</div>
-
-</div>
-
 <!-- INVENTORY -->
-<div id="inventory">
 
-<h2>🎒 INVENTORY</h2>
+<div id="inventory" class="panel">
+    <button class="close" onclick="toggleInventory()">✕</button>
+    <h2>🎒 INVENTORY</h2>
 
-<div class="item">
-<span>💧 Water</span>
-<span id="waterCount">1</span>
+    <div class="cards">
+
+        <div class="card">
+            🔫 Pistol
+            <br>
+            กระสุน <b id="invAmmo">60</b>
+        </div>
+
+        <div class="card">
+            💊 Medicine
+            <br>
+            จำนวน <b id="invMed">3</b>
+            <br>
+            <button onclick="useMedicine()">ใช้ยา</button>
+        </div>
+
+        <div class="card">
+            💉 Vaccine
+            <br>
+            จำนวน <b id="invVaccine">1</b>
+            <br>
+            <button onclick="useVaccine()">ใช้วัคซีน</button>
+        </div>
+
+        <div class="card">
+            🍖 Food
+            <br>
+            จำนวน <b id="invFood">5</b>
+            <br>
+            <button onclick="eatFood()">กิน</button>
+        </div>
+
+        <div class="card">
+            💧 Water
+            <br>
+            จำนวน <b id="invWater">5</b>
+            <br>
+            <button onclick="drinkWater()">ดื่ม</button>
+        </div>
+
+        <div class="card">
+            👕 Outfit
+            <br>
+            Survivor Jacket
+        </div>
+
+    </div>
 </div>
 
-<div class="item">
-<span>🍞 Food</span>
-<span id="foodCount">0</span>
-</div>
+<!-- CHARACTER -->
 
-<div class="item">
-<span>💊 Medicine</span>
-<span id="medicineCount">0</span>
-</div>
+<div id="characterPanel" class="panel">
+    <button class="close" onclick="closePanels()">✕</button>
+    <h2>🧍 CHARACTER</h2>
 
-<div class="item">
-<span>🔦 Flashlight</span>
-<span>1</span>
-</div>
+    <div class="cards">
 
-<div class="item">
-<span>🔑 Old Key</span>
-<span>1</span>
-</div>
+        <div class="card">
+            <b>ชื่อ</b>
+            <br>
+            Maya
+        </div>
 
-<div class="item">
-<span>🔋 Battery</span>
-<span>2</span>
-</div>
+        <div class="card">
+            <b>อาชีพ</b>
+            <br>
+            Survivor
+            <br>
+            <button onclick="changeJob()">เปลี่ยนอาชีพ</button>
+        </div>
 
-<button onclick="closeInventory()">CLOSE</button>
+        <div class="card">
+            <b>Level</b>
+            <br>
+            <span id="level">1</span>
+        </div>
 
-</div>
+        <div class="card">
+            <b>EXP</b>
+            <br>
+            <span id="exp">0</span> / 100
+        </div>
 
-<!-- SHOP -->
-<div id="shop">
+        <div class="card">
+            <b>เสื้อผ้า</b>
+            <br>
+            Jacket
+            <br>
+            <button onclick="changeOutfit()">เปลี่ยนชุด</button>
+        </div>
 
-<h2>🏪 MINI MART</h2>
-
-<div class="shopItem">
-<span>💧 Water — $5</span>
-<button onclick="buy('water')">BUY</button>
-</div>
-
-<div class="shopItem">
-<span>🍞 Food — $10</span>
-<button onclick="buy('food')">BUY</button>
-</div>
-
-<div class="shopItem">
-<span>💊 Medicine — $25</span>
-<button onclick="buy('medicine')">BUY</button>
-</div>
-
-<div class="shopItem">
-<span>🔋 Battery — $8</span>
-<button onclick="buy('battery')">BUY</button>
-</div>
-
-<button onclick="closeShop()">CLOSE</button>
-
-</div>
-
-<!-- PHONE -->
-<div id="phone">
-
-<div class="phoneHead">
-📱 PHONE
-</div>
-
-<div class="phoneApp">
-💬 MESSAGES<br><br>
-No new messages.
-</div>
-
-<div class="phoneApp">
-🗺️ CITY MAP<br><br>
-Several districts remain unexplored.
-</div>
-
-<div class="phoneApp">
-📋 QUESTS<br><br>
-Find water and food.
-</div>
-
-<div class="phoneApp">
-🧠 NOTES<br><br>
-“Don't trust the lights.”
-</div>
-
-<button onclick="closePhone()">CLOSE</button>
-
-</div>
-
+    </div>
 </div>
 
 <script>
 
-/* =========================
-   GAME STATE
-========================= */
+/* =====================================================
+   CANVAS
+===================================================== */
 
-const player = document.getElementById("player");
-const world = document.getElementById("world");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-let px = 1500;
-let py = 820;
+function resize(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+}
 
-let speed = 5;
-let running = false;
+addEventListener("resize",resize);
+resize();
 
-let day = 1;
-let minutes = 420;
 
-let health = 100;
-let hunger = 72;
-let thirst = 78;
-let energy = 90;
-let infection = 0;
+/* =====================================================
+   WORLD
+===================================================== */
 
-let money = 120;
-
-let inventory = {
-water:1,
-food:0,
-medicine:0,
-battery:2,
-flashlight:1,
-key:1
+const WORLD = {
+    width: 5200,
+    height: 4200
 };
 
-let keys = {};
+const camera = {
+    x:0,
+    y:0
+};
 
-let weather = "clear";
 
-/* =========================
-   CONTROLS
-========================= */
+/* =====================================================
+   PLAYER
+===================================================== */
 
-document.addEventListener("keydown",function(e){
+const player = {
+    x:2600,
+    y:2100,
+    r:16,
 
-keys[e.key.toLowerCase()] = true;
+    speed:2.4,
+    runSpeed:4.5,
 
-if(e.key.toLowerCase()==="e"){
-interact();
+    hp:100,
+    hunger:100,
+    thirst:100,
+    energy:100,
+
+    money:500,
+    kills:0,
+
+    ammo:60,
+    magazine:12,
+
+    med:3,
+    vaccine:1,
+    food:5,
+    water:5,
+
+    level:1,
+    exp:0,
+
+    outfit:0
+};
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+const keys = {};
+
+addEventListener("keydown",e=>{
+    keys[e.key.toLowerCase()] = true;
+
+    if(e.key.toLowerCase()==="e"){
+        interact();
+    }
+
+    if(e.key.toLowerCase()==="i"){
+        toggleInventory();
+    }
+
+    if(e.key.toLowerCase()==="q"){
+        lockTarget();
+    }
+
+    if(e.key===" "){
+        shoot();
+    }
+});
+
+addEventListener("keyup",e=>{
+    keys[e.key.toLowerCase()] = false;
+});
+
+
+/* =====================================================
+   TOUCH MOVEMENT
+===================================================== */
+
+let touchStart=null;
+
+canvas.addEventListener("touchstart",e=>{
+    const t=e.touches[0];
+    touchStart={x:t.clientX,y:t.clientY};
+});
+
+canvas.addEventListener("touchmove",e=>{
+    if(!touchStart)return;
+
+    const t=e.touches[0];
+
+    const dx=t.clientX-touchStart.x;
+    const dy=t.clientY-touchStart.y;
+
+    keys["touchdx"]=dx;
+    keys["touchdy"]=dy;
+});
+
+canvas.addEventListener("touchend",()=>{
+    touchStart=null;
+    keys["touchdx"]=0;
+    keys["touchdy"]=0;
+});
+
+
+/* =====================================================
+   BUILDINGS
+===================================================== */
+
+const buildings=[];
+
+function addBuilding(x,y,w,h,type){
+    buildings.push({
+        x,y,w,h,type
+    });
 }
 
-if(e.key.toLowerCase()==="i"){
-openInventory();
+
+/* Bangkok city blocks */
+
+for(let row=0;row<8;row++){
+
+    for(let col=0;col<10;col++){
+
+        const x=300+col*480;
+        const y=250+row*480;
+
+        if((row+col)%4===0){
+            addBuilding(x,y,330,260,"mall");
+        }
+        else if((row+col)%5===0){
+            addBuilding(x,y,250,350,"temple");
+        }
+        else{
+            addBuilding(x,y,300,230,
+                Math.random()<.25 ? "tower":"house");
+        }
+    }
 }
 
-if(e.key.toLowerCase()==="p"){
-openPhone();
+
+/* =====================================================
+   ROADS
+===================================================== */
+
+const roads=[];
+
+for(let i=0;i<9;i++){
+    roads.push({
+        x:0,
+        y:180+i*480,
+        w:WORLD.width,
+        h:90
+    });
 }
+
+for(let i=0;i<11;i++){
+    roads.push({
+        x:180+i*480,
+        y:0,
+        w:90,
+        h:WORLD.height
+    });
+}
+
+
+/* =====================================================
+   SPECIAL LOCATIONS
+===================================================== */
+
+const locations=[
+
+    {
+        x:600,
+        y:600,
+        name:"วัดกรุงเทพ",
+        type:"temple"
+    },
+
+    {
+        x:4000,
+        y:700,
+        name:"CITY MALL",
+        type:"mall"
+    },
+
+    {
+        x:2600,
+        y:1700,
+        name:"SAFE ZONE",
+        type:"safe"
+    },
+
+    {
+        x:4300,
+        y:3100,
+        name:"POLICE STATION",
+        type:"police"
+    },
+
+    {
+        x:1100,
+        y:3300,
+        name:"HOSPITAL",
+        type:"hospital"
+    }
+];
+
+
+/* =====================================================
+   NPC
+===================================================== */
+
+const npcs=[];
+
+const npcNames=[
+    "Somchai",
+    "Nina",
+    "Ton",
+    "Mali",
+    "Bank",
+    "Jane",
+    "Krit",
+    "Mew",
+    "Aom",
+    "Tee",
+    "Officer",
+    "Doctor"
+];
+
+for(let i=0;i<45;i++){
+
+    npcs.push({
+
+        x:400+Math.random()*4400,
+        y:300+Math.random()*3400,
+
+        r:12,
+
+        hp:100,
+
+        speed:0.7+Math.random()*0.7,
+
+        name:npcNames[i%npcNames.length],
+
+        state:"wander",
+
+        target:null,
+
+        cooldown:0,
+
+        weapon:Math.random()<.35 ? "gun":"none"
+
+    });
+}
+
+
+/* =====================================================
+   ZOMBIES
+===================================================== */
+
+const zombies=[];
+
+for(let i=0;i<35;i++){
+
+    zombies.push({
+
+        x:Math.random()*WORLD.width,
+        y:Math.random()*WORLD.height,
+
+        r:14,
+
+        hp:60,
+
+        speed:0.55+Math.random()*.35,
+
+        attackCooldown:0,
+
+        target:null
+
+    });
+}
+
+
+/* =====================================================
+   BULLETS
+===================================================== */
+
+const bullets=[];
+
+
+/* =====================================================
+   CARS
+===================================================== */
+
+const cars=[];
+
+for(let i=0;i<22;i++){
+
+    const horizontal=Math.random()<.5;
+
+    cars.push({
+
+        x:horizontal ? Math.random()*WORLD.width : 200+Math.floor(Math.random()*10)*480,
+
+        y:horizontal ? 180+Math.floor(Math.random()*9)*480 : Math.random()*WORLD.height,
+
+        horizontal,
+
+        speed:1+Math.random()*2,
+
+        color:["#d84a4a","#4c83d9","#e5a93d","#dddddd","#42a66b"][Math.floor(Math.random()*5)]
+
+    });
+}
+
+
+/* =====================================================
+   LOCK TARGET
+===================================================== */
+
+let lockedTarget=null;
+
+function lockTarget(){
+
+    let closest=null;
+    let dist=Infinity;
+
+    [...zombies,...npcs].forEach(entity=>{
+
+        if(entity.hp<=0)return;
+
+        const d=Math.hypot(
+            entity.x-player.x,
+            entity.y-player.y
+        );
+
+        if(d<dist && d<500){
+
+            dist=d;
+            closest=entity;
+        }
+    });
+
+    lockedTarget=closest;
+
+    if(lockedTarget){
+        showMessage("🎯 LOCKED TARGET");
+    }else{
+        showMessage("ไม่พบเป้าหมาย");
+    }
+}
+
+
+/* =====================================================
+   SHOOT
+===================================================== */
+
+let shootCooldown=0;
+
+function shoot(){
+
+    if(shootCooldown>0)return;
+
+    if(player.magazine<=0){
+
+        showMessage("กระสุนหมด! กด R เพื่อรีโหลด");
+        return;
+    }
+
+    player.magazine--;
+
+    shootCooldown=14;
+
+    let angle=0;
+
+    if(lockedTarget){
+
+        angle=Math.atan2(
+            lockedTarget.y-player.y,
+            lockedTarget.x-player.x
+        );
+
+    }else{
+
+        angle=0;
+
+    }
+
+    bullets.push({
+
+        x:player.x,
+        y:player.y,
+
+        vx:Math.cos(angle)*10,
+        vy:Math.sin(angle)*10,
+
+        life:80,
+
+        owner:"player"
+
+    });
+
+}
+
+
+/* =====================================================
+   RELOAD
+===================================================== */
+
+addEventListener("keydown",e=>{
+
+    if(e.key.toLowerCase()==="r"){
+
+        const need=player.magazine<12 ? 12-player.magazine:0;
+
+        if(need>0 && player.ammo>=need){
+
+            player.ammo-=need;
+            player.magazine+=need;
+
+            showMessage("🔄 Reload");
+
+        }
+
+    }
 
 });
 
-document.addEventListener("keyup",function(e){
 
-keys[e.key.toLowerCase()] = false;
+/* =====================================================
+   PLAYER MOVEMENT
+===================================================== */
 
-});
+function updatePlayer(){
 
-/* =========================
-   MOVEMENT
-========================= */
+    let dx=0;
+    let dy=0;
 
-function updateMovement(){
+    if(keys["w"] || keys["arrowup"])dy--;
+    if(keys["s"] || keys["arrowdown"])dy++;
+    if(keys["a"] || keys["arrowleft"])dx--;
+    if(keys["d"] || keys["arrowright"])dx++;
 
-let dx=0;
-let dy=0;
+    if(keys["touchdx"] || keys["touchdy"]){
 
-if(keys["w"] || keys["arrowup"]) dy-=1;
-if(keys["s"] || keys["arrowdown"]) dy+=1;
-if(keys["a"] || keys["arrowleft"]) dx-=1;
-if(keys["d"] || keys["arrowright"]) dx+=1;
+        dx=keys["touchdx"]||0;
+        dy=keys["touchdy"]||0;
 
-running =
-keys["shift"] &&
-energy>1;
+        const len=Math.hypot(dx,dy)||1;
 
-let currentSpeed =
-running ? 8 : speed;
+        dx/=len;
+        dy/=len;
+    }
 
-if(dx!==0 || dy!==0){
+    if(dx||dy){
 
-if(dx!==0 && dy!==0){
-dx*=.7;
-dy*=.7;
-}
+        const len=Math.hypot(dx,dy);
 
-px += dx*currentSpeed;
-py += dy*currentSpeed;
+        dx/=len;
+        dy/=len;
 
-if(running){
-energy-=.05;
-}
+        const running=keys["shift"] || keys["run"];
 
-px=Math.max(30,Math.min(3170,px));
-py=Math.max(30,Math.min(2170,py));
+        const speed=running ? player.runSpeed:player.speed;
 
-}
+        player.x+=dx*speed;
+        player.y+=dy*speed;
 
-player.style.left=px+"px";
-player.style.top=py+"px";
+        player.energy-=running?.08:.02;
 
-camera();
+    }else{
 
-updateMinimap();
+        player.energy+=.03;
 
-requestAnimationFrame(updateMovement);
+    }
+
+    player.x=Math.max(20,Math.min(WORLD.width-20,player.x));
+    player.y=Math.max(20,Math.min(WORLD.height-20,player.y));
 
 }
 
-/* =========================
-   CAMERA
-========================= */
 
-function camera(){
+/* =====================================================
+   NPC AI
+===================================================== */
 
-let cx =
-window.innerWidth/2-px;
+function updateNPC(npc){
 
-let cy =
-window.innerHeight/2-py;
+    if(npc.hp<=0)return;
 
-cx=Math.min(
-0,
-Math.max(
-window.innerWidth-3200,
-cx
-)
-);
+    npc.cooldown=Math.max(0,npc.cooldown-1);
 
-cy=Math.min(
-0,
-Math.max(
-window.innerHeight-2200,
-cy
-)
-);
+    let nearestZombie=null;
+    let nearestDist=Infinity;
 
-world.style.transform=
-`translate(${cx}px,${cy}px)`;
+    zombies.forEach(z=>{
+
+        if(z.hp<=0)return;
+
+        const d=Math.hypot(
+            z.x-npc.x,
+            z.y-npc.y
+        );
+
+        if(d<nearestDist){
+
+            nearestDist=d;
+            nearestZombie=z;
+
+        }
+
+    });
+
+
+    if(nearestZombie && nearestDist<230){
+
+        npc.state="flee";
+
+        const dx=npc.x-nearestZombie.x;
+        const dy=npc.y-nearestZombie.y;
+
+        const len=Math.hypot(dx,dy)||1;
+
+        npc.x+=(dx/len)*npc.speed*2;
+        npc.y+=(dy/len)*npc.speed*2;
+
+
+        /* armed NPC shoots zombies */
+
+        if(npc.weapon==="gun" && nearestDist<320 && npc.cooldown===0){
+
+            const a=Math.atan2(
+                nearestZombie.y-npc.y,
+                nearestZombie.x-npc.x
+            );
+
+            bullets.push({
+
+                x:npc.x,
+                y:npc.y,
+
+                vx:Math.cos(a)*8,
+                vy:Math.sin(a)*8,
+
+                life:70,
+
+                owner:"npc",
+
+                target:nearestZombie
+
+            });
+
+            npc.cooldown=40;
+        }
+
+    }else{
+
+        npc.state="wander";
+
+        if(Math.random()<.02){
+
+            npc.target={
+
+                x:npc.x+(Math.random()-.5)*400,
+
+                y:npc.y+(Math.random()-.5)*400
+
+            };
+
+        }
+
+        if(npc.target){
+
+            const dx=npc.target.x-npc.x;
+            const dy=npc.target.y-npc.y;
+
+            const len=Math.hypot(dx,dy)||1;
+
+            npc.x+=(dx/len)*npc.speed;
+            npc.y+=(dy/len)*npc.speed;
+
+            if(Math.hypot(dx,dy)<20){
+
+                npc.target=null;
+
+            }
+
+        }
+
+    }
+
+    npc.x=Math.max(20,Math.min(WORLD.width-20,npc.x));
+    npc.y=Math.max(20,Math.min(WORLD.height-20,npc.y));
+}
+
+
+/* =====================================================
+   ZOMBIE AI
+===================================================== */
+
+function updateZombie(z){
+
+    if(z.hp<=0)return;
+
+    z.attackCooldown=Math.max(0,z.attackCooldown-1);
+
+    let target=player;
+    let best= Math.hypot(
+        player.x-z.x,
+        player.y-z.y
+    );
+
+    npcs.forEach(n=>{
+
+        if(n.hp<=0)return;
+
+        const d=Math.hypot(
+            n.x-z.x,
+            n.y-z.y
+        );
+
+        if(d<best){
+
+            best=d;
+            target=n;
+
+        }
+
+    });
+
+    z.target=target;
+
+    if(best<520){
+
+        const dx=target.x-z.x;
+        const dy=target.y-z.y;
+
+        const len=Math.hypot(dx,dy)||1;
+
+        z.x+=(dx/len)*z.speed;
+        z.y+=(dy/len)*z.speed;
+
+    }
+
+    if(best<30 && z.attackCooldown===0){
+
+        target.hp-=8;
+
+        z.attackCooldown=45;
+
+        if(target===player){
+
+            showMessage("🧟 ซอมบี้กัดคุณ!");
+
+        }
+
+    }
 
 }
 
-/* =========================
-   TIME
-========================= */
 
-setInterval(function(){
+/* =====================================================
+   BULLET UPDATE
+===================================================== */
 
-minutes++;
+function updateBullets(){
 
-if(minutes>=1440){
+    for(let i=bullets.length-1;i>=0;i--){
 
-minutes=0;
-day++;
+        const b=bullets[i];
 
-showMessage("🌅 DAY "+day+" — A new day begins.");
+        b.x+=b.vx;
+        b.y+=b.vy;
 
-}
+        b.life--;
 
-updateClock();
+        let hit=false;
 
-},1500);
 
-function updateClock(){
+        if(b.owner==="player"){
 
-let h=Math.floor(minutes/60);
-let m=minutes%60;
+            zombies.forEach(z=>{
 
-let suffix=h>=12?"PM":"AM";
+                if(z.hp<=0)return;
 
-let display=h%12;
+                if(Math.hypot(z.x-b.x,z.y-b.y)<z.r+5){
 
-if(display===0) display=12;
+                    z.hp-=35;
+                    hit=true;
 
-document.getElementById("clock").textContent=
-String(display).padStart(2,"0")+":"+
-String(m).padStart(2,"0")+" "+suffix;
+                    if(z.hp<=0){
 
-document.getElementById("day").textContent=
-String(day).padStart(2,"0");
+                        player.kills++;
+                        gainExp(20);
 
-updateLighting();
+                    }
 
-}
+                }
 
-/* =========================
-   DAY / NIGHT
-========================= */
+            });
 
-function updateLighting(){
 
-let hour=minutes/60;
+            npcs.forEach(n=>{
 
-let darkness=0;
+                if(n.hp<=0)return;
 
-if(hour>=19 || hour<5){
-darkness=.55;
-}
-else if(hour>=17){
-darkness=.30;
-}
-else if(hour<7){
-darkness=.18;
-}
-else{
-darkness=.08;
-}
+                if(Math.hypot(n.x-b.x,n.y-b.y)<n.r+5){
 
-document.getElementById("vignette").style.background=
-`radial-gradient(
-ellipse at center,
-transparent 42%,
-rgba(5,7,18,${darkness}) 100%
-)`;
+                    n.hp-=35;
+                    hit=true;
 
-}
+                }
 
-/* =========================
-   NEEDS
-========================= */
+            });
 
-setInterval(function(){
+        }
 
-hunger-=.35;
-thirst-=.55;
-energy+=.05;
 
-if(hunger<0) hunger=0;
-if(thirst<0) thirst=0;
-if(energy>100) energy=100;
+        if(b.owner==="npc"){
 
-if(hunger<15){
-health-=.25;
-}
+            const z=b.target;
 
-if(thirst<15){
-health-=.4;
-}
+            if(z && z.hp>0 && Math.hypot(z.x-b.x,z.y-b.y)<z.r+6){
 
-health=Math.max(0,health);
+                z.hp-=25;
+                hit=true;
 
-updateStats();
+                if(z.hp<=0){
 
-if(health<=0){
-gameOver();
-}
+                    gainExp(10);
 
-},2500);
+                }
 
-function updateStats(){
+            }
 
-document.getElementById("healthBar").style.width=
-health+"%";
+        }
 
-document.getElementById("hungerBar").style.width=
-hunger+"%";
 
-document.getElementById("thirstBar").style.width=
-thirst+"%";
+        if(hit || b.life<=0){
 
-document.getElementById("energyBar").style.width=
-energy+"%";
+            bullets.splice(i,1);
 
-document.getElementById("infectionBar").style.width=
-infection+"%";
+        }
 
-document.getElementById("moneyValue").textContent=
-money;
-
-document.getElementById("waterCount").textContent=
-inventory.water;
-
-document.getElementById("foodCount").textContent=
-inventory.food;
-
-document.getElementById("medicineCount").textContent=
-inventory.medicine;
+    }
 
 }
 
-/* =========================
+
+/* =====================================================
+   SURVIVAL
+===================================================== */
+
+let survivalTimer=0;
+
+function updateSurvival(){
+
+    survivalTimer++;
+
+    if(survivalTimer%120===0){
+
+        player.hunger-=.7;
+        player.thirst-=1;
+
+        if(player.hunger<=0 || player.thirst<=0){
+
+            player.hp-=1;
+
+        }
+
+    }
+
+    if(player.energy<100){
+
+        player.energy+=.025;
+
+    }
+
+    player.hp=Math.max(0,player.hp);
+
+    player.hunger=Math.max(0,player.hunger);
+    player.thirst=Math.max(0,player.thirst);
+
+}
+
+
+/* =====================================================
+   XP
+===================================================== */
+
+function gainExp(amount){
+
+    player.exp+=amount;
+
+    if(player.exp>=100){
+
+        player.exp-=100;
+
+        player.level++;
+
+        player.hp=100;
+
+        showMessage("⭐ LEVEL UP!");
+
+    }
+
+}
+
+
+/* =====================================================
    INTERACTION
-========================= */
+===================================================== */
 
 function interact(){
 
-let nearest=null;
-let best=100;
+    locations.forEach(loc=>{
 
-document.querySelectorAll(".npc").forEach(n=>{
+        const d=Math.hypot(
+            loc.x-player.x,
+            loc.y-player.y
+        );
 
-let x=parseFloat(n.style.left);
-let y=parseFloat(n.style.top);
+        if(d<100){
 
-let d=Math.hypot(px-x,py-y);
+            if(loc.type==="hospital"){
 
-if(d<best){
+                player.hp=100;
 
-best=d;
-nearest=n;
+                showMessage("🏥 คุณได้รับการรักษา");
 
-}
+            }
 
-});
+            if(loc.type==="safe"){
 
-if(nearest){
+                showMessage("🛡️ SAFE ZONE");
 
-openDialogue(
-"STRANGER",
-"คุณดูเหมือนคนที่เพิ่งมาถึงเมืองนี้..."
-);
+            }
 
-return;
+            if(loc.type==="mall"){
 
-}
+                player.money-=50;
 
-let shopX=2470;
-let shopY=900;
+                player.food+=2;
+                player.water+=2;
 
-if(Math.hypot(px-shopX,py-shopY)<140){
+                showMessage("🛒 ซื้อเสบียง +อาหาร +น้ำ");
 
-openShop();
-return;
+            }
 
-}
+        }
 
-showMessage("ไม่มีอะไรน่าสนใจอยู่ใกล้ ๆ");
+    });
 
 }
 
-/* =========================
-   DIALOGUE
-========================= */
 
-function openDialogue(name,text){
+/* =====================================================
+   ITEMS
+===================================================== */
 
-document.getElementById("dialogueName").textContent=
-name;
+function useMedicine(){
 
-document.getElementById("dialogueText").textContent=
-text;
+    if(player.med>0 && player.hp<100){
 
-document.getElementById("dialogue").style.display=
-"block";
+        player.med--;
 
-}
+        player.hp=Math.min(100,player.hp+40);
 
-function dialogueChoice(choice){
+        updateInventory();
 
-let text="";
-
-if(choice===1){
-
-text=
-"ไฟดับมาแล้วสามวัน ถนนฝั่งตะวันตกเริ่มไม่มีคนเดิน...";
+    }
 
 }
 
-if(choice===2){
+function useVaccine(){
 
-text=
-"ถ้าต้องการเงิน ลองไปถามร้าน Night Market พวกเขายังรับคนอยู่.";
+    if(player.vaccine>0){
 
-}
+        player.vaccine--;
 
-if(choice===3){
+        player.hp=Math.min(100,player.hp+20);
 
-text=
-"อย่าให้พวกมันกัด ถ้าแผลเริ่มเปลี่ยนสี...อย่ารอ.";
+        showMessage("💉 ใช้วัคซีน");
 
-}
+        updateInventory();
 
-document.getElementById("dialogueText").textContent=
-text;
+    }
 
 }
 
-function closeDialogue(){
+function eatFood(){
 
-document.getElementById("dialogue").style.display=
-"none";
+    if(player.food>0){
 
-}
+        player.food--;
 
-/* =========================
-   INVENTORY
-========================= */
+        player.hunger=Math.min(100,player.hunger+35);
 
-function openInventory(){
+        updateInventory();
 
-document.getElementById("inventory").style.display=
-"block";
+    }
 
 }
 
-function closeInventory(){
+function drinkWater(){
 
-document.getElementById("inventory").style.display=
-"none";
+    if(player.water>0){
 
-}
+        player.water--;
 
-/* =========================
-   SHOP
-========================= */
+        player.thirst=Math.min(100,player.thirst+40);
 
-function openShop(){
+        updateInventory();
 
-document.getElementById("shop").style.display=
-"block";
+    }
 
 }
 
-function closeShop(){
 
-document.getElementById("shop").style.display=
-"none";
+/* =====================================================
+   UI
+===================================================== */
 
-}
+function updateHUD(){
 
-function buy(item){
+    document.getElementById("hp").style.width=player.hp+"%";
+    document.getElementById("food").style.width=player.hunger+"%";
+    document.getElementById("water").style.width=player.thirst+"%";
+    document.getElementById("energy").style.width=player.energy+"%";
 
-let prices={
-water:5,
-food:10,
-medicine:25,
-battery:8
-};
+    document.getElementById("money").textContent=player.money;
+    document.getElementById("kills").textContent=player.kills;
 
-if(money<prices[item]){
+    document.getElementById("ammo").textContent=
+        player.magazine+" / "+player.ammo;
 
-showMessage("💸 เงินไม่พอ");
+    document.getElementById("level").textContent=
+        player.level;
 
-return;
+    document.getElementById("exp").textContent=
+        player.exp;
 
-}
-
-money-=prices[item];
-
-inventory[item]++;
-
-updateStats();
-
-showMessage("ซื้อของเรียบร้อย");
+    updateInventory();
 
 }
 
-/* =========================
-   REST
-========================= */
 
-function rest(){
+function updateInventory(){
 
-if(energy<100){
-
-energy+=25;
-
-if(energy>100)
-energy=100;
-
-hunger-=5;
-thirst-=7;
-
-minutes+=60;
-
-showMessage("🛏 คุณพักหนึ่งชั่วโมง");
-
-updateStats();
-updateClock();
+    document.getElementById("invAmmo").textContent=player.ammo;
+    document.getElementById("invMed").textContent=player.med;
+    document.getElementById("invVaccine").textContent=player.vaccine;
+    document.getElementById("invFood").textContent=player.food;
+    document.getElementById("invWater").textContent=player.water;
 
 }
 
-}
 
-/* =========================
-   SEARCH
-========================= */
+function toggleInventory(){
 
-function searchArea(){
-
-let roll=Math.random();
-
-if(roll<.25){
-
-inventory.food++;
-
-showMessage("🍞 พบอาหาร!");
+    document
+        .getElementById("inventory")
+        .classList.toggle("active");
 
 }
 
-else if(roll<.45){
+function closePanels(){
 
-inventory.water++;
-
-showMessage("💧 พบน้ำ!");
-
-}
-
-else if(roll<.55){
-
-inventory.medicine++;
-
-showMessage("💊 พบยา!");
+    document.querySelectorAll(".panel")
+        .forEach(x=>x.classList.remove("active"));
 
 }
 
-else if(roll<.72){
-
-money+=10;
-
-showMessage("💰 พบเงิน $10");
-
-}
-
-else{
-
-showMessage("🔎 ไม่พบอะไร");
-
-}
-
-updateStats();
-
-}
-
-/* =========================
-   PHONE
-========================= */
-
-function openPhone(){
-
-document.getElementById("phone").style.display=
-"block";
-
-}
-
-function closePhone(){
-
-document.getElementById("phone").style.display=
-"none";
-
-}
-
-/* =========================
-   MINIMAP
-========================= */
-
-function updateMinimap(){
-
-let mx=(px/3200)*180;
-let my=(py/2200)*120;
-
-let mapPlayer=
-document.getElementById("mapPlayer");
-
-mapPlayer.style.left=
-mx+"px";
-
-mapPlayer.style.top=
-my+"px";
-
-}
-
-/* =========================
-   ZOMBIE AI
-========================= */
-
-function zombieAI(){
-
-document.querySelectorAll(".zombie").forEach(z=>{
-
-let zx=parseFloat(z.style.left);
-let zy=parseFloat(z.style.top);
-
-let d=Math.hypot(px-zx,py-zy);
-
-if(d<260){
-
-let angle=Math.atan2(
-py-zy,
-px-zx
-);
-
-zx+=Math.cos(angle)*.45;
-zy+=Math.sin(angle)*.45;
-
-z.style.left=zx+"px";
-z.style.top=zy+"px";
-
-if(d<55){
-
-health-=.3;
-infection+=.12;
-
-showMessage("🧟 YOU WERE ATTACKED");
-
-updateStats();
-
-}
-
-}
-
-});
-
-}
-
-setInterval(zombieAI,120);
-
-/* =========================
-   RANDOM EVENTS
-========================= */
-
-setInterval(function(){
-
-if(Math.random()<.25){
-
-let events=[
-
-"🌫️ หมอกเริ่มลงจัด",
-"📻 วิทยุในกระเป๋ามีสัญญาณแปลก ๆ",
-"🚨 ได้ยินเสียงไซเรนจากทางเหนือ",
-"🧟 มีบางอย่างเคลื่อนไหวอยู่ในตรอก",
-"🌧️ ฝนเริ่มตก",
-"👤 มีคนกำลังเดินตามคุณ..."
-
-];
-
-let event=
-events[Math.floor(Math.random()*events.length)];
-
-showMessage(event);
-
-}
-
-},12000);
-
-/* =========================
-   SAVE
-========================= */
-
-function saveGame(){
-
-localStorage.setItem(
-"lastLightSave",
-JSON.stringify({
-
-px,
-py,
-day,
-minutes,
-health,
-hunger,
-thirst,
-energy,
-infection,
-money,
-inventory
-
-})
-);
-
-showMessage("💾 GAME SAVED");
-
-}
-
-/* =========================
-   LOAD
-========================= */
-
-function loadGame(){
-
-let save=
-localStorage.getItem("lastLightSave");
-
-if(!save)return;
-
-let data=JSON.parse(save);
-
-px=data.px;
-py=data.py;
-day=data.day;
-minutes=data.minutes;
-health=data.health;
-hunger=data.hunger;
-thirst=data.thirst;
-energy=data.energy;
-infection=data.infection;
-money=data.money;
-inventory=data.inventory;
-
-updateStats();
-updateClock();
-
-}
-
-/* =========================
-   GAME OVER
-========================= */
-
-function gameOver(){
-
-alert(
-"YOU DIED\n\n"+
-"DAY "+day+
-"\n\nThe city swallowed another survivor."
-);
-
-location.reload();
-
-}
-
-/* =========================
-   MESSAGE
-========================= */
 
 function showMessage(text){
 
-let box=
-document.getElementById("message");
+    const m=document.getElementById("message");
 
-box.textContent=text;
+    m.textContent=text;
 
-box.classList.add("show");
+    m.classList.add("show");
 
-setTimeout(function(){
+    clearTimeout(window.msgTimer);
 
-box.classList.remove("show");
+    window.msgTimer=setTimeout(()=>{
 
-},2200);
+        m.classList.remove("show");
+
+    },1800);
 
 }
 
-/* =========================
-   START
-========================= */
+
+/* =====================================================
+   JOB SYSTEM
+===================================================== */
+
+const jobs=[
+    "Survivor",
+    "ตำรวจ",
+    "แพทย์",
+    "ทหาร",
+    "ช่าง",
+    "พ่อค้า",
+    "นักสำรวจ"
+];
+
+let jobIndex=0;
+
+function changeJob(){
+
+    jobIndex=(jobIndex+1)%jobs.length;
+
+    showMessage("💼 อาชีพ: "+jobs[jobIndex]);
+
+}
+
+
+/* =====================================================
+   OUTFIT
+===================================================== */
+
+function changeOutfit(){
+
+    player.outfit++;
+
+    if(player.outfit>3){
+
+        player.outfit=0;
+
+    }
+
+    showMessage("👕 เปลี่ยนชุดแล้ว");
+
+}
+
+
+/* =====================================================
+   DAY NIGHT
+===================================================== */
+
+let timeOfDay=0;
+
+function updateTime(){
+
+    timeOfDay+=.00025;
+
+    if(timeOfDay>1){
+
+        timeOfDay=0;
+
+    }
+
+}
+
+
+/* =====================================================
+   DRAW WORLD
+===================================================== */
+
+function drawWorld(){
+
+    ctx.fillStyle="#3b493f";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+
+    /* grass */
+
+    ctx.fillStyle="#567c4b";
+
+    ctx.fillRect(
+        0,
+        0,
+        WORLD.width,
+        WORLD.height
+    );
+
+
+    /* grass pixels */
+
+    for(let x=0;x<WORLD.width;x+=90){
+
+        for(let y=0;y<WORLD.height;y+=90){
+
+            ctx.fillStyle=
+                (x+y)%180===0
+                ?"#668c58"
+                :"#5c8250";
+
+            ctx.fillRect(x+10,y+15,3,3);
+            ctx.fillRect(x+30,y+50,4,3);
+
+        }
+
+    }
+
+
+    /* roads */
+
+    roads.forEach(r=>{
+
+        ctx.fillStyle="#444952";
+
+        ctx.fillRect(
+            r.x,r.y,r.w,r.h
+        );
+
+        ctx.strokeStyle="#747983";
+        ctx.lineWidth=2;
+
+        if(r.w>r.h){
+
+            for(let x=r.x;x<r.x+r.w;x+=55){
+
+                ctx.setLineDash([22,25]);
+
+                ctx.beginPath();
+
+                ctx.moveTo(x,r.y+r.h/2);
+
+                ctx.lineTo(x+25,r.y+r.h/2);
+
+                ctx.stroke();
+
+            }
+
+        }else{
+
+            for(let y=r.y;y<r.y+r.h;y+=55){
+
+                ctx.setLineDash([22,25]);
+
+                ctx.beginPath();
+
+                ctx.moveTo(r.x+r.w/2,y);
+
+                ctx.lineTo(r.x+r.w/2,y+25);
+
+                ctx.stroke();
+
+            }
+
+        }
+
+        ctx.setLineDash([]);
+
+    });
+
+
+    /* buildings */
+
+    buildings.forEach(b=>{
+
+        /* shadow */
+
+        ctx.fillStyle="rgba(0,0,0,.3)";
+
+        ctx.fillRect(
+            b.x+10,
+            b.y+12,
+            b.w,
+            b.h
+        );
+
+
+        if(b.type==="tower"){
+
+            ctx.fillStyle="#68758a";
+
+        }
+        else if(b.type==="mall"){
+
+            ctx.fillStyle="#9a6271";
+
+        }
+        else if(b.type==="temple"){
+
+            ctx.fillStyle="#d39c42";
+
+        }
+        else{
+
+            ctx.fillStyle="#8b6654";
+
+        }
+
+        ctx.fillRect(
+            b.x,
+            b.y,
+            b.w,
+            b.h
+        );
+
+
+        /* roof */
+
+        ctx.fillStyle=
+            b.type==="temple"
+            ?"#bd4d39"
+            :"#353d4b";
+
+        ctx.fillRect(
+            b.x-5,
+            b.y-12,
+            b.w+10,
+            15
+        );
+
+
+        /* windows */
+
+        const cols=Math.floor(b.w/45);
+        const rows=Math.floor(b.h/45);
+
+        for(let cx=0;cx<cols;cx++){
+
+            for(let cy=0;cy<rows;cy++){
+
+                ctx.fillStyle=
+                    Math.random()<.2
+                    ?"#e9b949"
+                    :"#27303b";
+
+                ctx.fillRect(
+                    b.x+15+cx*45,
+                    b.y+22+cy*45,
+                    13,
+                    16
+                );
+
+            }
+
+        }
+
+
+        /* sign */
+
+        if(b.type==="mall"){
+
+            ctx.fillStyle="#f2c14e";
+
+            ctx.fillRect(
+                b.x+20,
+                b.y+10,
+                100,
+                22
+            );
+
+            ctx.fillStyle="#272b33";
+
+            ctx.font="bold 12px Arial";
+
+            ctx.fillText(
+                "CITY MALL",
+                b.x+35,
+                b.y+26
+            );
+
+        }
+
+    });
+
+
+    /* special locations */
+
+    locations.forEach(loc=>{
+
+        if(loc.type==="safe"){
+
+            ctx.fillStyle="#2d9d78";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                loc.x,
+                loc.y,
+                65,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+            ctx.fillStyle="white";
+
+            ctx.font="bold 15px Arial";
+
+            ctx.fillText(
+                "SAFE",
+                loc.x-22,
+                loc.y+5
+            );
+
+        }
+
+        if(loc.type==="hospital"){
+
+            ctx.fillStyle="#e8eeee";
+
+            ctx.fillRect(
+                loc.x-55,
+                loc.y-45,
+                110,
+                90
+            );
+
+            ctx.fillStyle="#e74c3c";
+
+            ctx.fillRect(
+                loc.x-10,
+                loc.y-30,
+                20,
+                60
+            );
+
+            ctx.fillRect(
+                loc.x-30,
+                loc.y-10,
+                60,
+                20
+            );
+
+        }
+
+        if(loc.type==="police"){
+
+            ctx.fillStyle="#344b71";
+
+            ctx.fillRect(
+                loc.x-60,
+                loc.y-40,
+                120,
+                80
+            );
+
+            ctx.fillStyle="white";
+
+            ctx.font="bold 13px Arial";
+
+            ctx.fillText(
+                "POLICE",
+                loc.x-25,
+                loc.y+5
+            );
+
+        }
+
+        if(loc.type==="temple"){
+
+            ctx.fillStyle="#d7aa4e";
+
+            ctx.beginPath();
+
+            ctx.moveTo(loc.x,loc.y-70);
+            ctx.lineTo(loc.x+55,loc.y+30);
+            ctx.lineTo(loc.x-55,loc.y+30);
+
+            ctx.fill();
+
+        }
+
+    });
+
+
+    /* cars */
+
+    cars.forEach(car=>{
+
+        ctx.save();
+
+        ctx.translate(car.x,car.y);
+
+        if(car.horizontal){
+
+            ctx.fillStyle=car.color;
+
+            ctx.fillRect(-25,-10,50,20);
+
+            ctx.fillStyle="#1c2430";
+
+            ctx.fillRect(-12,-8,22,8);
+
+        }else{
+
+            ctx.rotate(Math.PI/2);
+
+            ctx.fillStyle=car.color;
+
+            ctx.fillRect(-25,-10,50,20);
+
+            ctx.fillStyle="#1c2430";
+
+            ctx.fillRect(-12,-8,22,8);
+
+        }
+
+        ctx.restore();
+
+    });
+
+
+    /* NPC */
+
+    npcs.forEach(n=>{
+
+        if(n.hp<=0){
+
+            ctx.fillStyle="#202020";
+
+            ctx.fillRect(n.x-10,n.y-5,20,8);
+
+            return;
+
+        }
+
+        drawCharacter(
+            n.x,
+            n.y,
+            "#d9b18d",
+            n.weapon==="gun" ? "#394d75":"#8a5b78"
+        );
+
+        if(n.state==="flee"){
+
+            ctx.fillStyle="#ffdf55";
+
+            ctx.font="12px Arial";
+
+            ctx.fillText(
+                "!",
+                n.x-3,
+                n.y-22
+            );
+
+        }
+
+    });
+
+
+    /* zombies */
+
+    zombies.forEach(z=>{
+
+        if(z.hp<=0){
+
+            ctx.globalAlpha=.35;
+
+            ctx.fillStyle="#252c27";
+
+            ctx.fillRect(
+                z.x-12,
+                z.y-5,
+                24,
+                9
+            );
+
+            ctx.globalAlpha=1;
+
+            return;
+
+        }
+
+        drawZombie(z);
+
+    });
+
+
+    /* bullets */
+
+    bullets.forEach(b=>{
+
+        ctx.fillStyle=
+            b.owner==="player"
+            ?"#ffe66d"
+            :"#ff8a65";
+
+        ctx.fillRect(
+            b.x-3,
+            b.y-3,
+            6,
+            6
+        );
+
+    });
+
+
+    /* player */
+
+    drawCharacter(
+        player.x,
+        player.y,
+        "#f1c7aa",
+        player.outfit===0
+            ?"#5c78a8"
+            :player.outfit===1
+                ?"#4f8063"
+                :player.outfit===2
+                    ?"#8d526d"
+                    :"#66548d"
+    );
+
+
+    /* lock */
+
+    if(lockedTarget && lockedTarget.hp>0){
+
+        ctx.strokeStyle="#ffdd55";
+
+        ctx.lineWidth=3;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            lockedTarget.x,
+            lockedTarget.y,
+            25,
+            0,
+            Math.PI*2
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    ctx.restore();
+
+
+    /* night overlay */
+
+    const darkness=
+        Math.sin(timeOfDay*Math.PI*2)*.5+.5;
+
+    ctx.fillStyle=
+        `rgba(8,12,30,${darkness*.38})`;
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+
+
+/* =====================================================
+   CHARACTER DRAW
+===================================================== */
+
+function drawCharacter(x,y,skin,shirt){
+
+    /* shadow */
+
+    ctx.fillStyle="rgba(0,0,0,.3)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x,
+        y+12,
+        15,
+        7,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* body */
+
+    ctx.fillStyle=shirt;
+
+    ctx.fillRect(
+        x-10,
+        y-2,
+        20,
+        22
+    );
+
+
+    /* head */
+
+    ctx.fillStyle=skin;
+
+    ctx.fillRect(
+        x-9,
+        y-18,
+        18,
+        17
+    );
+
+
+    /* hair */
+
+    ctx.fillStyle="#382c30";
+
+    ctx.fillRect(
+        x-10,
+        y-21,
+        20,
+        7
+    );
+
+    ctx.fillRect(
+        x-11,
+        y-17,
+        4,
+        9
+    );
+
+
+    /* legs */
+
+    ctx.fillStyle="#252b36";
+
+    ctx.fillRect(
+        x-8,
+        y+19,
+        6,
+        11
+    );
+
+    ctx.fillRect(
+        x+2,
+        y+19,
+        6,
+        11
+    );
+
+}
+
+
+/* =====================================================
+   ZOMBIE DRAW
+===================================================== */
+
+function drawZombie(z){
+
+    ctx.fillStyle="rgba(0,0,0,.3)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        z.x,
+        z.y+12,
+        15,
+        7,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.fillStyle="#667c61";
+
+    ctx.fillRect(
+        z.x-11,
+        z.y-3,
+        22,
+        24
+    );
+
+
+    ctx.fillStyle="#92a47b";
+
+    ctx.fillRect(
+        z.x-10,
+        z.y-20,
+        20,
+        18
+    );
+
+
+    ctx.fillStyle="#ff4444";
+
+    ctx.fillRect(
+        z.x-6,
+        z.y-14,
+        4,
+        4
+    );
+
+    ctx.fillRect(
+        z.x+3,
+        z.y-14,
+        4,
+        4
+    );
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+function updateCamera(){
+
+    camera.x=
+        player.x-canvas.width/2;
+
+    camera.y=
+        player.y-canvas.height/2;
+
+
+    camera.x=Math.max(
+        0,
+        Math.min(
+            WORLD.width-canvas.width,
+            camera.x
+        )
+    );
+
+    camera.y=Math.max(
+        0,
+        Math.min(
+            WORLD.height-canvas.height,
+            camera.y
+        )
+    );
+
+}
+
+
+/* =====================================================
+   CAR MOVEMENT
+===================================================== */
+
+function updateCars(){
+
+    cars.forEach(car=>{
+
+        if(car.horizontal){
+
+            car.x+=car.speed;
+
+            if(car.x>WORLD.width+50){
+
+                car.x=-50;
+
+            }
+
+        }else{
+
+            car.y+=car.speed;
+
+            if(car.y>WORLD.height+50){
+
+                car.y=-50;
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =====================================================
+   MISSION
+===================================================== */
+
+function updateMission(){
+
+    const safe=locations[2];
+
+    const d=Math.hypot(
+        player.x-safe.x,
+        player.y-safe.y
+    );
+
+    if(d<100){
+
+        document.getElementById("mission").innerHTML=
+            "<b>MISSION COMPLETE</b><br>🛡️ เข้าสู่ Safe Zone สำเร็จ";
+
+        gainExp(50);
+
+    }else{
+
+        document.getElementById("mission").innerHTML=
+            "<b>OBJECTIVE</b><br>เดินทางไปยังจุดปลอดภัย";
+
+    }
+
+}
+
+
+/* =====================================================
+   DEATH
+===================================================== */
+
+function checkDeath(){
+
+    if(player.hp<=0){
+
+        player.hp=100;
+        player.hunger=70;
+        player.thirst=70;
+
+        player.x=2600;
+        player.y=2100;
+
+        showMessage("☠️ คุณเสียชีวิต — กลับสู่จุดปลอดภัย");
+
+    }
+
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function saveGame(){
+
+    localStorage.setItem(
+        "lastLightSave",
+        JSON.stringify(player)
+    );
+
+    showMessage("💾 เกมถูกบันทึก");
+
+}
+
+function loadGame(){
+
+    const data=
+        localStorage.getItem("lastLightSave");
+
+    if(data){
+
+        const saved=JSON.parse(data);
+
+        Object.assign(player,saved);
+
+    }
+
+}
+
+setInterval(saveGame,30000);
 
 loadGame();
-updateStats();
-updateClock();
-updateMinimap();
-camera();
-updateMovement();
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document.getElementById("shoot")
+.addEventListener("click",shoot);
+
+document.getElementById("lock")
+.addEventListener("click",lockTarget);
+
+document.getElementById("run")
+.addEventListener("mousedown",()=>{
+    keys["run"]=true;
+});
+
+document.getElementById("run")
+.addEventListener("mouseup",()=>{
+    keys["run"]=false;
+});
+
+document.getElementById("run")
+.addEventListener("touchstart",()=>{
+    keys["run"]=true;
+});
+
+document.getElementById("run")
+.addEventListener("touchend",()=>{
+    keys["run"]=false;
+});
+
+document.getElementById("bag")
+.addEventListener("click",toggleInventory);
+
+document.getElementById("med")
+.addEventListener("click",useMedicine);
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+function update(){
+
+    updatePlayer();
+
+    npcs.forEach(updateNPC);
+
+    zombies.forEach(updateZombie);
+
+    updateBullets();
+
+    updateCars();
+
+    updateSurvival();
+
+    updateCamera();
+
+    updateTime();
+
+    updateMission();
+
+    checkDeath();
+
+    updateHUD();
+
+    shootCooldown=Math.max(
+        0,
+        shootCooldown-1
+    );
+
+}
+
+
+function gameLoop(){
+
+    update();
+
+    drawWorld();
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+gameLoop();
+
+
+/* =====================================================
+   START MESSAGE
+===================================================== */
+
+setTimeout(()=>{
+
+    showMessage(
+        "🌃 กรุงเทพฯ ล่มสลายแล้ว — เอาชีวิตรอดให้ถึงเช้า"
+    );
+
+},500);
 
 </script>
 
