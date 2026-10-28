@@ -3,485 +3,701 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>LAST LIGHT — Pixel City</title>
+<title>LAST LIGHT — Survival City</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 *{box-sizing:border-box}
 
 html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#080b16;
-    color:#fff;
-    font-family:'Press Start 2P',monospace;
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#090b14;
+color:#fff;
+font-family:monospace;
 }
 
 body{
-    image-rendering:pixelated;
-}
-
-#game{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    overflow:hidden;
-    background:#111827;
-}
-
-/* WORLD */
-#world{
-    position:absolute;
-    width:2200px;
-    height:1500px;
-    left:0;
-    top:0;
-    background:#202637;
-}
-
-/* ground blocks */
-.ground{
-    position:absolute;
-    background:#252d40;
-}
-
-.road{
-    position:absolute;
-    background:#454b5c;
-}
-
-.road:before,
-.road:after{
-    content:"";
-    position:absolute;
-    background:#d8d6c9;
-}
-
-.road.horizontal:after{
-    width:100%;
-    height:5px;
-    top:50%;
-    left:0;
-    transform:translateY(-50%);
-    background:repeating-linear-gradient(
-        to right,
-        #d8d6c9 0 45px,
-        transparent 45px 90px
-    );
-}
-
-.road.vertical:after{
-    height:100%;
-    width:5px;
-    left:50%;
-    top:0;
-    transform:translateX(-50%);
-    background:repeating-linear-gradient(
-        to bottom,
-        #d8d6c9 0 45px,
-        transparent 45px 90px
-    );
-}
-
-/* buildings */
-.building{
-    position:absolute;
-    border:7px solid #171b2b;
-    background:#596174;
-    box-shadow:12px 12px 0 #121625;
-}
-
-.building:before{
-    content:"";
-    position:absolute;
-    inset:12px;
-    background:
-      repeating-linear-gradient(
-        to right,
-        #ffd86b 0 22px,
-        transparent 22px 43px
-      ),
-      repeating-linear-gradient(
-        to bottom,
-        #ffd86b 0 20px,
-        transparent 20px 39px
-      );
-    opacity:.75;
-}
-
-.b1{left:80px;top:80px;width:330px;height:270px;background:#596276}
-.b2{left:540px;top:70px;width:380px;height:300px;background:#684f69}
-.b3{left:1050px;top:100px;width:300px;height:250px;background:#486174}
-.b4{left:1510px;top:60px;width:430px;height:310px;background:#69545e}
-.b5{left:90px;top:620px;width:370px;height:290px;background:#4e6470}
-.b6{left:600px;top:650px;width:310px;height:250px;background:#695a68}
-.b7{left:1080px;top:600px;width:400px;height:300px;background:#536276}
-.b8{left:1610px;top:620px;width:330px;height:270px;background:#6a5964}
-.b9{left:80px;top:1120px;width:360px;height:260px;background:#596779}
-.b10{left:580px;top:1100px;width:390px;height:280px;background:#675b72}
-.b11{left:1120px;top:1080px;width:350px;height:300px;background:#536979}
-.b12{left:1600px;top:1100px;width:360px;height:270px;background:#705b62}
-
-/* signs */
-.sign{
-    position:absolute;
-    padding:12px 16px;
-    background:#f05b75;
-    color:white;
-    border:4px solid #191d2b;
-    box-shadow:5px 5px 0 #10131f;
-    font-size:11px;
-    z-index:4;
-}
-
-.s1{left:140px;top:280px}
-.s2{left:650px;top:300px;background:#54c6c0}
-.s3{left:1160px;top:290px;background:#f2a65a}
-.s4{left:1660px;top:300px;background:#b276e8}
-.s5{left:680px;top:850px;background:#ef6f61}
-.s6{left:1260px;top:850px;background:#55a9e8}
-.s7{left:1700px;top:850px;background:#e7c65c}
-
-/* neon */
-.neon{
-    position:absolute;
-    width:100px;
-    height:10px;
-    background:#63e6ff;
-    box-shadow:0 0 15px #63e6ff;
-    z-index:3;
-}
-
-.n1{left:470px;top:450px}
-.n2{left:970px;top:500px;background:#ff62cf;box-shadow:0 0 15px #ff62cf}
-.n3{left:1480px;top:470px;background:#b77cff;box-shadow:0 0 15px #b77cff}
-
-/* trees */
-.tree{
-    position:absolute;
-    width:55px;
-    height:80px;
-    z-index:5;
-}
-
-.tree:before{
-    content:"";
-    position:absolute;
-    width:45px;
-    height:45px;
-    left:5px;
-    top:0;
-    background:#3f936d;
-    border:5px solid #17251f;
-    border-radius:12px;
-    box-shadow:
-      18px 10px 0 #34765b,
-      -10px 15px 0 #34765b;
-}
-
-.tree:after{
-    content:"";
-    position:absolute;
-    width:12px;
-    height:38px;
-    left:22px;
-    top:42px;
-    background:#725044;
-    border:3px solid #2a2020;
-}
-
-.t1{left:480px;top:200px}
-.t2{left:980px;top:250px}
-.t3{left:1450px;top:220px}
-.t4{left:500px;top:800px}
-.t5{left:1000px;top:780px}
-.t6{left:1530px;top:820px}
-.t7{left:470px;top:1250px}
-.t8{left:1020px;top:1250px}
-.t9{left:1510px;top:1240px}
-
-/* cars */
-.car{
-    position:absolute;
-    width:90px;
-    height:42px;
-    background:#d94d61;
-    border:5px solid #171b29;
-    border-radius:8px;
-    z-index:6;
-}
-
-.car:before{
-    content:"";
-    position:absolute;
-    width:38px;
-    height:18px;
-    left:21px;
-    top:-18px;
-    background:#82a7c7;
-    border:5px solid #171b29;
-}
-
-.car:after{
-    content:"●   ●";
-    position:absolute;
-    bottom:-17px;
-    left:10px;
-    color:#10131d;
-    font-size:18px;
-    letter-spacing:28px;
-}
-
-.c1{left:300px;top:500px}
-.c2{left:1200px;top:470px;background:#4ea9d7}
-.c3{left:1750px;top:500px;background:#e3a74f}
-.c4{left:700px;top:980px;background:#b56ee4}
-
-/* player */
-#player{
-    position:absolute;
-    width:38px;
-    height:50px;
-    z-index:20;
-    transform:translate(-50%,-50%);
-}
-
-#player .head{
-    position:absolute;
-    width:30px;
-    height:28px;
-    left:4px;
-    top:0;
-    background:#f1c29b;
-    border:4px solid #171b29;
-}
-
-#player .hair{
-    position:absolute;
-    width:30px;
-    height:11px;
-    left:4px;
-    top:0;
-    background:#33252a;
-    border:4px solid #171b29;
-    z-index:2;
-}
-
-#player .body{
-    position:absolute;
-    width:32px;
-    height:25px;
-    left:3px;
-    top:25px;
-    background:#e56b91;
-    border:4px solid #171b29;
-}
-
-#player .leg{
-    position:absolute;
-    width:9px;
-    height:13px;
-    background:#292d42;
-    bottom:0;
-    border:3px solid #171b29;
-}
-
-#player .l1{left:5px}
-#player .l2{right:5px}
-
-/* NPC */
-.npc{
-    position:absolute;
-    width:32px;
-    height:48px;
-    z-index:15;
-}
-
-.npc .nh{
-    position:absolute;
-    width:25px;
-    height:24px;
-    left:3px;
-    background:#eab78f;
-    border:4px solid #171b29;
-}
-
-.npc .nb{
-    position:absolute;
-    width:28px;
-    height:25px;
-    left:2px;
-    bottom:0;
-    background:#58a6d8;
-    border:4px solid #171b29;
-}
-
-.npc1{left:470px;top:500px}
-.npc2{left:1030px;top:470px}
-.npc3{left:1510px;top:520px}
-.npc4{left:850px;top:950px}
-.npc5{left:1370px;top:980px}
-
-/* UI */
-#ui{
-    position:fixed;
-    top:15px;
-    left:15px;
-    z-index:100;
-    width:330px;
-    background:rgba(11,14,27,.93);
-    border:4px solid #e7d9b1;
-    padding:15px;
-    box-shadow:8px 8px 0 rgba(0,0,0,.5);
-}
-
-#ui h1{
-    font-size:14px;
-    margin:0 0 14px;
-    color:#ffd86b;
-}
-
-.stat{
-    margin:7px 0;
-    font-size:9px;
-}
-
-.bar{
-    height:13px;
-    margin-top:5px;
-    background:#272b3b;
-    border:2px solid #111522;
-}
-
-.fill{
-    height:100%;
-}
-
-.hp{background:#ef6675;width:78%}
-.food{background:#e7a84d;width:62%}
-.water{background:#58b7e8;width:71%}
-.energy{background:#8fd35f;width:88%}
-
-#money{
-    margin-top:10px;
-    color:#ffd86b;
-}
-
-#objective{
-    position:fixed;
-    top:15px;
-    right:15px;
-    z-index:100;
-    width:360px;
-    background:rgba(12,15,28,.94);
-    border:4px solid #e7d9b1;
-    padding:16px;
-    font-size:10px;
-    line-height:1.8;
-}
-
-#controls{
-    position:fixed;
-    bottom:15px;
-    left:15px;
-    z-index:100;
-    background:rgba(10,13,25,.9);
-    border:3px solid #777f98;
-    padding:12px;
-    font-size:8px;
-    line-height:1.8;
-}
-
-#inventory{
-    position:fixed;
-    bottom:15px;
-    right:15px;
-    z-index:100;
-    background:rgba(10,13,25,.94);
-    border:4px solid #e7d9b1;
-    padding:14px;
-    width:260px;
-}
-
-#inventory h2{
-    font-size:10px;
-    color:#ffd86b;
-    margin:0 0 12px;
-}
-
-.item{
-    display:flex;
-    justify-content:space-between;
-    font-size:8px;
-    margin:8px 0;
-}
-
-#message{
-    position:fixed;
-    left:50%;
-    bottom:90px;
-    transform:translateX(-50%);
-    z-index:150;
-    background:#111626;
-    border:3px solid #ffd86b;
-    padding:14px 20px;
-    font-size:9px;
-    opacity:0;
-    transition:.2s;
-}
-
-#message.show{
-    opacity:1;
-}
-
-#night{
-    position:fixed;
-    inset:0;
-    z-index:50;
-    pointer-events:none;
-    background:rgba(13,16,38,.22);
-}
-
-/* interaction */
-#interact{
-    position:fixed;
-    left:50%;
-    top:55%;
-    transform:translate(-50%,-50%);
-    z-index:120;
-    background:#171c2e;
-    border:4px solid #ffd86b;
-    padding:16px;
-    width:360px;
-    display:none;
-    text-align:center;
-}
-
-#interact h3{
-    color:#ffd86b;
-    font-size:11px;
-}
-
-#interact p{
-    font-size:8px;
-    line-height:1.8;
+image-rendering:pixelated;
 }
 
 button{
-    font-family:'Press Start 2P',monospace;
-    font-size:8px;
-    border:3px solid #111522;
-    padding:10px;
-    margin:4px;
-    background:#ffd86b;
-    cursor:pointer;
+font-family:monospace;
+cursor:pointer;
 }
 
-button:hover{
-    transform:translateY(-2px);
+#game{
+position:relative;
+width:100vw;
+height:100vh;
+overflow:hidden;
+background:#111522;
+}
+
+/* =========================
+   WORLD
+========================= */
+
+#world{
+position:absolute;
+width:3200px;
+height:2200px;
+background:
+linear-gradient(#252b3b 2px,transparent 2px),
+linear-gradient(90deg,#252b3b 2px,transparent 2px);
+background-size:32px 32px;
+}
+
+/* roads */
+
+.road{
+position:absolute;
+background:#464b5b;
+border-top:5px solid #252a38;
+border-bottom:5px solid #252a38;
+}
+
+.road.horizontal{
+height:170px;
+width:100%;
+}
+
+.road.vertical{
+width:170px;
+height:100%;
+border-left:5px solid #252a38;
+border-right:5px solid #252a38;
+}
+
+.road.horizontal:after{
+content:"";
+position:absolute;
+left:0;
+right:0;
+top:82px;
+height:5px;
+background:repeating-linear-gradient(
+90deg,
+#d6cfae 0 55px,
+transparent 55px 110px
+);
+}
+
+.road.vertical:after{
+content:"";
+position:absolute;
+top:0;
+bottom:0;
+left:82px;
+width:5px;
+background:repeating-linear-gradient(
+0deg,
+#d6cfae 0 55px,
+transparent 55px 110px
+);
+}
+
+/* city blocks */
+
+.building{
+position:absolute;
+border:7px solid #151928;
+box-shadow:12px 12px 0 rgba(0,0,0,.35);
+overflow:hidden;
+}
+
+.building:before{
+content:"";
+position:absolute;
+inset:20px;
+background:
+repeating-linear-gradient(
+90deg,
+#ffd56b 0 18px,
+transparent 18px 38px
+),
+repeating-linear-gradient(
+0deg,
+#ffd56b 0 17px,
+transparent 17px 37px
+);
+opacity:.65;
+}
+
+/* different buildings */
+
+.b1{left:70px;top:70px;width:430px;height:300px;background:#765d72}
+.b2{left:650px;top:60px;width:390px;height:340px;background:#596c80}
+.b3{left:1190px;top:70px;width:450px;height:300px;background:#805a62}
+.b4{left:1780px;top:60px;width:390px;height:350px;background:#5c6680}
+.b5{left:2310px;top:80px;width:500px;height:300px;background:#765f62}
+
+.b6{left:80px;top:590px;width:400px;height:320px;background:#566f78}
+.b7{left:620px;top:620px;width:430px;height:280px;background:#7a5e78}
+.b8{left:1190px;top:590px;width:390px;height:330px;background:#596f83}
+.b9{left:1740px;top:610px;width:450px;height:290px;background:#7c6265}
+.b10{left:2340px;top:600px;width:420px;height:320px;background:#606a83}
+
+.b11{left:60px;top:1130px;width:450px;height:300px;background:#6d6178}
+.b12{left:650px;top:1110px;width:380px;height:350px;background:#536c7d}
+.b13{left:1190px;top:1140px;width:440px;height:290px;background:#795f66}
+.b14{left:1780px;top:1110px;width:420px;height:340px;background:#586a7d}
+.b15{left:2320px;top:1140px;width:470px;height:300px;background:#755e70}
+
+.b16{left:80px;top:1690px;width:430px;height:330px;background:#536c78}
+.b17{left:650px;top:1660px;width:420px;height:350px;background:#786072}
+.b18{left:1210px;top:1690px;width:400px;height:320px;background:#596d82}
+.b19{left:1760px;top:1660px;width:450px;height:350px;background:#765d67}
+.b20{left:2350px;top:1700px;width:430px;height:300px;background:#59677b}
+
+/* windows */
+
+.window{
+position:absolute;
+width:28px;
+height:24px;
+background:#ffd86c;
+border:4px solid #1b2030;
+box-shadow:0 0 12px rgba(255,216,108,.4);
+}
+
+/* signs */
+
+.sign{
+position:absolute;
+z-index:8;
+padding:10px 14px;
+border:4px solid #161a28;
+box-shadow:6px 6px 0 #111522;
+font-size:12px;
+font-weight:bold;
+}
+
+.sign.pink{background:#ed6385}
+.sign.blue{background:#55aee0}
+.sign.yellow{background:#e5bd5c;color:#292318}
+.sign.purple{background:#a477df}
+.sign.green{background:#55a97e}
+
+/* city props */
+
+.tree{
+position:absolute;
+width:60px;
+height:90px;
+z-index:5;
+}
+
+.tree:before{
+content:"";
+position:absolute;
+width:54px;
+height:54px;
+left:3px;
+top:0;
+background:#3f8e68;
+border:6px solid #17251f;
+border-radius:10px;
+box-shadow:
+20px 9px 0 #327455,
+-12px 15px 0 #327455;
+}
+
+.tree:after{
+content:"";
+position:absolute;
+left:24px;
+top:52px;
+width:14px;
+height:38px;
+background:#704b3f;
+border:4px solid #2b2020;
+}
+
+/* cars */
+
+.car{
+position:absolute;
+width:95px;
+height:46px;
+border:5px solid #151927;
+border-radius:8px;
+z-index:6;
+}
+
+.car:before{
+content:"";
+position:absolute;
+width:42px;
+height:20px;
+left:21px;
+top:-20px;
+background:#7fa4bf;
+border:5px solid #151927;
+}
+
+.car:after{
+content:"●     ●";
+position:absolute;
+left:8px;
+bottom:-20px;
+font-size:18px;
+color:#10131c;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+#player{
+position:absolute;
+width:44px;
+height:58px;
+z-index:50;
+transform:translate(-50%,-50%);
+}
+
+.p-head{
+position:absolute;
+left:7px;
+top:0;
+width:30px;
+height:29px;
+background:#efbd96;
+border:4px solid #151927;
+}
+
+.p-hair{
+position:absolute;
+left:7px;
+top:0;
+width:30px;
+height:12px;
+background:#30252a;
+border:4px solid #151927;
+z-index:3;
+}
+
+.p-body{
+position:absolute;
+left:5px;
+top:26px;
+width:34px;
+height:26px;
+background:#e36c8e;
+border:4px solid #151927;
+}
+
+.p-leg{
+position:absolute;
+bottom:0;
+width:10px;
+height:14px;
+background:#2c3143;
+border:3px solid #151927;
+}
+
+.p-l{left:7px}
+.p-r{right:7px}
+
+/* =========================
+   NPC
+========================= */
+
+.npc{
+position:absolute;
+width:38px;
+height:56px;
+z-index:40;
+}
+
+.n-head{
+position:absolute;
+left:5px;
+top:0;
+width:28px;
+height:27px;
+background:#e9b58f;
+border:4px solid #171b29;
+}
+
+.n-body{
+position:absolute;
+left:3px;
+top:25px;
+width:32px;
+height:27px;
+background:#55a8d5;
+border:4px solid #171b29;
+}
+
+/* =========================
+   ZOMBIES
+========================= */
+
+.zombie{
+position:absolute;
+width:40px;
+height:58px;
+z-index:45;
+}
+
+.z-head{
+position:absolute;
+left:5px;
+top:0;
+width:30px;
+height:28px;
+background:#8aa67e;
+border:4px solid #17201b;
+}
+
+.z-body{
+position:absolute;
+left:4px;
+top:26px;
+width:32px;
+height:28px;
+background:#495b50;
+border:4px solid #17201b;
+}
+
+.zombie.danger .z-head{
+background:#b25b65;
+}
+
+/* =========================
+   HUD
+========================= */
+
+#hud{
+position:fixed;
+top:14px;
+left:14px;
+z-index:200;
+width:320px;
+padding:16px;
+background:rgba(9,12,23,.94);
+border:4px solid #ead9a7;
+box-shadow:8px 8px 0 rgba(0,0,0,.45);
+}
+
+#logo{
+font-size:17px;
+color:#ffd86b;
+margin-bottom:14px;
+}
+
+.day{
+font-size:10px;
+margin-bottom:12px;
+color:#bfc5d8;
+}
+
+.stat{
+font-size:9px;
+margin-top:7px;
+}
+
+.bar{
+height:13px;
+margin-top:4px;
+background:#252a39;
+border:2px solid #111522;
+}
+
+.fill{
+height:100%;
+transition:width .25s;
+}
+
+.health{background:#e86173}
+.hunger{background:#e8aa4e}
+.thirst{background:#55b8e8}
+.energy{background:#8dd25e}
+.infection{background:#b46bdd}
+
+#money{
+margin-top:13px;
+color:#ffd86b;
+font-size:10px;
+}
+
+/* objective */
+
+#objective{
+position:fixed;
+top:14px;
+right:14px;
+z-index:200;
+width:330px;
+padding:16px;
+background:rgba(9,12,23,.94);
+border:4px solid #ead9a7;
+box-shadow:8px 8px 0 rgba(0,0,0,.45);
+font-size:9px;
+line-height:1.8;
+}
+
+#objectiveTitle{
+color:#ffd86b;
+font-size:11px;
+margin-bottom:10px;
+}
+
+/* bottom UI */
+
+#bottom{
+position:fixed;
+bottom:14px;
+left:50%;
+transform:translateX(-50%);
+z-index:200;
+display:flex;
+gap:8px;
+}
+
+.action{
+background:#171c2d;
+color:white;
+border:3px solid #8b91a7;
+padding:12px 15px;
+font-size:8px;
+}
+
+.action:hover{
+background:#ffd86b;
+color:#111;
+}
+
+/* message */
+
+#message{
+position:fixed;
+left:50%;
+bottom:90px;
+transform:translateX(-50%);
+z-index:300;
+background:#111727;
+border:4px solid #ffd86b;
+padding:14px 20px;
+font-size:9px;
+opacity:0;
+pointer-events:none;
+transition:.2s;
+}
+
+#message.show{
+opacity:1;
+}
+
+/* dialogue */
+
+#dialogue{
+position:fixed;
+left:50%;
+bottom:105px;
+transform:translateX(-50%);
+width:min(720px,90vw);
+background:rgba(10,13,25,.97);
+border:5px solid #e7d9b1;
+z-index:500;
+padding:20px;
+display:none;
+box-shadow:10px 10px 0 rgba(0,0,0,.5);
+}
+
+#dialogueName{
+color:#ffd86b;
+font-size:11px;
+margin-bottom:12px;
+}
+
+#dialogueText{
+font-size:9px;
+line-height:2;
+min-height:50px;
+}
+
+.dialogueButtons{
+margin-top:15px;
+display:flex;
+flex-wrap:wrap;
+gap:7px;
+}
+
+.dialogueButtons button{
+background:#252c42;
+color:white;
+border:3px solid #69718a;
+padding:11px;
+}
+
+.dialogueButtons button:hover{
+background:#ffd86b;
+color:#111;
+}
+
+/* inventory */
+
+#inventory{
+position:fixed;
+right:20px;
+bottom:75px;
+z-index:350;
+width:300px;
+background:rgba(9,12,23,.97);
+border:4px solid #ead9a7;
+padding:17px;
+display:none;
+box-shadow:9px 9px 0 rgba(0,0,0,.5);
+}
+
+#inventory h2{
+font-size:12px;
+color:#ffd86b;
+margin:0 0 14px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+font-size:9px;
+padding:8px 0;
+border-bottom:1px solid #30364a;
+}
+
+/* shop */
+
+#shop{
+position:fixed;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+z-index:600;
+width:min(520px,92vw);
+background:#0b0f1c;
+border:5px solid #ead9a7;
+padding:20px;
+display:none;
+box-shadow:12px 12px 0 rgba(0,0,0,.6);
+}
+
+#shop h2{
+font-size:14px;
+color:#ffd86b;
+}
+
+.shopItem{
+display:flex;
+align-items:center;
+justify-content:space-between;
+border:2px solid #343b50;
+padding:12px;
+margin:8px 0;
+font-size:9px;
+}
+
+.shopItem button{
+background:#ffd86b;
+border:3px solid #171b28;
+padding:8px;
+}
+
+/* phone */
+
+#phone{
+position:fixed;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:300px;
+height:520px;
+background:#141827;
+border:8px solid #080a12;
+border-radius:28px;
+z-index:700;
+display:none;
+box-shadow:15px 15px 0 rgba(0,0,0,.5);
+padding:22px;
+}
+
+.phoneHead{
+font-size:10px;
+color:#ffd86b;
+margin-bottom:20px;
+}
+
+.phoneApp{
+background:#242b40;
+border:3px solid #555e77;
+padding:13px;
+margin:10px 0;
+font-size:8px;
+}
+
+/* minimap */
+
+#minimap{
+position:fixed;
+right:15px;
+top:170px;
+z-index:200;
+width:190px;
+height:130px;
+background:#1b2030;
+border:4px solid #ead9a7;
+overflow:hidden;
+}
+
+.mapRoad{
+position:absolute;
+background:#50576a;
+}
+
+.mapPlayer{
+position:absolute;
+width:8px;
+height:8px;
+background:#ff708e;
+z-index:5;
+}
+
+/* weather */
+
+#rain{
+position:fixed;
+inset:0;
+z-index:100;
+pointer-events:none;
+opacity:0;
+background:
+repeating-linear-gradient(
+110deg,
+transparent 0 25px,
+rgba(130,190,255,.22) 26px 28px
+);
+animation:rain .45s linear infinite;
+}
+
+@keyframes rain{
+from{background-position:0 0}
+to{background-position:-30px 60px}
+}
+
+/* vignette */
+
+#vignette{
+position:fixed;
+inset:0;
+z-index:90;
+pointer-events:none;
+background:radial-gradient(
+ellipse at center,
+transparent 45%,
+rgba(0,0,0,.35)
+);
 }
 </style>
 </head>
@@ -492,325 +708,1084 @@ button:hover{
 
 <div id="world">
 
-    <!-- roads -->
-    <div class="road horizontal" style="left:0;top:410px;width:2200px;height:150px"></div>
-    <div class="road horizontal" style="left:0;top:930px;width:2200px;height:150px"></div>
-    <div class="road vertical" style="left:430px;top:0;width:150px;height:1500px"></div>
-    <div class="road vertical" style="left:970px;top:0;width:150px;height:1500px"></div>
-    <div class="road vertical" style="left:1480px;top:0;width:150px;height:1500px"></div>
+<!-- ROADS -->
+<div class="road horizontal" style="top:430px"></div>
+<div class="road horizontal" style="top:970px"></div>
+<div class="road horizontal" style="top:1510px"></div>
 
-    <!-- buildings -->
-    <div class="building b1"></div>
-    <div class="building b2"></div>
-    <div class="building b3"></div>
-    <div class="building b4"></div>
-    <div class="building b5"></div>
-    <div class="building b6"></div>
-    <div class="building b7"></div>
-    <div class="building b8"></div>
-    <div class="building b9"></div>
-    <div class="building b10"></div>
-    <div class="building b11"></div>
-    <div class="building b12"></div>
+<div class="road vertical" style="left:470px"></div>
+<div class="road vertical" style="left:1080px"></div>
+<div class="road vertical" style="left:1660px"></div>
+<div class="road vertical" style="left:2240px"></div>
 
-    <!-- signs -->
-    <div class="sign s1">NIGHT MARKET</div>
-    <div class="sign s2">CAFE 24H</div>
-    <div class="sign s3">CLINIC</div>
-    <div class="sign s4">ARCADE</div>
-    <div class="sign s5">RAMEN</div>
-    <div class="sign s6">MINI MART</div>
-    <div class="sign s7">HOTEL</div>
+<!-- BUILDINGS -->
+<div class="building b1"></div>
+<div class="building b2"></div>
+<div class="building b3"></div>
+<div class="building b4"></div>
+<div class="building b5"></div>
+<div class="building b6"></div>
+<div class="building b7"></div>
+<div class="building b8"></div>
+<div class="building b9"></div>
+<div class="building b10"></div>
+<div class="building b11"></div>
+<div class="building b12"></div>
+<div class="building b13"></div>
+<div class="building b14"></div>
+<div class="building b15"></div>
+<div class="building b16"></div>
+<div class="building b17"></div>
+<div class="building b18"></div>
+<div class="building b19"></div>
+<div class="building b20"></div>
 
-    <!-- neon -->
-    <div class="neon n1"></div>
-    <div class="neon n2"></div>
-    <div class="neon n3"></div>
+<!-- SIGNS -->
+<div class="sign pink" style="left:145px;top:330px">NIGHT MARKET</div>
+<div class="sign blue" style="left:740px;top:330px">CAFE 24H</div>
+<div class="sign yellow" style="left:1300px;top:315px">CITY CLINIC</div>
+<div class="sign purple" style="left:1880px;top:335px">ARCADE</div>
+<div class="sign green" style="left:2460px;top:330px">MINI MART</div>
 
-    <!-- trees -->
-    <div class="tree t1"></div>
-    <div class="tree t2"></div>
-    <div class="tree t3"></div>
-    <div class="tree t4"></div>
-    <div class="tree t5"></div>
-    <div class="tree t6"></div>
-    <div class="tree t7"></div>
-    <div class="tree t8"></div>
-    <div class="tree t9"></div>
+<div class="sign pink" style="left:180px;top:900px">RAMEN</div>
+<div class="sign blue" style="left:740px;top:910px">HOTEL</div>
+<div class="sign yellow" style="left:1280px;top:900px">PHARMACY</div>
+<div class="sign purple" style="left:1880px;top:910px">MUSIC CLUB</div>
+<div class="sign green" style="left:2450px;top:900px">BOOK STORE</div>
 
-    <!-- cars -->
-    <div class="car c1"></div>
-    <div class="car c2"></div>
-    <div class="car c3"></div>
-    <div class="car c4"></div>
+<div class="sign blue" style="left:180px;top:1440px">APARTMENTS</div>
+<div class="sign pink" style="left:760px;top:1450px">BAKERY</div>
+<div class="sign yellow" style="left:1290px;top:1440px">SUPERMARKET</div>
+<div class="sign purple" style="left:1880px;top:1450px">CINEMA</div>
 
-    <!-- NPC -->
-    <div class="npc npc1"><div class="nh"></div><div class="nb"></div></div>
-    <div class="npc npc2"><div class="nh"></div><div class="nb"></div></div>
-    <div class="npc npc3"><div class="nh"></div><div class="nb"></div></div>
-    <div class="npc npc4"><div class="nh"></div><div class="nb"></div></div>
-    <div class="npc npc5"><div class="nh"></div><div class="nb"></div></div>
+<!-- TREES -->
+<div class="tree" style="left:560px;top:170px"></div>
+<div class="tree" style="left:1130px;top:200px"></div>
+<div class="tree" style="left:1710px;top:180px"></div>
+<div class="tree" style="left:2280px;top:210px"></div>
 
-    <!-- player -->
-    <div id="player">
-        <div class="head"></div>
-        <div class="hair"></div>
-        <div class="body"></div>
-        <div class="leg l1"></div>
-        <div class="leg l2"></div>
-    </div>
+<div class="tree" style="left:550px;top:720px"></div>
+<div class="tree" style="left:1130px;top:760px"></div>
+<div class="tree" style="left:1710px;top:740px"></div>
+<div class="tree" style="left:2290px;top:760px"></div>
+
+<div class="tree" style="left:560px;top:1280px"></div>
+<div class="tree" style="left:1130px;top:1300px"></div>
+<div class="tree" style="left:1710px;top:1280px"></div>
+<div class="tree" style="left:2280px;top:1310px"></div>
+
+<!-- CARS -->
+<div class="car" style="left:300px;top:500px;background:#d75a69"></div>
+<div class="car" style="left:760px;top:560px;background:#55a9d2"></div>
+<div class="car" style="left:1350px;top:500px;background:#e1a94e"></div>
+<div class="car" style="left:1940px;top:560px;background:#a879d8"></div>
+<div class="car" style="left:2500px;top:500px;background:#6fb778"></div>
+
+<!-- NPC -->
+<div class="npc" id="npc1" style="left:560px;top:510px">
+<div class="n-head"></div><div class="n-body"></div>
+</div>
+
+<div class="npc" id="npc2" style="left:1160px;top:530px">
+<div class="n-head"></div><div class="n-body" style="background:#d06a89"></div>
+</div>
+
+<div class="npc" id="npc3" style="left:1720px;top:510px">
+<div class="n-head"></div><div class="n-body" style="background:#75bd78"></div>
+</div>
+
+<div class="npc" id="npc4" style="left:2290px;top:520px">
+<div class="n-head"></div><div class="n-body" style="background:#9d79d5"></div>
+</div>
+
+<div class="npc" id="npc5" style="left:850px;top:1040px">
+<div class="n-head"></div><div class="n-body" style="background:#d39b56"></div>
+</div>
+
+<div class="npc" id="npc6" style="left:1450px;top:1040px">
+<div class="n-head"></div><div class="n-body" style="background:#58a9bd"></div>
+</div>
+
+<!-- ZOMBIES -->
+<div class="zombie danger" id="z1" style="left:1960px;top:700px">
+<div class="z-head"></div><div class="z-body"></div>
+</div>
+
+<div class="zombie" id="z2" style="left:2500px;top:1250px">
+<div class="z-head"></div><div class="z-body"></div>
+</div>
+
+<div class="zombie danger" id="z3" style="left:1450px;top:1800px">
+<div class="z-head"></div><div class="z-body"></div>
+</div>
+
+<!-- PLAYER -->
+<div id="player">
+<div class="p-head"></div>
+<div class="p-hair"></div>
+<div class="p-body"></div>
+<div class="p-leg p-l"></div>
+<div class="p-leg p-r"></div>
+</div>
 
 </div>
 
-<div id="night"></div>
+<!-- ATMOSPHERE -->
+<div id="rain"></div>
+<div id="vignette"></div>
 
-<!-- UI -->
-<div id="ui">
-    <h1>♥ LAST LIGHT</h1>
+<!-- HUD -->
+<div id="hud">
 
-    <div class="stat">HEALTH</div>
-    <div class="bar"><div class="fill hp"></div></div>
+<div id="logo">✦ LAST LIGHT</div>
 
-    <div class="stat">HUNGER</div>
-    <div class="bar"><div class="fill food"></div></div>
-
-    <div class="stat">THIRST</div>
-    <div class="bar"><div class="fill water"></div></div>
-
-    <div class="stat">ENERGY</div>
-    <div class="bar"><div class="fill energy"></div></div>
-
-    <div id="money">💰 $ 120</div>
+<div class="day">
+DAY <span id="day">01</span>
+&nbsp;&nbsp;
+<span id="clock">07:00</span>
 </div>
 
+<div class="stat">❤️ HEALTH</div>
+<div class="bar">
+<div class="fill health" id="healthBar"></div>
+</div>
+
+<div class="stat">🍖 HUNGER</div>
+<div class="bar">
+<div class="fill hunger" id="hungerBar"></div>
+</div>
+
+<div class="stat">💧 THIRST</div>
+<div class="bar">
+<div class="fill thirst" id="thirstBar"></div>
+</div>
+
+<div class="stat">⚡ ENERGY</div>
+<div class="bar">
+<div class="fill energy" id="energyBar"></div>
+</div>
+
+<div class="stat">🦠 INFECTION</div>
+<div class="bar">
+<div class="fill infection" id="infectionBar"></div>
+</div>
+
+<div id="money">💰 $ <span id="moneyValue">120</span></div>
+
+</div>
+
+<!-- OBJECTIVE -->
 <div id="objective">
-    <b>OBJECTIVE</b><br><br>
-    Find water and food before nightfall.
-    <br><br>
-    Explore the city and talk to people.
+
+<div id="objectiveTitle">CURRENT OBJECTIVE</div>
+
+Find water and food before nightfall.
+
+<br><br>
+
+<i>Explore the city. Talk to people.</i>
+
 </div>
 
-<div id="controls">
-    WASD / ARROW KEYS — MOVE<br>
-    E — INTERACT<br>
-    I — INVENTORY
+<!-- MINIMAP -->
+<div id="minimap">
+
+<div class="mapRoad" style="left:0;top:58px;width:190px;height:14px"></div>
+<div class="mapRoad" style="left:85px;top:0;width:14px;height:130px"></div>
+<div class="mapRoad" style="left:145px;top:0;width:14px;height:130px"></div>
+
+<div class="mapPlayer" id="mapPlayer"></div>
+
 </div>
 
-<div id="inventory">
-    <h2>🎒 INVENTORY</h2>
-    <div class="item"><span>💧 Water</span><span id="waterCount">1</span></div>
-    <div class="item"><span>🍜 Food</span><span id="foodCount">0</span></div>
-    <div class="item"><span>💊 Medicine</span><span>0</span></div>
-    <div class="item"><span>🔑 Old Key</span><span>1</span></div>
+<!-- CONTROLS -->
+<div id="bottom">
+
+<button class="action" onclick="openInventory()">🎒 BAG</button>
+<button class="action" onclick="openPhone()">📱 PHONE</button>
+<button class="action" onclick="rest()">🛏 REST</button>
+<button class="action" onclick="searchArea()">🔎 SEARCH</button>
+<button class="action" onclick="saveGame()">💾 SAVE</button>
+
 </div>
 
+<!-- MESSAGE -->
 <div id="message"></div>
 
-<div id="interact">
-    <h3 id="interactTitle">CITY</h3>
-    <p id="interactText"></p>
-    <button onclick="closeInteract()">CLOSE</button>
+<!-- DIALOGUE -->
+<div id="dialogue">
+
+<div id="dialogueName">NPC</div>
+
+<div id="dialogueText">
+...
+</div>
+
+<div class="dialogueButtons">
+
+<button onclick="dialogueChoice(1)">ถามเรื่องเมือง</button>
+
+<button onclick="dialogueChoice(2)">ถามเรื่องงาน</button>
+
+<button onclick="dialogueChoice(3)">ถามเรื่องการติดเชื้อ</button>
+
+<button onclick="closeDialogue()">เดินออกมา</button>
+
+</div>
+
+</div>
+
+<!-- INVENTORY -->
+<div id="inventory">
+
+<h2>🎒 INVENTORY</h2>
+
+<div class="item">
+<span>💧 Water</span>
+<span id="waterCount">1</span>
+</div>
+
+<div class="item">
+<span>🍞 Food</span>
+<span id="foodCount">0</span>
+</div>
+
+<div class="item">
+<span>💊 Medicine</span>
+<span id="medicineCount">0</span>
+</div>
+
+<div class="item">
+<span>🔦 Flashlight</span>
+<span>1</span>
+</div>
+
+<div class="item">
+<span>🔑 Old Key</span>
+<span>1</span>
+</div>
+
+<div class="item">
+<span>🔋 Battery</span>
+<span>2</span>
+</div>
+
+<button onclick="closeInventory()">CLOSE</button>
+
+</div>
+
+<!-- SHOP -->
+<div id="shop">
+
+<h2>🏪 MINI MART</h2>
+
+<div class="shopItem">
+<span>💧 Water — $5</span>
+<button onclick="buy('water')">BUY</button>
+</div>
+
+<div class="shopItem">
+<span>🍞 Food — $10</span>
+<button onclick="buy('food')">BUY</button>
+</div>
+
+<div class="shopItem">
+<span>💊 Medicine — $25</span>
+<button onclick="buy('medicine')">BUY</button>
+</div>
+
+<div class="shopItem">
+<span>🔋 Battery — $8</span>
+<button onclick="buy('battery')">BUY</button>
+</div>
+
+<button onclick="closeShop()">CLOSE</button>
+
+</div>
+
+<!-- PHONE -->
+<div id="phone">
+
+<div class="phoneHead">
+📱 PHONE
+</div>
+
+<div class="phoneApp">
+💬 MESSAGES<br><br>
+No new messages.
+</div>
+
+<div class="phoneApp">
+🗺️ CITY MAP<br><br>
+Several districts remain unexplored.
+</div>
+
+<div class="phoneApp">
+📋 QUESTS<br><br>
+Find water and food.
+</div>
+
+<div class="phoneApp">
+🧠 NOTES<br><br>
+“Don't trust the lights.”
+</div>
+
+<button onclick="closePhone()">CLOSE</button>
+
 </div>
 
 </div>
 
 <script>
 
-const world = document.getElementById("world");
-const player = document.getElementById("player");
-const message = document.getElementById("message");
-const interact = document.getElementById("interact");
-const interactTitle = document.getElementById("interactTitle");
-const interactText = document.getElementById("interactText");
+/* =========================
+   GAME STATE
+========================= */
 
-let px = 1120;
-let py = 520;
+const player = document.getElementById("player");
+const world = document.getElementById("world");
+
+let px = 1500;
+let py = 820;
 
 let speed = 5;
-let keys = {};
+let running = false;
+
+let day = 1;
+let minutes = 420;
+
+let health = 100;
+let hunger = 72;
+let thirst = 78;
+let energy = 90;
+let infection = 0;
 
 let money = 120;
-let water = 1;
-let food = 0;
 
-let gameTime = 18;
+let inventory = {
+water:1,
+food:0,
+medicine:0,
+battery:2,
+flashlight:1,
+key:1
+};
 
-document.addEventListener("keydown", e => {
-    keys[e.key.toLowerCase()] = true;
+let keys = {};
 
-    if(e.key.toLowerCase() === "e"){
-        interactNearby();
-    }
+let weather = "clear";
 
-    if(e.key.toLowerCase() === "i"){
-        document.getElementById("inventory").style.display =
-        document.getElementById("inventory").style.display === "none"
-        ? "block"
-        : "none";
-    }
-});
+/* =========================
+   CONTROLS
+========================= */
 
-document.addEventListener("keyup", e => {
-    keys[e.key.toLowerCase()] = false;
-});
+document.addEventListener("keydown",function(e){
 
-function move(){
+keys[e.key.toLowerCase()] = true;
 
-    let dx = 0;
-    let dy = 0;
-
-    if(keys["w"] || keys["arrowup"]) dy -= speed;
-    if(keys["s"] || keys["arrowdown"]) dy += speed;
-    if(keys["a"] || keys["arrowleft"]) dx -= speed;
-    if(keys["d"] || keys["arrowright"]) dx += speed;
-
-    px += dx;
-    py += dy;
-
-    px = Math.max(25,Math.min(2175,px));
-    py = Math.max(25,Math.min(1475,py));
-
-    player.style.left = px + "px";
-    player.style.top = py + "px";
-
-    camera();
-
-    if(dx || dy){
-        gameTime += .003;
-        if(gameTime >= 24) gameTime = 0;
-        updateNight();
-    }
-
-    requestAnimationFrame(move);
+if(e.key.toLowerCase()==="e"){
+interact();
 }
+
+if(e.key.toLowerCase()==="i"){
+openInventory();
+}
+
+if(e.key.toLowerCase()==="p"){
+openPhone();
+}
+
+});
+
+document.addEventListener("keyup",function(e){
+
+keys[e.key.toLowerCase()] = false;
+
+});
+
+/* =========================
+   MOVEMENT
+========================= */
+
+function updateMovement(){
+
+let dx=0;
+let dy=0;
+
+if(keys["w"] || keys["arrowup"]) dy-=1;
+if(keys["s"] || keys["arrowdown"]) dy+=1;
+if(keys["a"] || keys["arrowleft"]) dx-=1;
+if(keys["d"] || keys["arrowright"]) dx+=1;
+
+running =
+keys["shift"] &&
+energy>1;
+
+let currentSpeed =
+running ? 8 : speed;
+
+if(dx!==0 || dy!==0){
+
+if(dx!==0 && dy!==0){
+dx*=.7;
+dy*=.7;
+}
+
+px += dx*currentSpeed;
+py += dy*currentSpeed;
+
+if(running){
+energy-=.05;
+}
+
+px=Math.max(30,Math.min(3170,px));
+py=Math.max(30,Math.min(2170,py));
+
+}
+
+player.style.left=px+"px";
+player.style.top=py+"px";
+
+camera();
+
+updateMinimap();
+
+requestAnimationFrame(updateMovement);
+
+}
+
+/* =========================
+   CAMERA
+========================= */
 
 function camera(){
 
-    let x = window.innerWidth/2 - px;
-    let y = window.innerHeight/2 - py;
+let cx =
+window.innerWidth/2-px;
 
-    x = Math.min(0,Math.max(window.innerWidth-2200,x));
-    y = Math.min(0,Math.max(window.innerHeight-1500,y));
+let cy =
+window.innerHeight/2-py;
 
-    world.style.transform =
-        `translate(${x}px,${y}px)`;
+cx=Math.min(
+0,
+Math.max(
+window.innerWidth-3200,
+cx
+)
+);
+
+cy=Math.min(
+0,
+Math.max(
+window.innerHeight-2200,
+cy
+)
+);
+
+world.style.transform=
+`translate(${cx}px,${cy}px)`;
+
 }
 
-function updateNight(){
+/* =========================
+   TIME
+========================= */
 
-    let darkness = 0;
+setInterval(function(){
 
-    if(gameTime >= 19 || gameTime < 6){
-        darkness = .48;
-    }else if(gameTime >= 17){
-        darkness = .25;
-    }else{
-        darkness = .12;
-    }
+minutes++;
 
-    document.getElementById("night").style.background =
-        `rgba(10,13,38,${darkness})`;
+if(minutes>=1440){
+
+minutes=0;
+day++;
+
+showMessage("🌅 DAY "+day+" — A new day begins.");
+
 }
 
-function distance(x,y){
-    return Math.sqrt(
-        Math.pow(px-x,2)+
-        Math.pow(py-y,2)
-    );
+updateClock();
+
+},1500);
+
+function updateClock(){
+
+let h=Math.floor(minutes/60);
+let m=minutes%60;
+
+let suffix=h>=12?"PM":"AM";
+
+let display=h%12;
+
+if(display===0) display=12;
+
+document.getElementById("clock").textContent=
+String(display).padStart(2,"0")+":"+
+String(m).padStart(2,"0")+" "+suffix;
+
+document.getElementById("day").textContent=
+String(day).padStart(2,"0");
+
+updateLighting();
+
 }
 
-function interactNearby(){
+/* =========================
+   DAY / NIGHT
+========================= */
 
-    let found = false;
+function updateLighting(){
 
-    const npcs = [
-        [470,500,"Street Vendor",
-        "คืนนี้คนเยอะกว่าปกติ... ถ้าหิวนะ ร้าน RAMEN ตรงหัวมุมยังเปิดอยู่"],
+let hour=minutes/60;
 
-        [1030,470,"Old Man",
-        "เมืองนี้เปลี่ยนไปมากตั้งแต่คืนที่ไฟดับครั้งแรก..."],
+let darkness=0;
 
-        [1510,520,"Girl with Backpack",
-        "ถ้าคุณกำลังหาน้ำ ลองไปที่ MINI MART ดูสิ"],
-
-        [850,950,"Delivery Worker",
-        "ฉันเห็นบางอย่างแปลก ๆ แถวโรงแรมเมื่อคืน..."],
-
-        [1370,980,"Musician",
-        "บางครั้งเมืองที่ไม่หลับ ก็มีความลับที่ไม่อยากให้ใครรู้"]
-    ];
-
-    for(const n of npcs){
-
-        if(distance(n[0],n[1]) < 80){
-
-            openInteract(n[2],n[3]);
-            found = true;
-            break;
-        }
-    }
-
-    if(!found){
-
-        if(distance(1260,850)<100){
-
-            if(money >= 10){
-
-                money -= 10;
-                food++;
-
-                document.getElementById("foodCount").textContent = food;
-
-                showMessage("🍜 ซื้ออาหารแล้ว! -$10");
-            }else{
-                showMessage("เงินไม่พอ...");
-            }
-
-            return;
-        }
-
-        if(distance(1260,850)<180){
-
-            openInteract(
-                "MINI MART",
-                "ร้านเล็ก ๆ ที่ยังเปิดไฟอยู่ท่ามกลางเมืองยามค่ำคืน."
-            );
-
-            return;
-        }
-
-        showMessage("ไม่มีอะไรให้ทำตรงนี้...");
-    }
+if(hour>=19 || hour<5){
+darkness=.55;
+}
+else if(hour>=17){
+darkness=.30;
+}
+else if(hour<7){
+darkness=.18;
+}
+else{
+darkness=.08;
 }
 
-function openInteract(title,text){
+document.getElementById("vignette").style.background=
+`radial-gradient(
+ellipse at center,
+transparent 42%,
+rgba(5,7,18,${darkness}) 100%
+)`;
 
-    interactTitle.textContent = title;
-    interactText.textContent = text;
-
-    interact.style.display = "block";
 }
 
-function closeInteract(){
-    interact.style.display = "none";
+/* =========================
+   NEEDS
+========================= */
+
+setInterval(function(){
+
+hunger-=.35;
+thirst-=.55;
+energy+=.05;
+
+if(hunger<0) hunger=0;
+if(thirst<0) thirst=0;
+if(energy>100) energy=100;
+
+if(hunger<15){
+health-=.25;
 }
+
+if(thirst<15){
+health-=.4;
+}
+
+health=Math.max(0,health);
+
+updateStats();
+
+if(health<=0){
+gameOver();
+}
+
+},2500);
+
+function updateStats(){
+
+document.getElementById("healthBar").style.width=
+health+"%";
+
+document.getElementById("hungerBar").style.width=
+hunger+"%";
+
+document.getElementById("thirstBar").style.width=
+thirst+"%";
+
+document.getElementById("energyBar").style.width=
+energy+"%";
+
+document.getElementById("infectionBar").style.width=
+infection+"%";
+
+document.getElementById("moneyValue").textContent=
+money;
+
+document.getElementById("waterCount").textContent=
+inventory.water;
+
+document.getElementById("foodCount").textContent=
+inventory.food;
+
+document.getElementById("medicineCount").textContent=
+inventory.medicine;
+
+}
+
+/* =========================
+   INTERACTION
+========================= */
+
+function interact(){
+
+let nearest=null;
+let best=100;
+
+document.querySelectorAll(".npc").forEach(n=>{
+
+let x=parseFloat(n.style.left);
+let y=parseFloat(n.style.top);
+
+let d=Math.hypot(px-x,py-y);
+
+if(d<best){
+
+best=d;
+nearest=n;
+
+}
+
+});
+
+if(nearest){
+
+openDialogue(
+"STRANGER",
+"คุณดูเหมือนคนที่เพิ่งมาถึงเมืองนี้..."
+);
+
+return;
+
+}
+
+let shopX=2470;
+let shopY=900;
+
+if(Math.hypot(px-shopX,py-shopY)<140){
+
+openShop();
+return;
+
+}
+
+showMessage("ไม่มีอะไรน่าสนใจอยู่ใกล้ ๆ");
+
+}
+
+/* =========================
+   DIALOGUE
+========================= */
+
+function openDialogue(name,text){
+
+document.getElementById("dialogueName").textContent=
+name;
+
+document.getElementById("dialogueText").textContent=
+text;
+
+document.getElementById("dialogue").style.display=
+"block";
+
+}
+
+function dialogueChoice(choice){
+
+let text="";
+
+if(choice===1){
+
+text=
+"ไฟดับมาแล้วสามวัน ถนนฝั่งตะวันตกเริ่มไม่มีคนเดิน...";
+
+}
+
+if(choice===2){
+
+text=
+"ถ้าต้องการเงิน ลองไปถามร้าน Night Market พวกเขายังรับคนอยู่.";
+
+}
+
+if(choice===3){
+
+text=
+"อย่าให้พวกมันกัด ถ้าแผลเริ่มเปลี่ยนสี...อย่ารอ.";
+
+}
+
+document.getElementById("dialogueText").textContent=
+text;
+
+}
+
+function closeDialogue(){
+
+document.getElementById("dialogue").style.display=
+"none";
+
+}
+
+/* =========================
+   INVENTORY
+========================= */
+
+function openInventory(){
+
+document.getElementById("inventory").style.display=
+"block";
+
+}
+
+function closeInventory(){
+
+document.getElementById("inventory").style.display=
+"none";
+
+}
+
+/* =========================
+   SHOP
+========================= */
+
+function openShop(){
+
+document.getElementById("shop").style.display=
+"block";
+
+}
+
+function closeShop(){
+
+document.getElementById("shop").style.display=
+"none";
+
+}
+
+function buy(item){
+
+let prices={
+water:5,
+food:10,
+medicine:25,
+battery:8
+};
+
+if(money<prices[item]){
+
+showMessage("💸 เงินไม่พอ");
+
+return;
+
+}
+
+money-=prices[item];
+
+inventory[item]++;
+
+updateStats();
+
+showMessage("ซื้อของเรียบร้อย");
+
+}
+
+/* =========================
+   REST
+========================= */
+
+function rest(){
+
+if(energy<100){
+
+energy+=25;
+
+if(energy>100)
+energy=100;
+
+hunger-=5;
+thirst-=7;
+
+minutes+=60;
+
+showMessage("🛏 คุณพักหนึ่งชั่วโมง");
+
+updateStats();
+updateClock();
+
+}
+
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+function searchArea(){
+
+let roll=Math.random();
+
+if(roll<.25){
+
+inventory.food++;
+
+showMessage("🍞 พบอาหาร!");
+
+}
+
+else if(roll<.45){
+
+inventory.water++;
+
+showMessage("💧 พบน้ำ!");
+
+}
+
+else if(roll<.55){
+
+inventory.medicine++;
+
+showMessage("💊 พบยา!");
+
+}
+
+else if(roll<.72){
+
+money+=10;
+
+showMessage("💰 พบเงิน $10");
+
+}
+
+else{
+
+showMessage("🔎 ไม่พบอะไร");
+
+}
+
+updateStats();
+
+}
+
+/* =========================
+   PHONE
+========================= */
+
+function openPhone(){
+
+document.getElementById("phone").style.display=
+"block";
+
+}
+
+function closePhone(){
+
+document.getElementById("phone").style.display=
+"none";
+
+}
+
+/* =========================
+   MINIMAP
+========================= */
+
+function updateMinimap(){
+
+let mx=(px/3200)*180;
+let my=(py/2200)*120;
+
+let mapPlayer=
+document.getElementById("mapPlayer");
+
+mapPlayer.style.left=
+mx+"px";
+
+mapPlayer.style.top=
+my+"px";
+
+}
+
+/* =========================
+   ZOMBIE AI
+========================= */
+
+function zombieAI(){
+
+document.querySelectorAll(".zombie").forEach(z=>{
+
+let zx=parseFloat(z.style.left);
+let zy=parseFloat(z.style.top);
+
+let d=Math.hypot(px-zx,py-zy);
+
+if(d<260){
+
+let angle=Math.atan2(
+py-zy,
+px-zx
+);
+
+zx+=Math.cos(angle)*.45;
+zy+=Math.sin(angle)*.45;
+
+z.style.left=zx+"px";
+z.style.top=zy+"px";
+
+if(d<55){
+
+health-=.3;
+infection+=.12;
+
+showMessage("🧟 YOU WERE ATTACKED");
+
+updateStats();
+
+}
+
+}
+
+});
+
+}
+
+setInterval(zombieAI,120);
+
+/* =========================
+   RANDOM EVENTS
+========================= */
+
+setInterval(function(){
+
+if(Math.random()<.25){
+
+let events=[
+
+"🌫️ หมอกเริ่มลงจัด",
+"📻 วิทยุในกระเป๋ามีสัญญาณแปลก ๆ",
+"🚨 ได้ยินเสียงไซเรนจากทางเหนือ",
+"🧟 มีบางอย่างเคลื่อนไหวอยู่ในตรอก",
+"🌧️ ฝนเริ่มตก",
+"👤 มีคนกำลังเดินตามคุณ..."
+
+];
+
+let event=
+events[Math.floor(Math.random()*events.length)];
+
+showMessage(event);
+
+}
+
+},12000);
+
+/* =========================
+   SAVE
+========================= */
+
+function saveGame(){
+
+localStorage.setItem(
+"lastLightSave",
+JSON.stringify({
+
+px,
+py,
+day,
+minutes,
+health,
+hunger,
+thirst,
+energy,
+infection,
+money,
+inventory
+
+})
+);
+
+showMessage("💾 GAME SAVED");
+
+}
+
+/* =========================
+   LOAD
+========================= */
+
+function loadGame(){
+
+let save=
+localStorage.getItem("lastLightSave");
+
+if(!save)return;
+
+let data=JSON.parse(save);
+
+px=data.px;
+py=data.py;
+day=data.day;
+minutes=data.minutes;
+health=data.health;
+hunger=data.hunger;
+thirst=data.thirst;
+energy=data.energy;
+infection=data.infection;
+money=data.money;
+inventory=data.inventory;
+
+updateStats();
+updateClock();
+
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+function gameOver(){
+
+alert(
+"YOU DIED\n\n"+
+"DAY "+day+
+"\n\nThe city swallowed another survivor."
+);
+
+location.reload();
+
+}
+
+/* =========================
+   MESSAGE
+========================= */
 
 function showMessage(text){
 
-    message.textContent = text;
-    message.classList.add("show");
+let box=
+document.getElementById("message");
 
-    setTimeout(()=>{
-        message.classList.remove("show");
-    },2200);
+box.textContent=text;
+
+box.classList.add("show");
+
+setTimeout(function(){
+
+box.classList.remove("show");
+
+},2200);
+
 }
 
-player.style.left = px+"px";
-player.style.top = py+"px";
+/* =========================
+   START
+========================= */
 
-updateNight();
+loadGame();
+updateStats();
+updateClock();
+updateMinimap();
 camera();
-move();
+updateMovement();
 
 </script>
 
