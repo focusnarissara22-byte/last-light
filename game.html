@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LAST LIGHT</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #090b0d;
+    color: #e7e1d2;
+    font-family: "Courier New", monospace;
+}
+
+button {
+    font-family: inherit;
+}
+
+#game {
+    min-height: 100vh;
+    max-width: 1100px;
+    margin: auto;
+    padding: 18px;
+}
+
+/* HEADER */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #343a3d;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.logo {
+    font-size: 28px;
+    letter-spacing: 5px;
+    color: #f0e8d4;
+}
+
+.day {
+    color: #8c9694;
+    font-size: 13px;
+}
+
+/* STATUS */
+
+.status {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.stat {
+    background: #111518;
+    border: 1px solid #292f32;
+    padding: 10px;
+    text-align: center;
+}
+
+.stat-name {
+    font-size: 11px;
+    color: #7f8987;
+}
+
+.stat-value {
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+/* MAIN */
+
+.screen {
+    background: #111416;
+    border: 1px solid #303638;
+    min-height: 480px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* PIXEL CITY */
+
+.scene {
+    height: 270px;
+    position: relative;
+    background:
+        linear-gradient(
+            rgba(0,0,0,.35),
+            rgba(0,0,0,.65)
+        ),
+        linear-gradient(
+            #242b2d 0 55%,
+            #171b1d 55% 100%
+        );
+    overflow: hidden;
+}
+
+.moon {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #d5d0bc;
+    right: 12%;
+    top: 25px;
+    box-shadow: 0 0 35px rgba(220,215,190,.18);
+}
+
+.building {
+    position: absolute;
+    bottom: 55px;
+    background: #101416;
+    border: 2px solid #202729;
+}
+
+.b1 {
+    left: 4%;
+    width: 120px;
+    height: 125px;
+}
+
+.b2 {
+    left: 18%;
+    width: 95px;
+    height: 165px;
+}
+
+.b3 {
+    right: 20%;
+    width: 140px;
+    height: 140px;
+}
+
+.b4 {
+    right: 3%;
+    width: 100px;
+    height: 190px;
+}
+
+.window {
+    position: absolute;
+    width: 8px;
+    height: 10px;
+    background: #7d765c;
+}
+
+.w1 { left: 15px; top: 20px; }
+.w2 { left: 45px; top: 45px; }
+.w3 { left: 75px; top: 20px; }
+.w4 { left: 30px; top: 80px; }
+.w5 { left: 65px; top: 100px; }
+
+.street {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 58px;
+    background: #0d1012;
+    border-top: 2px solid #292e30;
+}
+
+.road-line {
+    position: absolute;
+    width: 80px;
+    height: 3px;
+    background: #454746;
+    top: 27px;
+}
+
+.r1 { left: 8%; }
+.r2 { left: 32%; }
+.r3 { left: 56%; }
+.r4 { left: 80%; }
+
+.zombie {
+    position: absolute;
+    bottom: 58px;
+    right: 38%;
+    font-size: 42px;
+    filter: grayscale(1);
+}
+
+/* STORY */
+
+.story {
+    padding: 25px;
+}
+
+.location {
+    color: #929b97;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    margin: 0 0 15px;
+    font-size: 25px;
+    letter-spacing: 2px;
+}
+
+.story-text {
+    color: #c4c0b5;
+    line-height: 1.8;
+    font-size: 15px;
+    min-height: 85px;
+}
+
+/* CHOICES */
+
+.choices {
+    display: grid;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.choice {
+    background: #181d20;
+    color: #ded8ca;
+    border: 1px solid #394043;
+    padding: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.choice:hover {
+    background: #242b2d;
+    border-color: #aaa38e;
+    transform: translateX(3px);
+}
+
+.choice small {
+    display: block;
+    color: #747e7c;
+    margin-top: 5px;
+}
+
+/* INVENTORY */
+
+.inventory {
+    margin-top: 15px;
+    border: 1px solid #292f32;
+    background: #101315;
+    padding: 15px;
+}
+
+.inventory-title {
+    color: #8e9794;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.item {
+    background: #1b2022;
+    border: 1px solid #303638;
+    padding: 7px 10px;
+    font-size: 12px;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    color: #505958;
+    font-size: 10px;
+    padding: 18px;
+    letter-spacing: 1px;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    #game {
+        padding: 10px;
+    }
+
+    .status {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .scene {
+        height: 220px;
+    }
+
+    .logo {
+        font-size: 21px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .story {
+        padding: 18px;
+    }
+
+    .story-text {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<header>
+    <div class="logo">LAST LIGHT</div>
+    <div class="day" id="day">DAY 01 — 21:47</div>
+</header>
+
+<div class="status">
+
+    <div class="stat">
+        <div class="stat-name">HEALTH</div>
+        <div class="stat-value" id="health">100</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">HUNGER</div>
+        <div class="stat-value" id="hunger">82</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">THIRST</div>
+        <div class="stat-value" id="thirst">76</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">SANITY</div>
+        <div class="stat-value" id="sanity">91</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-name">AMMO</div>
+        <div class="stat-value" id="ammo">6</div>
+    </div>
+
+</div>
+
+<div class="screen">
+
+    <div class="scene">
+
+        <div class="moon"></div>
+
+        <div class="building b1">
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+            <div class="window w3"></div>
+            <div class="window w4"></div>
+        </div>
+
+        <div class="building b2">
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+            <div class="window w3"></div>
+            <div class="window w5"></div>
+        </div>
+
+        <div class="building b3">
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+            <div class="window w3"></div>
+            <div class="window w4"></div>
+        </div>
+
+        <div class="building b4">
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+            <div class="window w3"></div>
+            <div class="window w5"></div>
+        </div>
+
+        <div class="zombie">🧟</div>
+
+        <div class="street">
+            <div class="road-line r1"></div>
+            <div class="road-line r2"></div>
+            <div class="road-line r3"></div>
+            <div class="road-line r4"></div>
+        </div>
+
+    </div>
+
+    <div class="story">
+
+        <div class="location" id="location">
+            BANGKOK — UNKNOWN DISTRICT
+        </div>
+
+        <h1 id="title">
+            THE LAST NIGHT
+        </h1>
+
+        <div class="story-text" id="text">
+            ฝนหยุดตกเมื่อหนึ่งชั่วโมงก่อน
+
+            เมืองทั้งเมืองเงียบผิดปกติ
+
+            ไม่มีรถ ไม่มีเสียงผู้คน มีเพียงเสียงไซเรน
+            ที่ดังขึ้นเป็นครั้งคราวจากที่ไหนสักแห่งในความมืด
+
+            คุณอยู่คนเดียวในอพาร์ตเมนต์ชั้น 17
+
+            แบตเตอรี่โทรศัพท์เหลือ 12%
+
+            และเมื่อเวลา 21:47 น.
+            เสียงบางอย่างดังขึ้นจากทางเดินหน้าห้อง
+
+            สามครั้ง
+
+            กึก...
+
+            กึก...
+
+            กึก...
+
+            แล้วทุกอย่างก็เงียบลง
+        </div>
+
+        <div class="choices" id="choices">
+
+            <button class="choice" onclick="choose(1)">
+                ตรวจดูประตู
+                <small>คุณอาจได้รู้ว่าเกิดอะไรขึ้นด้านนอก</small>
+            </button>
+
+            <button class="choice" onclick="choose(2)">
+                ปิดไฟและซ่อนตัว
+                <small>บางทีสิ่งที่อยู่ข้างนอกอาจมองไม่เห็นคุณ</small>
+            </button>
+
+            <button class="choice" onclick="choose(3)">
+                เตรียมกระเป๋าแล้วออกทางบันไดหนีไฟ
+                <small>เสี่ยงมาก แต่การอยู่ที่นี่ก็อาจไม่ปลอดภัย</small>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="inventory">
+
+    <div class="inventory-title">
+        INVENTORY
+    </div>
+
+    <div class="items" id="items">
+
+        <div class="item">🔦 Flashlight</div>
+        <div class="item">📱 Phone 12%</div>
+        <div class="item">🔪 Kitchen Knife</div>
+        <div class="item">🥫 Canned Food ×2</div>
+        <div class="item">💧 Water ×1</div>
+
+    </div>
+
+</div>
+
+<footer>
+    LAST LIGHT // SURVIVAL IS NOT GUARANTEED
+</footer>
+
+</div>
+
+<script>
+
+let health = 100;
+let hunger = 82;
+let thirst = 76;
+let sanity = 91;
+let ammo = 6;
+
+let day = 1;
+let hour = 21;
+let minute = 47;
+
+function updateStats() {
+
+    document.getElementById("health").textContent = health;
+    document.getElementById("hunger").textContent = hunger;
+    document.getElementById("thirst").textContent = thirst;
+    document.getElementById("sanity").textContent = sanity;
+    document.getElementById("ammo").textContent = ammo;
+
+    document.getElementById("day").textContent =
+        "DAY " +
+        String(day).padStart(2,"0") +
+        " — " +
+        String(hour).padStart(2,"0") +
+        ":" +
+        String(minute).padStart(2,"0");
+}
+
+function advanceTime(minutes) {
+
+    minute += minutes;
+
+    while (minute >= 60) {
+        minute -= 60;
+        hour++;
+
+        if (hour >= 24) {
+            hour = 0;
+            day++;
+        }
+    }
+
+    hunger = Math.max(0, hunger - Math.floor(minutes / 30));
+    thirst = Math.max(0, thirst - Math.floor(minutes / 20));
+
+    if (hunger < 20) health -= 2;
+    if (thirst < 20) health -= 3;
+
+    updateStats();
+}
+
+function setStory(location, title, text, choices) {
+
+    document.getElementById("location").textContent = location;
+    document.getElementById("title").textContent = title;
+    document.getElementById("text").innerHTML = text;
+
+    const box = document.getElementById("choices");
+
+    box.innerHTML = "";
+
+    choices.forEach((choice, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "choice";
+
+        button.innerHTML =
+            choice.text +
+            "<small>" +
+            choice.sub +
+            "</small>";
+
+        button.onclick = function() {
+            choose(index + 10);
+        };
+
+        box.appendChild(button);
+
+    });
+
+}
+
+function choose(option) {
+
+    if (option === 1) {
+
+        advanceTime(5);
+
+        sanity -= 3;
+
+        setStory(
+            "APARTMENT 17F",
+            "SOMETHING IS OUT THERE",
+            "คุณค่อย ๆ เดินไปที่ประตูและแนบหูกับมัน<br><br>" +
+            "มีเสียงหายใจ<br>" +
+            "ช้า... หนัก... และผิดจังหวะ<br><br>" +
+            "จากนั้นเสียงเล็บก็ลากผ่านประตูเบา ๆ",
+            [
+                {
+                    text: "มองผ่านช่องตาแมว",
+                    sub: "อยากรู้ว่ามันคืออะไร"
+                },
+                {
+                    text: "ถอยออกมา",
+                    sub: "บางสิ่งไม่ควรถูกมองเห็น"
+                }
+            ]
+        );
+
+    }
+
+    else if (option === 2) {
+
+        advanceTime(30);
+
+        sanity -= 8;
+
+        setStory(
+            "APARTMENT 17F",
+            "DON'T MAKE A SOUND",
+            "คุณปิดไฟทั้งหมดและนั่งลงกับพื้น<br><br>" +
+            "เสียงฝีเท้าค่อย ๆ เดินผ่านหน้าห้อง<br><br>" +
+            "หนึ่งก้าว<br>" +
+            "สองก้าว<br>" +
+            "สามก้าว<br><br>" +
+            "แล้วหยุดลงตรงหน้าประตูของคุณ",
+            [
+                {
+                    text: "อยู่นิ่ง ๆ",
+                    sub: "อย่าทำเสียงแม้แต่นิดเดียว"
+                },
+                {
+                    text: "เตรียมมีด",
+                    sub: "เผื่อมันเข้ามา"
+                }
+            ]
+        );
+
+    }
+
+    else if (option === 3) {
+
+        advanceTime(15);
+
+        setStory(
+            "STAIRWELL",
+            "NO WAY BACK",
+            "คุณสะพายกระเป๋าและเปิดประตูบันไดหนีไฟ<br><br>" +
+            "กลิ่นเหม็นเน่าลอยขึ้นมาจากชั้นล่าง<br><br>" +
+            "ไฟฉุกเฉินกระพริบเป็นจังหวะ<br><br>" +
+            "และบนผนังมีรอยเลือดลากยาวลงไปหลายชั้น",
+            [
+                {
+                    text: "ลงไปชั้น 16",
+                    sub: "อาจมีทางออก"
+                },
+                {
+                    text: "กลับเข้าห้อง",
+                    sub: "นี่อาจเป็นความคิดที่แย่"
+                }
+            ]
+        );
+
+    }
+
+    else if (option === 10) {
+
+        advanceTime(10);
+
+        setStory(
+            "APARTMENT 17F",
+            "THE EYE",
+            "คุณค่อย ๆ มองผ่านช่องตาแมว<br><br>" +
+            "ทางเดินว่างเปล่า<br><br>" +
+            "ไม่มีใครอยู่ตรงนั้น<br><br>" +
+            "แต่เมื่อคุณกำลังจะถอยออกมา..." +
+            "<br><br><b>มีดวงตาคู่หนึ่งปรากฏขึ้นตรงช่องตาแมว</b>",
+            [
+                {
+                    text: "ถอยทันที",
+                    sub: "อย่าให้มันรู้ว่าคุณอยู่ตรงนี้"
+                },
+                {
+                    text: "เปิดประตู",
+                    sub: "เผชิญหน้ากับมัน"
+                }
+            ]
+        );
+
+    }
+
+    else {
+
+        advanceTime(5);
+
+        sanity -= 5;
+
+        setStory(
+            "APARTMENT 17F",
+            "WAIT",
+            "คุณยืนนิ่งอยู่ในความมืด<br><br>" +
+            "ผ่านไปเกือบหนึ่งนาที<br><br>" +
+            "เสียงนั้นหายไปแล้ว<br><br>" +
+            "แต่โทรศัพท์ของคุณสั่นขึ้นมา<br><br>" +
+            "<b>UNKNOWN NUMBER</b><br><br>" +
+            "มีข้อความใหม่หนึ่งข้อความ",
+            [
+                {
+                    text: "เปิดอ่านข้อความ",
+                    sub: "ใครส่งข้อความมาตอนนี้?"
+                },
+                {
+                    text: "ปิดโทรศัพท์",
+                    sub: "คุณไม่ไว้ใจสิ่งที่เกิดขึ้น"
+                }
+            ]
+        );
+
+    }
+
+    if (health <= 0) {
+
+        setStory(
+            "DAY " + day,
+            "YOU DIED",
+            "โลกภายนอกกลืนคุณไปแล้ว<br><br>" +
+            "แต่เรื่องราวของคุณยังไม่จบ",
+            [
+                {
+                    text: "เริ่มเกมใหม่",
+                    sub: "กลับไปคืนแรก"
+                }
+            ]
+        );
+
+        document.getElementById("choices")
+            .querySelector("button")
+            .onclick = function() {
+                location.reload();
+            };
+    }
+
+}
+
+updateStats();
+
+</script>
+
+</body>
+</html>
