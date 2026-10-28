@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LAST LIGHT — A Pixel Survival Game</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#080b0d;
+    color:#e8e2d0;
+    font-family:'VT323',monospace;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+button{
+    font-family:'VT323',monospace;
+    cursor:pointer;
+}
+
+#game{
+    position:relative;
+    width:min(1200px,100vw);
+    height:min(760px,100vh);
+    background:#111719;
+    overflow:hidden;
+    border:2px solid #394345;
+    box-shadow:
+        0 0 0 5px #080a0b,
+        0 0 60px rgba(0,0,0,.8);
+}
+
+canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+}
+
+#scanlines{
+    pointer-events:none;
+    position:absolute;
+    inset:0;
+    z-index:20;
+    opacity:.10;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.13) 4px
+        );
+}
+
+#vignette{
+    pointer-events:none;
+    position:absolute;
+    inset:0;
+    z-index:19;
+    background:radial-gradient(
+        ellipse at center,
+        transparent 35%,
+        rgba(0,0,0,.25) 65%,
+        rgba(0,0,0,.82) 100%
+    );
+}
+
+#hud{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    z-index:10;
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+}
+
+.panel{
+    background:rgba(7,11,12,.88);
+    border:2px solid #465154;
+    box-shadow:4px 4px 0 rgba(0,0,0,.45);
+    padding:12px;
+}
+
+#playerPanel{
+    width:285px;
+}
+
+.game-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:11px;
+    color:#e9d99d;
+    margin-bottom:12px;
+    letter-spacing:1px;
+}
+
+.stat{
+    margin:7px 0;
+}
+
+.stat-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:17px;
+}
+
+.bar{
+    height:9px;
+    margin-top:3px;
+    background:#1d2527;
+    border:1px solid #485154;
+}
+
+.fill{
+    height:100%;
+    width:100%;
+    transition:width .2s;
+}
+
+.hp{background:#bd4f4f}
+.hunger{background:#b99755}
+.thirst{background:#568eaa}
+.energy{background:#9b8d54}
+.infection{background:#6d9b68}
+
+#worldPanel{
+    width:230px;
+    text-align:right;
+}
+
+#clock{
+    font-family:'Press Start 2P',monospace;
+    font-size:12px;
+    color:#e9d99d;
+    margin-bottom:8px;
+}
+
+#weather{
+    font-size:19px;
+    color:#aeb9b6;
+}
+
+#objective{
+    position:absolute;
+    top:130px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:11;
+    width:min(550px,80%);
+    text-align:center;
+    padding:8px 15px;
+    background:rgba(7,10,11,.78);
+    border-left:3px solid #c5aa67;
+    border-right:3px solid #c5aa67;
+    font-size:18px;
+    color:#d8d0b9;
+}
+
+#message{
+    position:absolute;
+    left:50%;
+    bottom:125px;
+    transform:translateX(-50%);
+    z-index:15;
+    min-width:300px;
+    max-width:80%;
+    text-align:center;
+    padding:10px 16px;
+    background:rgba(8,10,11,.92);
+    border:2px solid #4a5557;
+    font-size:20px;
+    opacity:0;
+    transition:opacity .2s;
+    pointer-events:none;
+}
+
+#inventory{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+    z-index:12;
+    width:250px;
+}
+
+.inventory-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:9px;
+    color:#e9d99d;
+    margin-bottom:9px;
+}
+
+.items{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+}
+
+.item{
+    height:55px;
+    border:1px solid #3e484a;
+    background:#151c1e;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+}
+
+.item b{
+    font-size:20px;
+    color:#d9d0b7;
+}
+
+#controls{
+    position:absolute;
+    left:18px;
+    bottom:18px;
+    z-index:12;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+}
+
+.control-row{
+    display:flex;
+    gap:4px;
+}
+
+.ctrl{
+    width:42px;
+    height:38px;
+    border:2px solid #465154;
+    background:rgba(8,12,13,.9);
+    color:#ddd4bd;
+    font-size:19px;
+    box-shadow:3px 3px 0 #050707;
+}
+
+.ctrl:active{
+    transform:translate(2px,2px);
+    box-shadow:1px 1px 0 #050707;
+}
+
+#actions{
+    position:absolute;
+    right:285px;
+    bottom:20px;
+    z-index:12;
+    display:flex;
+    gap:8px;
+}
+
+.action{
+    min-width:72px;
+    height:43px;
+    padding:0 10px;
+    border:2px solid #555e5e;
+    background:rgba(8,12,13,.93);
+    color:#ddd4bd;
+    font-size:17px;
+    box-shadow:3px 3px 0 #050707;
+}
+
+.action:hover{
+    border-color:#bba66d;
+    color:#f0dfae;
+}
+
+#startScreen,
+#gameOver{
+    position:absolute;
+    inset:0;
+    z-index:30;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at 50% 45%,rgba(64,75,70,.2),transparent 35%),
+        rgba(4,7,8,.94);
+}
+
+.start-box{
+    width:min(680px,90%);
+    text-align:center;
+    padding:35px;
+    border:2px solid #596365;
+    background:rgba(10,14,15,.95);
+    box-shadow:
+        8px 8px 0 #050708,
+        0 0 80px rgba(0,0,0,.7);
+}
+
+.logo{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(25px,5vw,48px);
+    color:#e7d49a;
+    letter-spacing:4px;
+    text-shadow:4px 4px 0 #372f20;
+}
+
+.subtitle{
+    margin-top:15px;
+    font-size:24px;
+    color:#a9b2ae;
+}
+
+.quote{
+    margin:28px auto;
+    max-width:510px;
+    font-size:21px;
+    line-height:1.2;
+    color:#c9c2ae;
+}
+
+.start-button{
+    padding:15px 32px;
+    border:2px solid #b7a66e;
+    background:#181c1a;
+    color:#e6d69f;
+    font-family:'Press Start 2P',monospace;
+    font-size:11px;
+    box-shadow:5px 5px 0 #050707;
+}
+
+.start-button:hover{
+    background:#272b26;
+}
+
+.help{
+    margin-top:20px;
+    font-size:16px;
+    color:#777f7e;
+}
+
+.hidden{
+    display:none!important;
+}
+
+#mobileActions{
+    display:none;
+}
+
+@media(max-width:800px){
+
+    #game{
+        width:100vw;
+        height:100vh;
+        border:none;
+    }
+
+    #hud{
+        padding:8px;
+    }
+
+    #playerPanel{
+        width:190px;
+        padding:8px;
+    }
+
+    #worldPanel{
+        width:130px;
+        padding:8px;
+    }
+
+    .game-title{
+        font-size:8px;
+    }
+
+    .stat-row{
+        font-size:14px;
+    }
+
+    .bar{
+        height:6px;
+    }
+
+    #objective{
+        top:108px;
+        font-size:15px;
+    }
+
+    #inventory{
+        right:8px;
+        bottom:90px;
+        width:165px;
+        padding:7px;
+    }
+
+    .item{
+        height:42px;
+        font-size:11px;
+    }
+
+    .item b{
+        font-size:16px;
+    }
+
+    #controls{
+        left:8px;
+        bottom:12px;
+    }
+
+    #actions{
+        right:8px;
+        bottom:15px;
+        display:none;
+    }
+
+    #mobileActions{
+        position:absolute;
+        right:8px;
+        bottom:15px;
+        z-index:12;
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+    }
+
+    .action{
+        min-width:65px;
+        height:39px;
+    }
+
+    #message{
+        bottom:150px;
+        font-size:17px;
+        min-width:230px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<canvas id="canvas"></canvas>
+
+<div id="scanlines"></div>
+<div id="vignette"></div>
+
+<div id="hud">
+
+    <div id="playerPanel" class="panel">
+
+        <div class="game-title">SURVIVOR // 01</div>
+
+        <div class="stat">
+            <div class="stat-row">
+                <span>♥ HEALTH</span>
+                <span id="hpText">100</span>
+            </div>
+            <div class="bar"><div id="hpBar" class="fill hp"></div></div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-row">
+                <span>🍖 HUNGER</span>
+                <span id="hungerText">100</span>
+            </div>
+            <div class="bar"><div id="hungerBar" class="fill hunger"></div></div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-row">
+                <span>💧 THIRST</span>
+                <span id="thirstText">100</span>
+            </div>
+            <div class="bar"><div id="thirstBar" class="fill thirst"></div></div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-row">
+                <span>⚡ ENERGY</span>
+                <span id="energyText">100</span>
+            </div>
+            <div class="bar"><div id="energyBar" class="fill energy"></div></div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-row">
+                <span>☣ INFECTION</span>
+                <span id="infectionText">0</span>
+            </div>
+            <div class="bar"><div id="infectionBar" class="fill infection"></div></div>
+        </div>
+
+    </div>
+
+    <div id="worldPanel" class="panel">
+        <div id="clock">DAY 01 // 07:00</div>
+        <div id="weather">ASHEN MORNING</div>
+        <div style="font-size:16px;margin-top:8px;color:#707978">
+            SECTOR: OLD BANGKOK
+        </div>
+    </div>
+
+</div>
+
+<div id="objective">
+    OBJECTIVE: Find water and food before nightfall.
+</div>
+
+<div id="message"></div>
+
+<div id="inventory" class="panel">
+    <div class="inventory-title">BACKPACK</div>
+
+    <div class="items">
+        <div class="item"><b id="food">2</b> FOOD</div>
+        <div class="item"><b id="water">2</b> WATER</div>
+        <div class="item"><b id="medkit">1</b> MEDKIT</div>
+        <div class="item"><b id="ammo">12</b> AMMO</div>
+        <div class="item"><b id="scrap">0</b> SCRAP</div>
+        <div class="item"><b id="mask">1</b> MASK</div>
+    </div>
+</div>
+
+<div id="controls">
+    <div class="control-row">
+        <button class="ctrl" data-key="ArrowUp">▲</button>
+    </div>
+    <div class="control-row">
+        <button class="ctrl" data-key="ArrowLeft">◀</button>
+        <button class="ctrl" data-key="ArrowDown">▼</button>
+        <button class="ctrl" data-key="ArrowRight">▶</button>
+    </div>
+</div>
+
+<div id="actions">
+    <button class="action" id="shootBtn">🔫 SHOOT</button>
+    <button class="action" id="lootBtn">📦 LOOT</button>
+    <button class="action" id="useBtn">💊 USE</button>
+</div>
+
+<div id="mobileActions">
+    <button class="action" id="mobileShoot">🔫</button>
+    <button class="action" id="mobileLoot">📦</button>
+    <button class="action" id="mobileUse">💊</button>
+</div>
+
+<div id="startScreen">
+
+    <div class="start-box">
+
+        <div class="logo">LAST LIGHT</div>
+
+        <div class="subtitle">
+            A PIXEL SURVIVAL STORY
+        </div>
+
+        <div class="quote">
+            “The world didn't end in one night.<br>
+            It disappeared one ordinary day at a time.”
+        </div>
+
+        <button class="start-button" id="startBtn">
+            ENTER THE RUINS
+        </button>
+
+        <div class="help">
+            WASD / ARROW KEYS — MOVE &nbsp; • &nbsp;
+            SPACE — SHOOT
+        </div>
+
+    </div>
+
+</div>
+
+<div id="gameOver" class="hidden">
+
+    <div class="start-box">
+
+        <div class="logo" style="font-size:25px;color:#b75d5d;">
+            SIGNAL LOST
+        </div>
+
+        <div class="subtitle">
+            YOU DID NOT MAKE IT THROUGH THE NIGHT.
+        </div>
+
+        <div class="quote" id="deathText">
+            The city keeps breathing.
+        </div>
+
+        <button class="start-button" id="restartBtn">
+            TRY AGAIN
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let W = 1200;
+let H = 760;
+
+function resize(){
+    const rect = canvas.getBoundingClientRect();
+    W = 1200;
+    H = 760;
+    canvas.width = W;
+    canvas.height = H;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const keys = {};
+
+window.addEventListener("keydown", e=>{
+    keys[e.key] = true;
+
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)){
+        e.preventDefault();
+    }
+
+    if(e.key === " "){
+        shoot();
+    }
+
+    if(e.key.toLowerCase() === "e"){
+        loot();
+    }
+
+    if(e.key.toLowerCase() === "q"){
+        useItem();
+    }
+});
+
+window.addEventListener("keyup", e=>{
+    keys[e.key] = false;
+});
+
+const game = {
+    started:false,
+    over:false,
+    time:7 * 60,
+    day:1,
+    score:0,
+    kills:0,
+    rain:0,
+    shake:0,
+    lastTick:performance.now()
+};
+
+const player = {
+    x:600,
+    y:420,
+    r:12,
+    speed:2.25,
+    hp:100,
+    hunger:100,
+    thirst:100,
+    energy:100,
+    infection:0,
+    food:2,
+    water:2,
+    medkit:1,
+    ammo:12,
+    scrap:0,
+    mask:1,
+    dirX:1,
+    dirY:0,
+    cooldown:0
+};
+
+const buildings = [
+    {x:70,y:180,w:170,h:115},
+    {x:70,y:470,w:180,h:135},
+    {x:335,y:110,w:180,h:105},
+    {x:820,y:120,w:230,h:130},
+    {x:875,y:355,w:210,h:150},
+    {x:310,y:575,w:180,h:100},
+    {x:620,y:560,w:150,h:105}
+];
+
+const lootSpots = [
+    {x:145,y:345,type:"water",used:false},
+    {x:285,y:250,type:"food",used:false},
+    {x:450,y:280,type:"ammo",used:false},
+    {x:720,y:330,type:"medkit",used:false},
+    {x:1010,y:290,type:"scrap",used:false},
+    {x:570,y:650,type:"food",used:false},
+    {x:180,y:680,type:"water",used:false},
+    {x:760,y:180,type:"scrap",used:false}
+];
+
+const zombies = [];
+
+function spawnZombie(){
+
+    const side = Math.floor(Math.random()*4);
+
+    let x,y;
+
+    if(side===0){
+        x=Math.random()*W;
+        y=80;
+    }else if(side===1){
+        x=W-80;
+        y=Math.random()*H;
+    }else if(side===2){
+        x=Math.random()*W;
+        y=H-80;
+    }else{
+        x=80;
+        y=Math.random()*H;
+    }
+
+    zombies.push({
+        x,y,
+        r:11,
+        speed:.42 + Math.random()*.28,
+        hp:2,
+        hitCooldown:0,
+        wander:Math.random()*Math.PI*2
+    });
+}
+
+for(let i=0;i<6;i++) spawnZombie();
+
+function rectCollision(x,y,r,b){
+
+    return (
+        x+r>b.x &&
+        x-r<b.x+b.w &&
+        y+r>b.y &&
+        y-r<b.y+b.h
+    );
+}
+
+function canMove(x,y){
+
+    if(x<25 || x>W-25 || y<80 || y>H-25) return false;
+
+    for(const b of buildings){
+        if(rectCollision(x,y,player.r,b)) return false;
+    }
+
+    return true;
+}
+
+function movePlayer(){
+
+    if(game.over) return;
+
+    let dx=0;
+    let dy=0;
+
+    if(keys["w"] || keys["W"] || keys["ArrowUp"]) dy-=1;
+    if(keys["s"] || keys["S"] || keys["ArrowDown"]) dy+=1;
+    if(keys["a"] || keys["A"] || keys["ArrowLeft"]) dx-=1;
+    if(keys["d"] || keys["D"] || keys["ArrowRight"]) dx+=1;
+
+    if(dx!==0 || dy!==0){
+
+        const length=Math.hypot(dx,dy);
+
+        dx/=length;
+        dy/=length;
+
+        player.dirX=dx;
+        player.dirY=dy;
+
+        const speed = player.energy>5 ? player.speed : 1.15;
+
+        const nx=player.x+dx*speed;
+        const ny=player.y+dy*speed;
+
+        if(canMove(nx,player.y)) player.x=nx;
+        if(canMove(player.x,ny)) player.y=ny;
+
+        player.energy=Math.max(0,player.energy-.025);
+    }
+}
+
+function shoot(){
+
+    if(!game.started || game.over) return;
+
+    if(player.cooldown>0) return;
+
+    if(player.ammo<=0){
+        showMessage("NO AMMO.");
+        return;
+    }
+
+    player.ammo--;
+    player.cooldown=22;
+    game.shake=5;
+
+    let target=null;
+    let best=Infinity;
+
+    for(const z of zombies){
+
+        const dx=z.x-player.x;
+        const dy=z.y-player.y;
+
+        const distance=Math.hypot(dx,dy);
+
+        if(distance>260) continue;
+
+        const dot=(dx*player.dirX+dy*player.dirY)/Math.max(distance,.001);
+
+        if(dot>.55 && distance<best){
+            target=z;
+            best=distance;
+        }
+    }
+
+    if(target){
+
+        target.hp--;
+
+        if(target.hp<=0){
+
+            const index=zombies.indexOf(target);
+
+            if(index>=0) zombies.splice(index,1);
+
+            game.kills++;
+            game.score+=100;
+
+            showMessage("TARGET DOWN  +100");
+        }else{
+            showMessage("HIT.");
+        }
+
+    }else{
+
+        showMessage("SHOT FIRED.");
+    }
+}
+
+function loot(){
+
+    if(game.over) return;
+
+    let found=false;
+
+    for(const item of lootSpots){
+
+        if(item.used) continue;
+
+        const d=Math.hypot(player.x-item.x,player.y-item.y);
+
+        if(d<42){
+
+            item.used=true;
+            found=true;
+
+            if(item.type==="water"){
+                player.water++;
+                showMessage("FOUND WATER +1");
+            }
+
+            if(item.type==="food"){
+                player.food++;
+                showMessage("FOUND CANNED FOOD +1");
+            }
+
+            if(item.type==="ammo"){
+                player.ammo+=6;
+                showMessage("FOUND AMMO +6");
+            }
+
+            if(item.type==="medkit"){
+                player.medkit++;
+                showMessage("FOUND MEDKIT +1");
+            }
+
+            if(item.type==="scrap"){
+                player.scrap+=2;
+                showMessage("FOUND SCRAP +2");
+            }
+
+            break;
+        }
+    }
+
+    if(!found){
+        showMessage("NOTHING HERE.");
+    }
+}
+
+function useItem(){
+
+    if(game.over) return;
+
+    if(player.medkit>0 && player.hp<85){
+
+        player.medkit--;
+        player.hp=Math.min(100,player.hp+35);
+        showMessage("MEDKIT USED  +35 HP");
+
+    }else if(player.water>0 && player.thirst<75){
+
+        player.water--;
+        player.thirst=Math.min(100,player.thirst+35);
+        showMessage("WATER +35 THIRST");
+
+    }else if(player.food>0 && player.hunger<75){
+
+        player.food--;
+        player.hunger=Math.min(100,player.hunger+30);
+        showMessage("FOOD +30 HUNGER");
+
+    }else{
+
+        showMessage("NOTHING TO USE.");
+    }
+}
+
+function updateZombies(){
+
+    for(const z of zombies){
+
+        if(z.hitCooldown>0) z.hitCooldown--;
+
+        const dx=player.x-z.x;
+        const dy=player.y-z.y;
+
+        const dist=Math.hypot(dx,dy);
+
+        if(dist<300){
+
+            const nx=dx/Math.max(dist,.001);
+            const ny=dy/Math.max(dist,.001);
+
+            const nextX=z.x+nx*z.speed;
+            const nextY=z.y+ny*z.speed;
+
+            if(!buildings.some(b=>rectCollision(nextX,nextY,z.r,b))){
+                z.x=nextX;
+                z.y=nextY;
+            }
+
+        }else{
+
+            z.wander+=.01;
+
+            z.x+=Math.cos(z.wander)*.15;
+            z.y+=Math.sin(z.wander)*.15;
+        }
+
+        if(dist<25 && z.hitCooldown<=0){
+
+            player.hp-=5;
+            player.infection+=1.2;
+            z.hitCooldown=55;
+            game.shake=7;
+
+            showMessage("INFECTED BITE!");
+        }
+    }
+}
+
+function updateNeeds(){
+
+    player.hunger=Math.max(0,player.hunger-.0028);
+    player.thirst=Math.max(0,player.thirst-.0042);
+
+    if(player.hunger<20){
+        player.hp-=.015;
+    }
+
+    if(player.thirst<20){
+        player.hp-=.025;
+    }
+
+    if(player.infection>65){
+        player.hp-=.018;
+    }
+
+    if(player.infection>90){
+        player.hp-=.035;
+    }
+
+    if(player.cooldown>0) player.cooldown--;
+
+    if(Math.random()<.0008 && zombies.length<14){
+        spawnZombie();
+    }
+
+    game.time += .035;
+
+    if(game.time>=24*60){
+
+        game.time=0;
+        game.day++;
+
+        player.hunger=Math.max(0,player.hunger-5);
+        player.thirst=Math.max(0,player.thirst-8);
+
+        showMessage("A NEW DAY.");
+
+        for(let i=0;i<2;i++) spawnZombie();
+    }
+
+    game.rain=Math.sin(game.time/180)*.5+.5;
+
+    if(player.hp<=0){
+        endGame();
+    }
+}
+
+function endGame(){
+
+    game.over=true;
+
+    document.getElementById("gameOver").classList.remove("hidden");
+
+    let text="The city keeps breathing.";
+
+    if(player.infection>=90){
+        text="The infection finally reached your heart.";
+    }else if(player.thirst<=0){
+        text="You ran out of water before you found shelter.";
+    }else if(player.hunger<=0){
+        text="Hunger won before the night did.";
+    }
+
+    document.getElementById("deathText").textContent=text;
+}
+
+function resetGame(){
+
+    location.reload();
+}
+
+function showMessage(text){
+
+    const el=document.getElementById("message");
+
+    el.textContent=text;
+    el.style.opacity=1;
+
+    clearTimeout(showMessage.timer);
+
+    showMessage.timer=setTimeout(()=>{
+        el.style.opacity=0;
+    },1300);
+}
+
+function drawBackground(){
+
+    ctx.fillStyle="#141b1c";
+    ctx.fillRect(0,0,W,H);
+
+    // roads
+    ctx.fillStyle="#202829";
+
+    ctx.fillRect(0,300,W,110);
+    ctx.fillRect(260,0,80,H);
+    ctx.fillRect(520,0,95,H);
+    ctx.fillRect(760,250,95,H);
+
+    // road lines
+    ctx.fillStyle="#424b49";
+
+    for(let x=0;x<W;x+=70){
+        ctx.fillRect(x,351,35,3);
+    }
+
+    for(let y=0;y<H;y+=70){
+        ctx.fillRect(292,y,3,35);
+    }
+
+    // grass / ground pixels
+    for(let i=0;i<180;i++){
+
+        const x=(i*83)%W;
+        const y=(i*47)%H;
+
+        if(y>300&&y<410) continue;
+
+        ctx.fillStyle=i%3===0?"#26302c":"#1c2523";
+
+        ctx.fillRect(x,y,2+(i%3),2);
+    }
+}
+
+function drawBuildings(){
+
+    for(const b of buildings){
+
+        ctx.fillStyle="#111617";
+        ctx.fillRect(b.x+6,b.y+7,b.w,b.h);
+
+        ctx.fillStyle="#2b3435";
+        ctx.fillRect(b.x,b.y,b.w,b.h);
+
+        ctx.fillStyle="#384344";
+        ctx.fillRect(b.x+5,b.y+5,b.w-10,8);
+
+        // windows
+        const cols=Math.max(2,Math.floor(b.w/45));
+        const rows=Math.max(1,Math.floor(b.h/42));
+
+        for(let c=0;c<cols;c++){
+
+            for(let r=0;r<rows;r++){
+
+                const wx=b.x+15+c*40;
+                const wy=b.y+25+r*37;
+
+                ctx.fillStyle=(c+r)%3===0?"#7b7356":"#171e20";
+
+                ctx.fillRect(wx,wy,20,17);
+
+                ctx.fillStyle="#0d1112";
+                ctx.fillRect(wx+3,wy+3,14,11);
+            }
+        }
+
+        // door
+        ctx.fillStyle="#111516";
+        ctx.fillRect(b.x+b.w/2-10,b.y+b.h-32,20,32);
+    }
+}
+
+function drawLoot(){
+
+    for(const item of lootSpots){
+
+        if(item.used) continue;
+
+        const pulse=Math.sin(Date.now()/300+item.x)*2;
+
+        ctx.fillStyle="#101617";
+        ctx.fillRect(item.x-12,item.y-10+pulse,24,20);
+
+        ctx.strokeStyle="#9d9164";
+        ctx.lineWidth=2;
+        ctx.strokeRect(item.x-12,item.y-10+pulse,24,20);
+
+        ctx.fillStyle="#c9ba78";
+        ctx.fillRect(item.x-6,item.y-4+pulse,12,3);
+    }
+}
+
+function drawPlayer(){
+
+    ctx.save();
+
+    ctx.translate(player.x,player.y);
+
+    // shadow
+    ctx.fillStyle="rgba(0,0,0,.45)";
+    ctx.fillRect(-14,10,28,6);
+
+    // body
+    ctx.fillStyle="#c4c2b5";
+    ctx.fillRect(-8,-2,16,19);
+
+    // jacket
+    ctx.fillStyle="#38484a";
+    ctx.fillRect(-10,0,20,13);
+
+    // head
+    ctx.fillStyle="#b89579";
+    ctx.fillRect(-7,-15,14,14);
+
+    // hair
+    ctx.fillStyle="#292727";
+    ctx.fillRect(-8,-16,16,5);
+
+    // eyes
+    ctx.fillStyle="#111";
+    ctx.fillRect(-5,-11,3,2);
+    ctx.fillRect(2,-11,3,2);
+
+    // legs
+    ctx.fillStyle="#252c2d";
+    ctx.fillRect(-8,13,6,10);
+    ctx.fillRect(2,13,6,10);
+
+    // weapon direction
+    ctx.fillStyle="#a9a18b";
+
+    if(Math.abs(player.dirX)>Math.abs(player.dirY)){
+        ctx.fillRect(player.dirX>0?8:-20,2,12,4);
+    }else{
+        ctx.fillRect(-2,player.dirY>0?18:-21,4,12);
+    }
+
+    ctx.restore();
+}
+
+function drawZombies(){
+
+    for(const z of zombies){
+
+        ctx.save();
+        ctx.translate(z.x,z.y);
+
+        // shadow
+        ctx.fillStyle="rgba(0,0,0,.4)";
+        ctx.fillRect(-13,9,26,5);
+
+        // body
+        ctx.fillStyle="#526057";
+        ctx.fillRect(-9,-2,18,19);
+
+        // shirt
+        ctx.fillStyle="#38433e";
+        ctx.fillRect(-10,1,20,12);
+
+        // head
+        ctx.fillStyle="#75816f";
+        ctx.fillRect(-8,-15,16,14);
+
+        // blood / wounds
+        ctx.fillStyle="#663c38";
+        ctx.fillRect(-5,-8,3,3);
+        ctx.fillRect(3,-3,4,2);
+
+        // eyes
+        ctx.fillStyle="#c6b76b";
+        ctx.fillRect(-5,-10,3,2);
+        ctx.fillRect(2,-10,3,2);
+
+        ctx.restore();
+    }
+}
+
+function drawRain(){
+
+    if(game.rain<.65) return;
+
+    ctx.strokeStyle="rgba(150,170,165,.12)";
+    ctx.lineWidth=1;
+
+    for(let i=0;i<120;i++){
+
+        const x=(i*97+Date.now()*.15)%W;
+        const y=(i*53+Date.now()*.45)%H;
+
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(x-3,y+12);
+        ctx.stroke();
+    }
+}
+
+function drawLighting(){
+
+    const hour=game.time/60;
+
+    let darkness=0;
+
+    if(hour<6) darkness=.60;
+    else if(hour<8) darkness=.35;
+    else if(hour<17) darkness=.05;
+    else if(hour<20) darkness=.28;
+    else darkness=.62;
+
+    if(darkness<=0) return;
+
+    ctx.fillStyle=`rgba(5,8,12,${darkness})`;
+    ctx.fillRect(0,0,W,H);
+
+    // player light at night
+    if(hour<7 || hour>18){
+
+        const gradient=ctx.createRadialGradient(
+            player.x,player.y,20,
+            player.x,player.y,190
+        );
+
+        gradient.addColorStop(0,"rgba(230,205,125,.16)");
+        gradient.addColorStop(.45,"rgba(230,205,125,.05)");
+        gradient.addColorStop(1,"rgba(0,0,0,0)");
+
+        ctx.fillStyle=gradient;
+        ctx.fillRect(
+            player.x-200,
+            player.y-200,
+            400,
+            400
+        );
+    }
+}
+
+function draw(){
+
+    ctx.clearRect(0,0,W,H);
+
+    drawBackground();
+    drawBuildings();
+    drawLoot();
+    drawZombies();
+    drawPlayer();
+    drawRain();
+    drawLighting();
+
+    // screen shake
+    if(game.shake>0){
+        game.shake*=.85;
+        if(game.shake<.2) game.shake=0;
+    }
+}
+
+function updateHUD(){
+
+    const set=(id,value)=>{
+        document.getElementById(id).textContent=Math.max(0,Math.round(value));
+    };
+
+    const bar=(id,value)=>{
+        document.getElementById(id).style.width=
+            Math.max(0,Math.min(100,value))+"%";
+    };
+
+    set("hpText",player.hp);
+    set("hungerText",player.hunger);
+    set("thirstText",player.thirst);
+    set("energyText",player.energy);
+    set("infectionText",player.infection);
+
+    bar("hpBar",player.hp);
+    bar("hungerBar",player.hunger);
+    bar("thirstBar",player.thirst);
+    bar("energyBar",player.energy);
+    bar("infectionBar",player.infection);
+
+    document.getElementById("food").textContent=player.food;
+    document.getElementById("water").textContent=player.water;
+    document.getElementById("medkit").textContent=player.medkit;
+    document.getElementById("ammo").textContent=player.ammo;
+    document.getElementById("scrap").textContent=player.scrap;
+
+    const h=Math.floor(game.time/60);
+    const m=Math.floor(game.time%60);
+
+    const hh=String(h).padStart(2,"0");
+    const mm=String(m).padStart(2,"0");
+
+    document.getElementById("clock").textContent=
+        `DAY ${String(game.day).padStart(2,"0")} // ${hh}:${mm}`;
+
+    let weather="CLEAR SKIES";
+
+    if(game.rain>.72) weather="ACID RAIN";
+    else if(game.rain>.55) weather="COLD DRIZZLE";
+    else if(h<6||h>19) weather="DEAD NIGHT";
+    else if(h<9) weather="ASHEN MORNING";
+
+    document.getElementById("weather").textContent=weather;
+
+    if(player.infection>70){
+        document.getElementById("objective").textContent=
+            "WARNING: INFECTION CRITICAL — FIND MEDICINE.";
+    }else if(player.thirst<25){
+        document.getElementById("objective").textContent=
+            "WARNING: WATER CRITICAL.";
+    }else if(player.hunger<25){
+        document.getElementById("objective").textContent=
+            "WARNING: HUNGER CRITICAL.";
+    }else if(game.time>18*60){
+        document.getElementById("objective").textContent=
+            "NIGHTFALL APPROACHING — FIND SHELTER.";
+    }else{
+        document.getElementById("objective").textContent=
+            "OBJECTIVE: Find water and food before nightfall.";
+    }
+}
+
+function gameLoop(){
+
+    if(game.started && !game.over){
+
+        movePlayer();
+        updateZombies();
+        updateNeeds();
+        updateHUD();
+    }
+
+    draw();
+
+    requestAnimationFrame(gameLoop);
+}
+
+document.getElementById("startBtn").addEventListener("click",()=>{
+
+    game.started=true;
+
+    document.getElementById("startScreen").classList.add("hidden");
+
+    showMessage("SURVIVE THE NIGHT.");
+});
+
+document.getElementById("restartBtn").addEventListener("click",resetGame);
+
+document.getElementById("shootBtn").addEventListener("click",shoot);
+document.getElementById("lootBtn").addEventListener("click",loot);
+document.getElementById("useBtn").addEventListener("click",useItem);
+
+document.getElementById("mobileShoot").addEventListener("click",shoot);
+document.getElementById("mobileLoot").addEventListener("click",loot);
+document.getElementById("mobileUse").addEventListener("click",useItem);
+
+document.querySelectorAll(".ctrl").forEach(button=>{
+
+    const key=button.dataset.key;
+
+    button.addEventListener("pointerdown",e=>{
+        e.preventDefault();
+        keys[key]=true;
+    });
+
+    button.addEventListener("pointerup",e=>{
+        e.preventDefault();
+        keys[key]=false;
+    });
+
+    button.addEventListener("pointerleave",()=>{
+        keys[key]=false;
+    });
+});
+
+gameLoop();
+</script>
+
+</body>
+</html>
