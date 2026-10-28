@@ -1,32 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no">
+
 <title>LAST LIGHT — Bangkok Survival</title>
 
 <style>
-:root{
-    --pink:#ff4f87;
-    --cyan:#58e7ff;
-    --gold:#ffd76a;
-    --bg:#07101d;
-}
-
 *{
     box-sizing:border-box;
-    -webkit-user-select:none;
+    margin:0;
+    padding:0;
     user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
 }
 
 html,body{
-    margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
-    background:var(--bg);
-    font-family:Arial,"Noto Sans Thai",sans-serif;
-    color:#fff;
+    background:#08101a;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    touch-action:none;
 }
 
 canvas{
@@ -34,62 +34,57 @@ canvas{
     inset:0;
     width:100%;
     height:100%;
-    display:block;
-    cursor:none;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
 }
 
 #ui{
     position:fixed;
     inset:0;
     pointer-events:none;
+    color:white;
 }
 
 .panel{
-    background:rgba(6,13,27,.82);
-    border:1px solid rgba(255,255,255,.16);
-    box-shadow:0 12px 35px rgba(0,0,0,.3);
-    backdrop-filter:blur(8px);
-    border-radius:16px;
+    background:rgba(8,14,25,.88);
+    border:2px solid rgba(255,255,255,.18);
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.35),
+        inset 0 0 20px rgba(255,255,255,.025);
+    backdrop-filter:blur(6px);
+    border-radius:14px;
 }
-
-/* =========================
-   PLAYER HUD
-========================= */
 
 #stats{
     position:absolute;
-    left:16px;
-    top:16px;
-    width:250px;
-    padding:12px;
+    left:15px;
+    top:15px;
+    width:245px;
+    padding:13px;
 }
 
-.brand{
+.logo{
+    font-size:18px;
     font-weight:900;
     letter-spacing:2px;
-    color:var(--gold);
-    font-size:17px;
-}
-
-.sub{
-    font-size:10px;
-    color:#94dfff;
-    margin-left:5px;
+    color:#ffd95a;
+    margin-bottom:9px;
 }
 
 .row{
     display:flex;
     justify-content:space-between;
     font-size:11px;
-    margin-top:7px;
+    margin-top:5px;
+    color:#d9e2ef;
 }
 
 .bar{
-    height:9px;
-    background:#1a2538;
-    border-radius:8px;
-    overflow:hidden;
+    height:10px;
     margin-top:4px;
+    background:#202b3b;
+    border-radius:5px;
+    overflow:hidden;
 }
 
 .fill{
@@ -98,421 +93,279 @@ canvas{
     transition:width .12s;
 }
 
-.hp{
-    background:linear-gradient(90deg,#ff3d6d,#ff7b9e);
-}
-
-.food{
-    background:linear-gradient(90deg,#ff9f43,#ffd36a);
-}
-
-.water{
-    background:linear-gradient(90deg,#36c8ff,#8bf0ff);
-}
-
-.stam{
-    background:linear-gradient(90deg,#73df73,#c3ff83);
-}
-
-/* =========================
-   TOP RIGHT
-========================= */
+.hp{background:#ff5578}
+.hunger{background:#ffbd4a}
+.thirst{background:#4dcaff}
+.stamina{background:#9be86d}
 
 #top{
     position:absolute;
-    right:16px;
-    top:16px;
-    padding:11px 14px;
-    text-align:right;
-    min-width:155px;
+    right:15px;
+    top:15px;
+    min-width:175px;
+    padding:12px;
     font-size:12px;
     line-height:1.7;
+    text-align:right;
 }
-
-.gold{
-    color:var(--gold);
-}
-
-.cyan{
-    color:var(--cyan);
-}
-
-/* =========================
-   QUEST
-========================= */
 
 #quest{
     position:absolute;
     left:50%;
-    top:16px;
+    top:15px;
     transform:translateX(-50%);
-    padding:9px 18px;
-    min-width:330px;
+    width:min(430px,55vw);
+    padding:10px 15px;
     text-align:center;
     font-size:12px;
+    color:#e7edf8;
 }
 
-/* =========================
-   INVENTORY
-========================= */
-
-#inv{
+#inventory{
     position:absolute;
-    right:16px;
-    bottom:16px;
-    width:235px;
-    padding:11px;
+    right:15px;
+    bottom:15px;
+    width:255px;
+    padding:12px;
 }
 
-.invhead{
-    color:var(--cyan);
-    font-weight:800;
+.invHead{
+    color:#75e7ff;
+    font-size:13px;
+    font-weight:bold;
     margin-bottom:8px;
-    font-size:12px;
 }
 
-.grid{
+.inv{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:6px;
 }
 
-.item{
-    background:#111d31;
-    border:1px solid #ffffff16;
-    border-radius:9px;
-    padding:7px 4px;
+.slot{
+    min-height:48px;
+    padding:7px 3px;
+    background:#172235;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:7px;
     text-align:center;
     font-size:10px;
+    color:#dce5f3;
 }
 
-.item b{
-    font-size:13px;
-    color:#fff;
+.slot b{
+    display:block;
+    margin-top:3px;
+    color:white;
+    font-size:12px;
 }
 
-/* =========================
-   CONTROLS
-========================= */
-
-#help{
+#controls{
     position:absolute;
-    left:16px;
-    bottom:16px;
-    padding:10px 12px;
+    left:15px;
+    bottom:15px;
+    padding:10px 13px;
     font-size:10px;
     line-height:1.65;
 }
 
-/* =========================
-   MESSAGE
-========================= */
-
-#msg{
+#message{
     position:absolute;
     left:50%;
-    bottom:25px;
+    bottom:35px;
     transform:translateX(-50%);
-    padding:9px 17px;
-    border-radius:99px;
-    background:rgba(4,9,18,.92);
-    border:1px solid #ffffff20;
-    opacity:0;
-    transition:.2s;
+    padding:10px 18px;
+    background:rgba(6,11,20,.94);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:30px;
     font-size:12px;
+    opacity:0;
+    transition:opacity .2s;
     white-space:nowrap;
 }
 
-/* =========================
-   CROSSHAIR
-========================= */
-
-#cross{
+#crosshair{
     position:fixed;
-    width:28px;
-    height:28px;
+    width:26px;
+    height:26px;
     transform:translate(-50%,-50%);
     pointer-events:none;
     display:none;
-    z-index:5;
+    z-index:10;
 }
 
-.c1,
-.c2{
+#crosshair:before,
+#crosshair:after{
+    content:"";
     position:absolute;
     background:#fff;
-    box-shadow:0 0 8px #ff4f87;
+    box-shadow:0 0 7px #ff5478;
 }
 
-.c1{
-    width:28px;
+#crosshair:before{
+    width:26px;
     height:2px;
-    top:13px;
+    top:12px;
 }
 
-.c2{
-    height:28px;
+#crosshair:after{
     width:2px;
-    left:13px;
+    height:26px;
+    left:12px;
 }
 
-/* =========================
-   START SCREEN
-========================= */
-
-#start{
+#menu{
     position:fixed;
     inset:0;
-    z-index:20;
+    z-index:50;
     display:flex;
     align-items:center;
     justify-content:center;
-
     background:
-        radial-gradient(
-            circle at 50% 40%,
-            #1c355b 0,
-            #07101d 60%,
-            #03070d 100%
-        );
+        radial-gradient(circle at center,
+            rgba(35,64,110,.7),
+            rgba(3,7,14,.98) 70%);
 }
 
-.startbox{
-    width:min(680px,90vw);
-    padding:34px;
-
-    border:1px solid #ffffff28;
-    border-radius:24px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(17,34,61,.94),
-            rgba(6,12,23,.97)
-        );
-
-    box-shadow:
-        0 25px 100px #000;
-
+.menu{
+    width:min(650px,90vw);
+    padding:35px;
     text-align:center;
+    border:2px solid rgba(255,255,255,.18);
+    border-radius:20px;
+    background:linear-gradient(145deg,#14243e,#080e18);
+    box-shadow:0 25px 100px rgba(0,0,0,.75);
 }
 
-.startbox h1{
-    margin:0;
-
-    font-size:
-        clamp(38px,8vw,72px);
-
+.menu h1{
+    font-size:48px;
     letter-spacing:5px;
-
-    color:var(--gold);
-
+    color:#ffd45b;
     text-shadow:
-        0 5px 25px #ff4f8740;
+        4px 4px #9c315e,
+        0 0 30px rgba(255,210,80,.2);
 }
 
-.startbox h2{
-    margin:3px 0 18px;
-
-    color:var(--cyan);
-
+.menu h2{
+    margin-top:4px;
+    color:#6ee3ff;
     font-size:14px;
     letter-spacing:3px;
 }
 
-.startbox p{
-    font-size:13px;
+.menu p{
+    margin-top:20px;
+    color:#c9d4e5;
+    font-size:12px;
     line-height:1.8;
-    color:#cbd6e6;
 }
 
-.startbox button,
-.gameover button{
+.start{
+    margin-top:24px;
+    padding:14px 35px;
     border:0;
-    border-radius:12px;
-
-    padding:14px 28px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ff4f87,
-            #ff6b63
-        );
-
-    color:#fff;
-
-    font-weight:900;
-
-    cursor:pointer;
-
-    box-shadow:
-        0 6px 0 #a62f50;
-
+    border-radius:10px;
+    background:#ff4f79;
+    color:white;
+    font-weight:bold;
     font-size:14px;
+    cursor:pointer;
+    box-shadow:0 5px 0 #8e2949;
 }
 
-.startbox button:active,
-.gameover button:active{
-    transform:translateY(3px);
-    box-shadow:0 3px 0 #a62f50;
+.start:active{
+    transform:translateY(4px);
+    box-shadow:0 1px 0 #8e2949;
 }
-
-.tips{
-    margin-top:18px;
-    font-size:10px!important;
-    color:#8ea3bd!important;
-}
-
-/* =========================
-   MOBILE
-========================= */
 
 #mobile{
     display:none;
     position:fixed;
     inset:0;
+    z-index:20;
     pointer-events:none;
-    z-index:10;
 }
 
 .touch{
-    pointer-events:auto;
-
     position:absolute;
-
-    border:1px solid #ffffff38;
-
-    background:#ffffff15;
-
-    color:#fff;
-
-    border-radius:50%;
-
+    pointer-events:auto;
     width:58px;
     height:58px;
-
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.25);
+    background:rgba(10,20,35,.55);
+    color:white;
     font-size:20px;
 }
 
-.touch:active{
-    background:#ffffff30;
-}
+#up{left:76px;bottom:140px}
+#left{left:14px;bottom:78px}
+#down{left:76px;bottom:78px}
+#right{left:138px;bottom:78px}
 
-.up{
-    left:70px;
-    bottom:126px;
-}
-
-.left{
-    left:10px;
-    bottom:66px;
-}
-
-.down{
-    left:70px;
-    bottom:66px;
-}
-
-.right{
-    left:130px;
-    bottom:66px;
-}
-
-.fire{
-    right:20px;
-    bottom:78px;
-
+#fire{
+    right:25px;
+    bottom:85px;
     width:82px;
     height:82px;
-
-    background:#ff4f8733;
+    background:rgba(255,55,85,.45);
 }
 
-.use{
-    right:118px;
-    bottom:28px;
+#interact{
+    right:125px;
+    bottom:32px;
 }
 
-/* =========================
-   GAME OVER
-========================= */
-
-.gameover{
-    display:none;
-
-    position:fixed;
-    inset:0;
-
-    z-index:30;
-
-    align-items:center;
-    justify-content:center;
-
-    background:rgba(2,5,12,.9);
+#lock{
+    right:25px;
+    bottom:180px;
 }
 
-.gameover .startbox{
-    max-width:500px;
+#job{
+    right:125px;
+    bottom:105px;
 }
-
-.danger{
-    color:#ff6688;
-}
-
-/* =========================
-   MOBILE RESPONSIVE
-========================= */
 
 @media(max-width:700px){
 
     #stats{
-        width:205px;
         left:8px;
         top:8px;
-        padding:9px;
+        width:190px;
+        padding:8px;
+    }
+
+    .logo{
+        font-size:13px;
     }
 
     #top{
         right:8px;
         top:8px;
-        min-width:120px;
+        min-width:125px;
         padding:8px;
-        font-size:10px;
+        font-size:9px;
     }
 
     #quest{
-        top:105px;
-        min-width:250px;
+        top:95px;
+        width:80%;
         font-size:10px;
-        padding:8px;
     }
 
-    #inv{
+    #inventory{
         right:8px;
         bottom:8px;
-        width:195px;
+        width:185px;
         padding:8px;
     }
 
-    .item{
-        padding:5px 2px;
-    }
-
-    #help{
+    #controls{
         display:none;
     }
 
     #mobile{
         display:block;
-    }
-
-    #msg{
-        bottom:18px;
-        font-size:10px;
-        max-width:75%;
-        text-align:center;
-        white-space:normal;
     }
 }
 </style>
@@ -522,873 +375,940 @@ canvas{
 
 <canvas id="game"></canvas>
 
-<!-- START SCREEN -->
-
-<div id="start">
-
-    <div class="startbox">
+<div id="menu">
+    <div class="menu">
 
         <h1>LAST LIGHT</h1>
-
         <h2>BANGKOK SURVIVAL</h2>
 
         <p>
-            กรุงเทพฯ หลังคืนที่ไม่มีใครรู้ว่าเกิดอะไรขึ้น<br>
-            ผู้รอดชีวิต ทหาร รถยนต์ ซอมบี้ และสิ่งของที่ยังพอช่วยให้คุณอยู่รอด<br>
-            <b>นี่คือเมืองใหญ่ที่คุณต้องเดินทางเอง ไม่ใช่ฉากเดียว</b>
+            กรุงเทพฯ หลังคืนที่ไม่มีใครอธิบายได้<br>
+            ถนนยังมีไฟ รถยังวิ่ง ผู้คนยังพยายามกลับบ้าน<br>
+            แต่บางคน... ไม่ใช่มนุษย์อีกต่อไป
         </p>
 
-        <button id="startBtn">
+        <p>
+            WASD / ลูกศร = เดิน<br>
+            Mouse = เล็ง &nbsp; • &nbsp; Click = ยิง<br>
+            Q = ล็อกเป้า &nbsp; • &nbsp; R = Reload<br>
+            E = เก็บของ &nbsp; • &nbsp; J = เปลี่ยนอาชีพ<br>
+            1 = ยา &nbsp; 2 = อาหาร &nbsp; 3 = น้ำ &nbsp; 4 = Vaccine
+        </p>
+
+        <button class="start" id="startButton">
             ENTER THE CITY
         </button>
 
-        <p class="tips">
-            WASD / ลูกศร = เดิน · SHIFT = วิ่ง · Mouse = เล็ง · Click = ยิง ·
-            E = เก็บของ · R = รีโหลด · I = กระเป๋า · J = เปลี่ยนอาชีพ
-        </p>
-
     </div>
-
 </div>
-
-
-<!-- HUD -->
 
 <div id="ui">
 
     <div id="stats" class="panel">
 
-        <div class="brand">
-            ♥ SURVIVOR
-            <span class="sub">BANGKOK</span>
-        </div>
+        <div class="logo">♥ SURVIVOR</div>
 
         <div class="row">
             <span>HEALTH</span>
-            <span id="hpT">100</span>
+            <span id="hpText">100</span>
         </div>
-
         <div class="bar">
-            <div id="hp" class="fill hp"></div>
+            <div id="hpFill" class="fill hp"></div>
         </div>
-
 
         <div class="row">
             <span>HUNGER</span>
-            <span id="foodT">100</span>
+            <span id="hungerText">100</span>
         </div>
-
         <div class="bar">
-            <div id="food" class="fill food"></div>
+            <div id="hungerFill" class="fill hunger"></div>
         </div>
-
 
         <div class="row">
             <span>THIRST</span>
-            <span id="waterT">100</span>
+            <span id="thirstText">100</span>
         </div>
-
         <div class="bar">
-            <div id="water" class="fill water"></div>
+            <div id="thirstFill" class="fill thirst"></div>
         </div>
-
 
         <div class="row">
             <span>STAMINA</span>
-            <span id="stamT">100</span>
+            <span id="staminaText">100</span>
         </div>
-
         <div class="bar">
-            <div id="stam" class="fill stam"></div>
+            <div id="staminaFill" class="fill stamina"></div>
         </div>
 
-
-        <div style="margin-top:7px;font-size:11px;color:#ffd76a">
-
+        <div style="margin-top:9px;color:#ffd65c;font-size:11px">
             JOB:
-            <b id="job">SURVIVOR</b>
-
+            <b id="jobText">SURVIVOR</b>
         </div>
 
     </div>
-
 
     <div id="top" class="panel">
 
         <div>
-            DAY
-            <span id="day" class="gold">1</span>
-            ·
-            <span id="time">08:00</span>
+            DAY <b id="dayText">1</b>
+        </div>
+
+        <div id="timeText">08:00</div>
+
+        <div>
+            🔫 <b id="ammoText">12 / 60</b>
         </div>
 
         <div>
-            🔫
-            <span id="ammo">12 / 60</span>
+            💰 <b id="moneyText">250</b>
         </div>
 
         <div>
-            💰
-            <span id="money">250</span>
-        </div>
-
-        <div>
-            ☠ KILLS
-            <span id="kills">0</span>
+            ☠ <b id="killText">0</b>
         </div>
 
     </div>
-
 
     <div id="quest" class="panel">
-        OBJECTIVE:
-        เดินทางไปยัง MEGA CITY MALL
+        OBJECTIVE: เดินทางไปยัง MEGA CITY MALL
     </div>
 
+    <div id="inventory" class="panel">
 
-    <div id="inv" class="panel">
-
-        <div class="invhead">
+        <div class="invHead">
             🎒 INVENTORY
-            <span style="float:right">[I]</span>
         </div>
 
-        <div class="grid">
+        <div class="inv">
 
-            <div class="item">
-                🔫<br>
-                PISTOL<br>
+            <div class="slot">
+                🔫 PISTOL
                 <b>1</b>
             </div>
 
-            <div class="item">
-                💊<br>
-                MEDKIT<br>
-                <b id="med">2</b>
+            <div class="slot">
+                💊 MEDKIT
+                <b id="medText">2</b>
             </div>
 
-            <div class="item">
-                💉<br>
-                VACCINE<br>
-                <b id="vac">1</b>
+            <div class="slot">
+                💉 VACCINE
+                <b id="vacText">1</b>
             </div>
 
-            <div class="item">
-                🍞<br>
-                FOOD<br>
-                <b id="fcount">4</b>
+            <div class="slot">
+                🍞 FOOD
+                <b id="foodText">4</b>
             </div>
 
-            <div class="item">
-                💧<br>
-                WATER<br>
-                <b id="wcount">4</b>
+            <div class="slot">
+                💧 WATER
+                <b id="waterText">4</b>
             </div>
 
-            <div class="item">
-                📦<br>
-                AMMO<br>
-                <b id="acount">60</b>
+            <div class="slot">
+                🔦 FLASHLIGHT
+                <b>1</b>
             </div>
 
         </div>
 
     </div>
 
-
-    <div id="help" class="panel">
+    <div id="controls" class="panel">
 
         <b>CONTROLS</b><br>
-
-        WASD / ARROWS — MOVE<br>
-        SHIFT — SPRINT<br>
-        MOUSE — AIM · CLICK — FIRE<br>
-        E — LOOT / INTERACT<br>
-        R — RELOAD · I — INVENTORY<br>
-        1 MEDKIT · 2 FOOD · 3 WATER · 4 VACCINE<br>
-        J — CHANGE JOB
+        WASD — เดิน<br>
+        SHIFT — วิ่ง<br>
+        Mouse — เล็ง<br>
+        Click — ยิง<br>
+        Q — Lock Target<br>
+        R — Reload<br>
+        E — เก็บ / ใช้<br>
+        J — เปลี่ยนอาชีพ<br>
+        P — Save<br>
+        L — Load
 
     </div>
 
-
-    <div id="msg"></div>
-
-</div>
-
-
-<!-- CROSSHAIR -->
-
-<div id="cross">
-
-    <i class="c1"></i>
-    <i class="c2"></i>
+    <div id="message"></div>
 
 </div>
 
-
-<!-- MOBILE -->
+<div id="crosshair"></div>
 
 <div id="mobile">
 
-    <button class="touch up" data-key="w">
-        ▲
-    </button>
+    <button class="touch" id="up">▲</button>
+    <button class="touch" id="left">◀</button>
+    <button class="touch" id="down">▼</button>
+    <button class="touch" id="right">▶</button>
 
-    <button class="touch left" data-key="a">
-        ◀
-    </button>
-
-    <button class="touch down" data-key="s">
-        ▼
-    </button>
-
-    <button class="touch right" data-key="d">
-        ▶
-    </button>
-
-    <button class="touch fire" id="fire">
-        🔫
-    </button>
-
-    <button class="touch use" id="use">
-        E
-    </button>
+    <button class="touch" id="fire">🔫</button>
+    <button class="touch" id="interact">E</button>
+    <button class="touch" id="lock">🎯</button>
+    <button class="touch" id="job">JOB</button>
 
 </div>
-
-
-<!-- GAME OVER -->
-
-<div id="over" class="gameover">
-
-    <div class="startbox">
-
-        <h1 class="danger">
-            YOU DIED
-        </h1>
-
-        <h2>
-            LAST LIGHT
-        </h2>
-
-        <p>
-            กรุงเทพฯ ยังอยู่ แต่คืนนี้คุณไม่รอด
-        </p>
-
-        <p>
-            Zombie eliminated:
-            <b id="finalKills">0</b>
-        </p>
-
-        <button id="restart">
-            TRY AGAIN
-        </button>
-
-    </div>
-
-</div>
-
 
 <script>
 
-"use strict";
-
 /* =========================================================
-   CANVAS
-========================================================= */
+   LAST LIGHT
+   BANGKOK SURVIVAL
+   SINGLE FILE ENGINE
+   ========================================================= */
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let W = innerWidth;
-let H = innerHeight;
+ctx.imageSmoothingEnabled = false;
 
-const dpr = Math.min(
-    devicePixelRatio || 1,
-    2
-);
+
+/* =========================================================
+   SCREEN
+   ========================================================= */
+
+let SW = innerWidth;
+let SH = innerHeight;
 
 function resize(){
 
-    W = innerWidth;
-    H = innerHeight;
+    SW = innerWidth;
+    SH = innerHeight;
 
-    canvas.width =
-        Math.floor(W * dpr);
+    canvas.width = Math.min(1280, Math.max(640, Math.floor(SW)));
+    canvas.height = Math.min(720, Math.max(360, Math.floor(SH)));
 
-    canvas.height =
-        Math.floor(H * dpr);
-
-    canvas.style.width =
-        W + "px";
-
-    canvas.style.height =
-        H + "px";
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
+    ctx.imageSmoothingEnabled = false;
 }
 
-addEventListener(
-    "resize",
-    resize
-);
-
+addEventListener("resize",resize);
 resize();
 
 
 /* =========================================================
-   GAME STATE
-========================================================= */
+   WORLD
+   ========================================================= */
 
-const WORLD_W = 6000;
-const WORLD_H = 4600;
+const WORLD_W = 6400;
+const WORLD_H = 4800;
 
-const keys = {};
-
-const mouse = {
-
-    x: W / 2,
-    y: H / 2,
-
-    down:false
-
-};
-
-let running = false;
-
-let day = 1;
-
-let clock = 8 * 60;
-
-let quest = 0;
-
-let msgTimer = 0;
-
-let invOpen = true;
-
-let eventTimer = 800;
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-const cam = {
-
+const camera = {
     x:0,
     y:0
-
 };
 
 
 /* =========================================================
    PLAYER
-========================================================= */
+   ========================================================= */
 
-const p = {
+const player = {
 
-    x:3000,
-    y:2300,
+    x:3200,
+    y:2400,
 
-    r:15,
-
-    speed:3.2,
+    r:14,
 
     hp:100,
-
     hunger:100,
-
     thirst:100,
-
     stamina:100,
 
-    ammo:12,
+    speed:2.6,
 
+    ammo:12,
     reserve:60,
 
     money:250,
-
     kills:0,
+
+    job:"SURVIVOR",
+    outfit:"URBAN",
 
     angle:0,
 
-    cool:0,
+    shootCooldown:0,
 
-    job:"SURVIVOR",
-
-    med:2,
-
-    vaccine:1,
-
+    medkits:2,
+    vaccines:1,
     food:4,
-
     water:4
-
 };
 
 
 /* =========================================================
-   ROADS
-========================================================= */
+   INPUT
+   ========================================================= */
 
-const roads = [
+const keys = {};
 
-    {
-        x:0,
-        y:1050,
-        w:WORLD_W,
-        h:240
-    },
+const mouse = {
 
-    {
-        x:0,
-        y:2150,
-        w:WORLD_W,
-        h:240
-    },
+    x:SW/2,
+    y:SH/2,
 
-    {
-        x:0,
-        y:3250,
-        w:WORLD_W,
-        h:240
-    },
+    down:false
+};
 
-    {
-        x:1050,
-        y:0,
-        w:240,
-        h:WORLD_H
-    },
+let running=false;
 
-    {
-        x:2300,
-        y:0,
-        w:240,
-        h:WORLD_H
-    },
+let lockedTarget=null;
 
-    {
-        x:3550,
-        y:0,
-        w:240,
-        h:WORLD_H
-    },
 
-    {
-        x:4800,
-        y:0,
-        w:240,
-        h:WORLD_H
+addEventListener("keydown",e=>{
+
+    const k=e.key.toLowerCase();
+
+    keys[k]=true;
+
+    if(k==="r") reload();
+
+    if(k==="e") interact();
+
+    if(k==="q") lockTarget();
+
+    if(k==="j") changeJob();
+
+    if(k==="p") saveGame();
+
+    if(k==="l") loadGame();
+
+    if(k==="1") useMedkit();
+
+    if(k==="2") useFood();
+
+    if(k==="3") useWater();
+
+    if(k==="4") useVaccine();
+
+});
+
+
+addEventListener("keyup",e=>{
+
+    keys[e.key.toLowerCase()]=false;
+
+});
+
+
+addEventListener("mousemove",e=>{
+
+    mouse.x=e.clientX;
+    mouse.y=e.clientY;
+
+    const cross=document.getElementById("crosshair");
+
+    cross.style.left=e.clientX+"px";
+    cross.style.top=e.clientY+"px";
+
+});
+
+
+addEventListener("mousedown",e=>{
+
+    if(e.button===0){
+
+        mouse.down=true;
+
+        shoot();
+
     }
 
-];
+});
+
+
+addEventListener("mouseup",e=>{
+
+    if(e.button===0){
+
+        mouse.down=false;
+
+    }
+
+});
 
 
 /* =========================================================
-   BUILDINGS
-========================================================= */
+   MAP DATA
+   ========================================================= */
 
-const buildings = [];
+const roads=[];
 
-function B(
-    x,
-    y,
-    w,
-    h,
-    type,
-    name
-){
+function road(x,y,w,h,type="road"){
 
-    buildings.push({
-
-        x,
-        y,
-        w,
-        h,
-
-        type,
-        name
-
+    roads.push({
+        x,y,w,h,type
     });
 
 }
 
 
-/* NORTH */
+/* major Bangkok roads */
 
-B(
-    260,
-    250,
-    690,
-    620,
+road(0,850,WORLD_W,260);
+road(0,2050,WORLD_W,280);
+road(0,3300,WORLD_W,280);
+
+road(850,0,260,WORLD_H);
+road(2050,0,280,WORLD_H);
+road(3250,0,280,WORLD_H);
+road(4450,0,260,WORLD_H);
+
+
+/* smaller roads */
+
+road(1100,1450,1000,130);
+road(3000,1250,1400,130);
+road(3900,2700,1500,130);
+road(700,3900,1500,130);
+
+
+/* =========================================================
+   BUILDINGS
+   ========================================================= */
+
+const buildings=[];
+
+function building(x,y,w,h,type,name){
+
+    buildings.push({
+        x,y,w,h,type,name
+    });
+
+}
+
+
+/* MEGA CITY */
+
+building(
+    250,220,
+    900,520,
     "mall",
     "MEGA CITY MALL"
 );
 
-B(
-    1320,
-    220,
-    520,
-    760,
+building(
+    1250,160,
+    470,720,
     "tower",
     "BANGKOK TOWER"
 );
 
-B(
-    1950,
-    270,
-    470,
-    550,
-    "house",
-    "RIVERSIDE HOMES"
+building(
+    1800,240,
+    560,560,
+    "tower",
+    "RIVERSIDE CONDO"
 );
 
-B(
-    2670,
-    260,
-    560,
-    620,
+building(
+    2450,180,
+    580,620,
     "temple",
-    "WAT ARUN LIGHT"
+    "WAT ARUN DISTRICT"
 );
 
-B(
-    3650,
-    250,
-    720,
-    520,
+building(
+    3500,220,
+    720,520,
     "tower",
     "SIAM BUSINESS CENTER"
 );
 
-B(
-    4900,
-    250,
-    650,
-    780,
+building(
+    4500,180,
+    700,760,
     "tower",
     "SKY RESIDENCE"
 );
 
 
-/* CENTER NORTH */
+/* middle city */
 
-B(
-    260,
-    1380,
-    480,
-    360,
+building(
+    180,1200,
+    550,390,
+    "house",
+    "BANGKOK HOMES"
+);
+
+building(
+    900,1180,
+    420,330,
     "shop",
     "PHARMACY"
 );
 
-B(
-    900,
-    1370,
-    520,
-    410,
+building(
+    1450,1200,
+    520,390,
     "house",
     "OLD TOWN"
 );
 
-B(
-    1550,
-    1370,
-    650,
-    480,
-    "mall",
+building(
+    2200,1150,
+    720,470,
+    "market",
     "NIGHT MARKET"
 );
 
-B(
-    2700,
-    1370,
-    560,
-    420,
+building(
+    3100,1100,
+    420,350,
     "shop",
-    "SURVIVAL STORE"
+    "7 DAY STORE"
 );
 
-B(
-    3300,
-    1370,
-    650,
-    450,
+building(
+    3800,1150,
+    720,450,
     "tower",
     "CITY PLAZA"
 );
 
-B(
-    4150,
-    1380,
-    650,
-    400,
+
+/* lower city */
+
+building(
+    180,2500,
+    750,470,
     "house",
-    "BANGKOK HOME"
+    "RIVERSIDE HOMES"
 );
 
-
-/* CENTER */
-
-B(
-    230,
-    2500,
-    650,
-    430,
-    "house",
-    "RIVERSIDE HOME"
-);
-
-B(
-    980,
-    2500,
-    520,
-    400,
+building(
+    1100,2450,
+    520,430,
     "temple",
-    "COMMUNITY TEMPLE"
+    "SMALL TEMPLE"
 );
 
-B(
-    1600,
-    2500,
-    760,
-    520,
+building(
+    1800,2500,
+    700,500,
     "mall",
     "CENTRAL MARKET"
 );
 
-B(
-    2800,
-    2500,
-    600,
-    430,
+building(
+    2750,2500,
+    600,440,
     "house",
     "SUKHUMVIT HOMES"
 );
 
-B(
-    3650,
-    2500,
-    720,
-    520,
+building(
+    3700,2500,
+    760,520,
     "tower",
     "METRO HEIGHTS"
 );
 
-B(
-    4800,
-    2500,
-    650,
-    420,
+building(
+    4700,2520,
+    580,430,
     "shop",
-    "MEDICAL CENTER"
+    "SURVIVAL STORE"
 );
 
 
-/* SOUTH */
+/* south */
 
-B(
-    240,
-    3600,
-    650,
-    520,
+building(
+    200,3650,
+    700,500,
     "tower",
     "WEST CITY"
 );
 
-B(
-    1000,
-    3600,
-    520,
-    400,
+building(
+    1100,3600,
+    550,440,
     "house",
     "CANAL HOMES"
 );
 
-B(
-    1750,
-    3550,
-    760,
-    540,
+building(
+    1900,3650,
+    780,500,
     "mall",
     "BIG BANGKOK MALL"
 );
 
-B(
-    2800,
-    3600,
-    520,
-    410,
-    "shop",
-    "CLINIC 24H"
+building(
+    2950,3600,
+    520,420,
+    "hospital",
+    "BANGKOK MEDICAL CENTER"
 );
 
-B(
-    3500,
-    3550,
-    700,
-    520,
+building(
+    3700,3650,
+    720,470,
     "tower",
     "EAST RESIDENCE"
 );
 
-B(
-    4700,
-    3550,
-    700,
-    500,
+building(
+    4600,3600,
+    600,480,
     "house",
     "OLD HOUSE"
 );
 
 
 /* =========================================================
-   ENTITIES
-========================================================= */
+   PARKS
+   ========================================================= */
 
-const npcs = [];
-
-const zombies = [];
-
-const cars = [];
-
-const items = [];
-
-const bullets = [];
-
-const particles = [];
+const parks=[
+    {x:1500,y:1800,w:450,h:200},
+    {x:3550,y:1750,w:550,h:230},
+    {x:2700,y:4250,w:750,h:280},
+    {x:80,y:440,w:150,h:230}
+];
 
 
 /* =========================================================
-   HELPERS
-========================================================= */
+   NPC
+   ========================================================= */
 
-const names = [
+const npcs=[];
 
-    "Mali",
-    "Niran",
-    "Pim",
-    "Aom",
-    "Bank",
-    "Mook",
-    "Ton",
-    "Fern",
-    "Kai",
-    "June",
-    "Boss",
-    "Somchai"
-
+const names=[
+    "MALI",
+    "NIRAN",
+    "PIM",
+    "SOMCHAI",
+    "AOM",
+    "BANK",
+    "MOOK",
+    "TON",
+    "FERN",
+    "KAI",
+    "JUNE",
+    "BOSS"
 ];
 
-const colors = [
 
-    "#e85d75",
-    "#56c7ed",
-    "#ffd15c",
-    "#8c7be8",
-    "#65d48a",
-    "#f08bc3"
+function random(arr){
 
-];
-
-function rand(array){
-
-    return array[
-        Math.floor(
-            Math.random() * array.length
-        )
+    return arr[
+        Math.floor(Math.random()*arr.length)
     ];
 
 }
 
+
 function distance(a,b){
 
     return Math.hypot(
-        a.x - b.x,
-        a.y - b.y
+        a.x-b.x,
+        a.y-b.y
     );
 
 }
 
 
-/* =========================================================
-   RANDOM ROAD POSITION
-========================================================= */
+function randomRoadPoint(){
 
-function roadPoint(){
+    const horizontal=Math.random()<.5;
 
-    if(Math.random() < .5){
+    if(horizontal){
 
-        const r = rand(
-            roads.filter(
-                r => r.w > r.h
-            )
-        );
+        const rs=roads.filter(r=>r.w>r.h);
+
+        const r=random(rs);
 
         return {
 
-            x:Math.random()*WORLD_W,
+            x:80+Math.random()*(WORLD_W-160),
 
-            y:
-                r.y +
-                40 +
-                Math.random()*160
+            y:r.y+30+
+              Math.random()*
+              Math.max(40,r.h-60)
 
         };
 
     }
 
-    const r = rand(
-        roads.filter(
-            r => r.h > r.w
-        )
-    );
+    const rs=roads.filter(r=>r.h>r.w);
+
+    const r=random(rs);
 
     return {
 
-        x:
-            r.x +
-            40 +
-            Math.random()*160,
+        x:r.x+30+
+          Math.random()*
+          Math.max(40,r.w-60),
 
-        y:
-            Math.random()*WORLD_H
+        y:80+Math.random()*(WORLD_H-160)
 
     };
 
 }
 
 
+function spawnCivilian(){
+
+    const p=randomRoadPoint();
+
+    npcs.push({
+
+        x:p.x,
+        y:p.y,
+
+        r:10,
+
+        type:"civilian",
+
+        hp:55,
+
+        speed:0.8+Math.random()*0.5,
+
+        angle:Math.random()*Math.PI*2,
+
+        panic:0
+
+    });
+
+}
+
+
+function spawnSoldier(){
+
+    const p=randomRoadPoint();
+
+    npcs.push({
+
+        x:p.x,
+        y:p.y,
+
+        r:11,
+
+        type:"soldier",
+
+        hp:110,
+
+        speed:1.05,
+
+        angle:Math.random()*Math.PI*2,
+
+        cooldown:Math.random()*50
+
+    });
+
+}
+
+
+function spawnBandit(){
+
+    const p=randomRoadPoint();
+
+    npcs.push({
+
+        x:p.x,
+        y:p.y,
+
+        r:11,
+
+        type:"bandit",
+
+        hp:80,
+
+        speed:1,
+
+        angle:Math.random()*Math.PI*2,
+
+        cooldown:Math.random()*50
+
+    });
+
+}
+
+
+for(let i=0;i<28;i++)spawnCivilian();
+
+for(let i=0;i<8;i++)spawnSoldier();
+
+for(let i=0;i<8;i++)spawnBandit();
+
+
+/* =========================================================
+   ZOMBIES
+   ========================================================= */
+
+const zombies=[];
+
+function spawnZombie(x,y){
+
+    zombies.push({
+
+        x,
+        y,
+
+        r:14,
+
+        hp:45,
+
+        maxHp:45,
+
+        speed:.65+Math.random()*.3,
+
+        type:Math.random()<.16?"runner":"walker",
+
+        angle:Math.random()*Math.PI*2,
+
+        attack:0
+
+    });
+
+}
+
+
+for(let i=0;i<34;i++){
+
+    const p=randomRoadPoint();
+
+    spawnZombie(p.x,p.y);
+
+}
+
+
+/* =========================================================
+   CARS
+   ========================================================= */
+
+const cars=[];
+
+const carColors=[
+    "#e95762",
+    "#51bce9",
+    "#f2c24d",
+    "#9278e4",
+    "#62d38a",
+    "#eeeeee",
+    "#3d4c69"
+];
+
+
+function spawnCar(){
+
+    const horizontal=Math.random()<.5;
+
+    if(horizontal){
+
+        const rs=roads.filter(r=>r.w>r.h);
+
+        const r=random(rs);
+
+        cars.push({
+
+            x:Math.random()*WORLD_W,
+
+            y:r.y+r.h/2,
+
+            vx:(Math.random()<.5?-1:1)*
+               (1.1+Math.random()*1.4),
+
+            vy:0,
+
+            color:random(carColors),
+
+            size:1
+
+        });
+
+    }else{
+
+        const rs=roads.filter(r=>r.h>r.w);
+
+        const r=random(rs);
+
+        cars.push({
+
+            x:r.x+r.w/2,
+
+            y:Math.random()*WORLD_H,
+
+            vx:0,
+
+            vy:(Math.random()<.5?-1:1)*
+               (1.1+Math.random()*1.4),
+
+            color:random(carColors),
+
+            size:1
+
+        });
+
+    }
+
+}
+
+
+for(let i=0;i<30;i++)spawnCar();
+
+
+/* =========================================================
+   ITEMS
+   ========================================================= */
+
+const items=[];
+
+function item(type){
+
+    const p=randomRoadPoint();
+
+    items.push({
+
+        x:p.x,
+        y:p.y,
+
+        type,
+
+        pulse:Math.random()*10
+
+    });
+
+}
+
+
+for(let i=0;i<22;i++)item("food");
+
+for(let i=0;i<22;i++)item("water");
+
+for(let i=0;i<14;i++)item("medkit");
+
+for(let i=0;i<6;i++)item("vaccine");
+
+for(let i=0;i<18;i++)item("ammo");
+
+
 /* =========================================================
    COLLISION
-========================================================= */
+   ========================================================= */
 
-function blocked(
-    x,
-    y,
-    r=12
-){
+function blocked(x,y,r=10){
+
+    if(x<20 || y<20 ||
+       x>WORLD_W-20 ||
+       y>WORLD_H-20){
+
+        return true;
+    }
+
 
     for(const b of buildings){
 
         if(
-
-            x+r > b.x &&
-
-            x-r < b.x+b.w &&
-
-            y+r > b.y &&
-
-            y-r < b.y+b.h
-
+            x+r>b.x &&
+            x-r<b.x+b.w &&
+            y+r>b.y &&
+            y-r<b.y+b.h
         ){
 
             return true;
@@ -1403,461 +1323,271 @@ function blocked(
 
 
 /* =========================================================
-   NPC SPAWN
-========================================================= */
+   PLAYER
+   ========================================================= */
 
-function spawnCivilian(){
+function updatePlayer(){
 
-    const q = roadPoint();
+    let dx=0;
+    let dy=0;
 
-    npcs.push({
+    if(keys.w || keys.arrowup)dy--;
 
-        x:q.x,
-        y:q.y,
+    if(keys.s || keys.arrowdown)dy++;
 
-        type:"civilian",
+    if(keys.a || keys.arrowleft)dx--;
 
-        name:rand(names),
+    if(keys.d || keys.arrowright)dx++;
 
-        hp:60,
 
-        speed:
-            1 +
-            Math.random()*.55,
+    if(dx || dy){
 
-        a:
-            Math.random()*Math.PI*2,
+        const length=Math.hypot(dx,dy);
 
-        panic:0,
+        dx/=length;
+        dy/=length;
 
-        cool:0
 
-    });
+        let speed=player.speed;
 
-}
 
+        if(keys.shift && player.stamina>0){
 
-function spawnSoldier(){
+            speed=4.5;
 
-    const q = roadPoint();
+            player.stamina-=.45;
 
-    npcs.push({
+        }else{
 
-        x:q.x,
-        y:q.y,
-
-        type:"soldier",
-
-        name:
-            "UNIT-" +
-            (100 +
-            Math.random()*899 | 0),
-
-        hp:120,
-
-        speed:1.25,
-
-        a:
-            Math.random()*Math.PI*2,
-
-        cool:
-            Math.random()*40
-
-    });
-
-}
-
-
-function spawnBandit(){
-
-    const q = roadPoint();
-
-    npcs.push({
-
-        x:q.x,
-        y:q.y,
-
-        type:"bandit",
-
-        name:"RAIDER",
-
-        hp:90,
-
-        speed:1.15,
-
-        a:
-            Math.random()*Math.PI*2,
-
-        cool:
-            Math.random()*50
-
-    });
-
-}
-
-
-/* =========================================================
-   ZOMBIES
-========================================================= */
-
-function spawnZombie(
-    x,
-    y
-){
-
-    const q =
-        x === undefined
-            ? roadPoint()
-            : {x,y};
-
-    zombies.push({
-
-        x:q.x,
-        y:q.y,
-
-        r:14,
-
-        hp:
-            50 +
-            Math.random()*40,
-
-        speed:
-            .65 +
-            Math.random()*.35,
-
-        type:
-            Math.random()<.17
-                ? "runner"
-                : "walker",
-
-        a:0,
-
-        cool:0
-
-    });
-
-}
-
-
-/* =========================================================
-   INITIAL POPULATION
-========================================================= */
-
-for(let i=0;i<48;i++){
-
-    spawnCivilian();
-
-}
-
-for(let i=0;i<10;i++){
-
-    spawnSoldier();
-
-}
-
-for(let i=0;i<12;i++){
-
-    spawnBandit();
-
-}
-
-for(let i=0;i<38;i++){
-
-    spawnZombie();
-
-}
-
-
-/* =========================================================
-   CARS
-========================================================= */
-
-function spawnCar(){
-
-    const horizontal =
-        Math.random()<.5;
-
-    if(horizontal){
-
-        const r = rand(
-            roads.filter(
-                r=>r.w>r.h
-            )
-        );
-
-        cars.push({
-
-            x:Math.random()*WORLD_W,
-
-            y:
-                r.y+
-                60+
-                Math.random()*110,
-
-            vx:
-                rand([-1,1])*
-                (1.2+
-                Math.random()*1.4),
-
-            vy:0,
-
-            c:rand(colors)
-
-        });
-
-    }else{
-
-        const r = rand(
-            roads.filter(
-                r=>r.h>r.w
-            )
-        );
-
-        cars.push({
-
-            x:
-                r.x+
-                60+
-                Math.random()*110,
-
-            y:
-                Math.random()*WORLD_H,
-
-            vx:0,
-
-            vy:
-                rand([-1,1])*
-                (1.2+
-                Math.random()*1.4),
-
-            c:rand(colors)
-
-        });
-
-    }
-
-}
-
-
-for(let i=0;i<34;i++){
-
-    spawnCar();
-
-}
-
-
-/* =========================================================
-   ITEMS
-========================================================= */
-
-function addItem(type){
-
-    const q = roadPoint();
-
-    items.push({
-
-        x:q.x,
-        y:q.y,
-
-        type
-
-    });
-
-}
-
-for(let i=0;i<25;i++) addItem("food");
-
-for(let i=0;i<25;i++) addItem("water");
-
-for(let i=0;i<16;i++) addItem("medkit");
-
-for(let i=0;i<7;i++) addItem("vaccine");
-
-for(let i=0;i<20;i++) addItem("ammo");
-
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-function show(text){
-
-    const element =
-        document.getElementById("msg");
-
-    element.textContent = text;
-
-    element.style.opacity = 1;
-
-    msgTimer = 150;
-
-}
-
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-addEventListener(
-    "keydown",
-    event => {
-
-        const key =
-            event.key.toLowerCase();
-
-        keys[key] = true;
-
-        if(key === "r")
-            reload();
-
-        if(key === "e")
-            interact();
-
-        if(key === "i")
-            toggleInventory();
-
-        if(key === "1")
-            use("med");
-
-        if(key === "2")
-            use("food");
-
-        if(key === "3")
-            use("water");
-
-        if(key === "4")
-            use("vaccine");
-
-        if(key === "j")
-            changeJob();
-
-    }
-);
-
-
-addEventListener(
-    "keyup",
-    event => {
-
-        keys[
-            event.key.toLowerCase()
-        ] = false;
-
-    }
-);
-
-
-addEventListener(
-    "mousemove",
-    event => {
-
-        mouse.x = event.clientX;
-
-        mouse.y = event.clientY;
-
-        const cross =
-            document.getElementById("cross");
-
-        cross.style.left =
-            mouse.x + "px";
-
-        cross.style.top =
-            mouse.y + "px";
-
-    }
-);
-
-
-addEventListener(
-    "mousedown",
-    event => {
-
-        if(event.button === 0){
-
-            mouse.down = true;
-
-            if(running)
-                shoot();
+            player.stamina+=.18;
 
         }
 
+
+        player.stamina=
+            Math.max(
+                0,
+                Math.min(100,player.stamina)
+            );
+
+
+        const nx=
+            player.x+
+            dx*speed;
+
+        const ny=
+            player.y+
+            dy*speed;
+
+
+        if(!blocked(nx,player.y,player.r)){
+
+            player.x=nx;
+
+        }
+
+
+        if(!blocked(player.x,ny,player.r)){
+
+            player.y=ny;
+
+        }
+
+    }else{
+
+        player.stamina=
+            Math.min(
+                100,
+                player.stamina+.3
+            );
+
     }
-);
 
 
-addEventListener(
-    "mouseup",
-    event => {
+    player.hunger-=.0012;
 
-        if(event.button === 0)
-            mouse.down = false;
+    player.thirst-=.002;
+
+
+    if(player.hunger<15){
+
+        player.hp-=.006;
 
     }
-);
+
+
+    if(player.thirst<15){
+
+        player.hp-=.009;
+
+    }
+
+
+    player.shootCooldown=
+        Math.max(
+            0,
+            player.shootCooldown-1
+        );
+
+
+}
 
 
 /* =========================================================
    AIM
-========================================================= */
+   ========================================================= */
 
-function updateAim(){
+function aimAtMouse(){
 
-    p.angle = Math.atan2(
+    if(lockedTarget){
 
-        mouse.y +
-        cam.y -
-        p.y,
+        if(
+            lockedTarget.hp<=0 ||
+            !zombies.includes(lockedTarget)
+        ){
 
-        mouse.x +
-        cam.x -
-        p.x
+            lockedTarget=null;
 
-    );
+        }
+
+    }
+
+
+    if(lockedTarget){
+
+        player.angle=Math.atan2(
+
+            lockedTarget.y-player.y,
+
+            lockedTarget.x-player.x
+
+        );
+
+    }else{
+
+        const worldX=
+            camera.x+
+            mouse.x*
+            canvas.width/SW;
+
+        const worldY=
+            camera.y+
+            mouse.y*
+            canvas.height/SH;
+
+
+        player.angle=Math.atan2(
+
+            worldY-player.y,
+
+            worldX-player.x
+
+        );
+
+    }
 
 }
 
 
 /* =========================================================
-   SHOOT
-========================================================= */
+   LOCK TARGET
+   ========================================================= */
+
+function lockTarget(){
+
+    let nearest=null;
+
+    let best=900;
+
+
+    for(const z of zombies){
+
+        const d=distance(player,z);
+
+        if(d<best){
+
+            best=d;
+            nearest=z;
+
+        }
+
+    }
+
+
+    for(const n of npcs){
+
+        if(n.type==="civilian")continue;
+
+        const d=distance(player,n);
+
+        if(d<best){
+
+            best=d;
+            nearest=n;
+
+        }
+
+    }
+
+
+    lockedTarget=nearest;
+
+
+    if(lockedTarget){
+
+        showMessage("🎯 TARGET LOCKED");
+
+    }else{
+
+        showMessage("ไม่มีศัตรูในระยะ");
+
+    }
+
+}
+
+
+/* =========================================================
+   BULLETS
+   ========================================================= */
+
+const bullets=[];
+
 
 function shoot(){
 
-    if(!running)
-        return;
+    if(!running)return;
 
-    if(p.cool > 0)
-        return;
+    if(player.shootCooldown>0)return;
 
-    if(p.ammo <= 0){
 
-        show(
-            "กระสุนหมด — กด R เพื่อรีโหลด"
-        );
+    if(player.ammo<=0){
+
+        showMessage("🔫 กระสุนหมด — กด R");
 
         return;
 
     }
 
-    p.ammo--;
 
-    p.cool = 8;
+    aimAtMouse();
+
+
+    player.ammo--;
+
+    player.shootCooldown=9;
+
 
     bullets.push({
 
-        x:
-            p.x +
-            Math.cos(p.angle)*20,
+        x:player.x+
+          Math.cos(player.angle)*24,
 
-        y:
-            p.y +
-            Math.sin(p.angle)*20,
+        y:player.y+
+          Math.sin(player.angle)*24,
 
-        vx:
-            Math.cos(p.angle)*13,
+        vx:Math.cos(player.angle)*12,
 
-        vy:
-            Math.sin(p.angle)*13,
+        vy:Math.sin(player.angle)*12,
 
         life:55,
 
@@ -1865,342 +1595,113 @@ function shoot(){
 
     });
 
-
-    for(let i=0;i<3;i++){
-
-        particles.push({
-
-            x:
-                p.x+
-                Math.cos(p.angle)*22,
-
-            y:
-                p.y+
-                Math.sin(p.angle)*22,
-
-            vx:
-                (Math.random()-.5)*2,
-
-            vy:
-                (Math.random()-.5)*2,
-
-            life:15,
-
-            t:"muzzle"
-
-        });
-
-    }
-
 }
 
-
-/* =========================================================
-   RELOAD
-========================================================= */
 
 function reload(){
 
     if(
-        p.ammo >= 12 ||
-        p.reserve <= 0
-    )
-        return;
+        player.ammo>=12 ||
+        player.reserve<=0
+    )return;
 
-    const amount =
+
+    const needed=
+        12-player.ammo;
+
+    const amount=
         Math.min(
-            12-p.ammo,
-            p.reserve
+            needed,
+            player.reserve
         );
 
-    p.ammo += amount;
 
-    p.reserve -= amount;
+    player.ammo+=amount;
 
-    show("🔫 RELOADED");
+    player.reserve-=amount;
+
+
+    showMessage("🔄 RELOADED");
 
 }
 
 
 /* =========================================================
-   PLAYER MOVEMENT
-========================================================= */
-
-function updatePlayer(){
-
-    let dx=0;
-    let dy=0;
-
-    if(
-        keys.w ||
-        keys.arrowup
-    )
-        dy--;
-
-    if(
-        keys.s ||
-        keys.arrowdown
-    )
-        dy++;
-
-    if(
-        keys.a ||
-        keys.arrowleft
-    )
-        dx--;
-
-    if(
-        keys.d ||
-        keys.arrowright
-    )
-        dx++;
-
-
-    if(dx || dy){
-
-        const length =
-            Math.hypot(dx,dy);
-
-        dx/=length;
-        dy/=length;
-
-        let speed =
-            p.speed;
-
-
-        if(
-            keys.shift &&
-            p.stamina > 0
-        ){
-
-            speed=5.2;
-
-            p.stamina =
-                Math.max(
-                    0,
-                    p.stamina-.55
-                );
-
-        }else{
-
-            p.stamina =
-                Math.min(
-                    100,
-                    p.stamina+.22
-                );
-
-        }
-
-
-        const nx =
-            p.x +
-            dx*speed;
-
-        const ny =
-            p.y +
-            dy*speed;
-
-
-        if(
-            !blocked(
-                nx,
-                p.y,
-                p.r
-            )
-        )
-            p.x=nx;
-
-
-        if(
-            !blocked(
-                p.x,
-                ny,
-                p.r
-            )
-        )
-            p.y=ny;
-
-    }else{
-
-        p.stamina =
-            Math.min(
-                100,
-                p.stamina+.3
-            );
-
-    }
-
-
-    p.x =
-        Math.max(
-            25,
-            Math.min(
-                WORLD_W-25,
-                p.x
-            )
-        );
-
-
-    p.y =
-        Math.max(
-            25,
-            Math.min(
-                WORLD_H-25,
-                p.y
-            )
-        );
-
-
-    p.hunger -= .0013;
-
-    p.thirst -= .0021;
-
-
-    if(p.hunger < 15)
-        p.hp -= .006;
-
-    if(p.thirst < 15)
-        p.hp -= .009;
-
-
-    p.cool =
-        Math.max(
-            0,
-            p.cool-1
-        );
-
-}
-
-
-/* =========================================================
-   BULLETS
-========================================================= */
+   BULLET UPDATE
+   ========================================================= */
 
 function updateBullets(){
 
-    for(
-        let i=bullets.length-1;
-        i>=0;
-        i--
-    ){
+    for(let i=bullets.length-1;i>=0;i--){
 
         const b=bullets[i];
 
-        b.x += b.vx;
-
-        b.y += b.vy;
+        b.x+=b.vx;
+        b.y+=b.vy;
 
         b.life--;
 
 
-        let hit=false;
+        let remove=
+            b.life<=0;
 
 
-        if(
-            b.life<=0 ||
-            blocked(
-                b.x,
-                b.y,
-                2
-            )
-        )
-            hit=true;
+        if(blocked(b.x,b.y,2)){
+
+            remove=true;
+
+        }
 
 
-        /* ZOMBIES */
+        for(let j=zombies.length-1;j>=0;j--){
 
-        for(
-            let j=zombies.length-1;
-            j>=0 && !hit;
-            j--
-        ){
+            const z=zombies[j];
 
-            const z =
-                zombies[j];
 
             if(
                 Math.hypot(
                     b.x-z.x,
                     b.y-z.y
-                )
-                <
-                z.r+5
+                ) < z.r+5
             ){
 
-                z.hp -= b.damage;
+                z.hp-=b.damage;
 
-                hit=true;
+                remove=true;
 
 
                 if(z.hp<=0){
 
-                    zombies.splice(
-                        j,
-                        1
-                    );
+                    player.kills++;
 
-                    p.kills++;
+                    player.money+=10;
 
-                    p.money+=10;
+                    if(lockedTarget===z){
 
-                    show(
-                        "☠ +1 zombie · +10 ฿"
+                        lockedTarget=null;
+
+                    }
+
+                    zombies.splice(j,1);
+
+                    showMessage(
+                        "🧟 Zombie eliminated +10฿"
                     );
 
                 }
+
+                break;
 
             }
 
         }
 
 
-        /* ENEMY NPC */
+        if(remove){
 
-        for(
-            let j=npcs.length-1;
-            j>=0 && !hit;
-            j--
-        ){
-
-            const n=npcs[j];
-
-            if(
-                n.type !== "civilian" &&
-                Math.hypot(
-                    b.x-n.x,
-                    b.y-n.y
-                ) < 15
-            ){
-
-                n.hp -= b.damage;
-
-                hit=true;
-
-
-                if(n.hp<=0){
-
-                    npcs.splice(
-                        j,
-                        1
-                    );
-
-                    p.kills++;
-
-                    p.money+=20;
-
-                    show(
-                        "⚠ ศัตรูถูกกำจัด · +20 ฿"
-                    );
-
-                }
-
-            }
-
-        }
-
-
-        if(hit)
             bullets.splice(i,1);
+
+        }
 
     }
 
@@ -2209,50 +1710,63 @@ function updateBullets(){
 
 /* =========================================================
    ZOMBIE AI
-========================================================= */
+   ========================================================= */
 
 function updateZombies(){
 
-    for(
-        let i=zombies.length-1;
-        i>=0;
-        i--
-    ){
+    for(let i=zombies.length-1;i>=0;i--){
 
-        const z =
-            zombies[i];
+        const z=zombies[i];
 
-        const distanceToPlayer =
-            distance(
-                z,
-                p
-            );
+        let target=player;
+
+        let nearest=
+            distance(z,player);
 
 
-        if(
-            distanceToPlayer < 600
-        ){
+        /* civilians can become targets */
 
-            z.a =
-                Math.atan2(
-                    p.y-z.y,
-                    p.x-z.x
-                );
+        for(const n of npcs){
+
+            const d=distance(z,n);
+
+            if(
+                d<nearest &&
+                d<330
+            ){
+
+                nearest=d;
+                target=n;
+
+            }
+
+        }
 
 
-            const speed =
-                z.type === "runner"
-                    ? 1.7
-                    : z.speed;
+        z.angle=Math.atan2(
+
+            target.y-z.y,
+
+            target.x-z.x
+
+        );
 
 
-            const nx =
-                z.x +
-                Math.cos(z.a)*speed;
+        if(nearest<500){
 
-            const ny =
-                z.y +
-                Math.sin(z.a)*speed;
+            const speed=
+                z.type==="runner"
+                ?1.45
+                :z.speed;
+
+
+            const nx=
+                z.x+
+                Math.cos(z.angle)*speed;
+
+            const ny=
+                z.y+
+                Math.sin(z.angle)*speed;
 
 
             if(
@@ -2261,8 +1775,11 @@ function updateZombies(){
                     z.y,
                     z.r
                 )
-            )
+            ){
+
                 z.x=nx;
+
+            }
 
 
             if(
@@ -2271,28 +1788,35 @@ function updateZombies(){
                     ny,
                     z.r
                 )
-            )
-                z.y=ny;
-
-
-            if(
-                distanceToPlayer < 29
             ){
 
-                z.cool--;
+                z.y=ny;
 
-                if(z.cool<=0){
+            }
 
-                    p.hp -=
-                        z.type === "runner"
-                            ? 10
-                            : 6;
 
-                    z.cool=45;
+            if(nearest<27){
 
-                    show(
-                        "🧟 ถูกซอมบี้กัด!"
-                    );
+                z.attack--;
+
+
+                if(z.attack<=0){
+
+                    target.hp-=
+                        z.type==="runner"
+                        ?10
+                        :6;
+
+                    z.attack=45;
+
+
+                    if(target===player){
+
+                        showMessage(
+                            "🧟 ZOMBIE ATTACK!"
+                        );
+
+                    }
 
                 }
 
@@ -2300,164 +1824,109 @@ function updateZombies(){
 
         }else{
 
-            if(
-                Math.random()<.02
-            ){
-
-                z.a +=
-                    (Math.random()-.5)*2;
-
-            }
-
-
-            const nx =
-                z.x +
-                Math.cos(z.a)*.35;
-
-            const ny =
-                z.y +
-                Math.sin(z.a)*.35;
-
-
-            if(
-                !blocked(
-                    nx,
-                    ny,
-                    z.r
-                )
-            ){
-
-                z.x=nx;
-                z.y=ny;
-
-            }else{
-
-                z.a+=1.5;
-
-            }
+            z.angle+=
+                (Math.random()-.5)*.08;
 
         }
 
     }
 
 
-    /* RESPAWN ZOMBIES */
+    while(zombies.length<34){
 
-    if(
-        zombies.length < 34
-    ){
+        const p=randomRoadPoint();
 
-        const q =
-            roadPoint();
-
-        spawnZombie(
-            q.x,
-            q.y
-        );
+        spawnZombie(p.x,p.y);
 
     }
-
-}
-
-
-/* =========================================================
-   FIND NEAREST
-========================================================= */
-
-function nearestZombie(
-    n,
-    maxDistance
-){
-
-    let best=null;
-
-    let bestDistance=
-        maxDistance;
-
-
-    for(const z of zombies){
-
-        const q =
-            distance(
-                n,
-                z
-            );
-
-
-        if(q < bestDistance){
-
-            bestDistance=q;
-
-            best=z;
-
-        }
-
-    }
-
-    return best;
 
 }
 
 
 /* =========================================================
    NPC AI
-========================================================= */
+   ========================================================= */
 
 function updateNPCs(){
 
-    for(
-        let i=npcs.length-1;
-        i>=0;
-        i--
-    ){
+    for(let i=npcs.length-1;i>=0;i--){
 
         const n=npcs[i];
 
 
-        /* CIVILIANS */
+        if(n.hp<=0){
 
-        if(
-            n.type === "civilian"
-        ){
+            npcs.splice(i,1);
 
-            const danger =
-                nearestZombie(
-                    n,
-                    180
-                );
+            continue;
+
+        }
 
 
-            if(danger)
-                n.panic=110;
+        if(n.type==="civilian"){
+
+            let danger=false;
+
+
+            for(const z of zombies){
+
+                if(distance(n,z)<150){
+
+                    danger=true;
+
+                    break;
+
+                }
+
+            }
+
+
+            if(danger){
+
+                n.panic=120;
+
+            }
 
 
             if(n.panic>0){
 
                 n.panic--;
 
-                n.a =
-                    Math.atan2(
-                        n.y-danger.y,
-                        n.x-danger.x
-                    );
+
+                let dx=0;
+                let dy=0;
 
 
-                const nx =
+                for(const z of zombies){
+
+                    if(distance(n,z)<190){
+
+                        dx+=n.x-z.x;
+                        dy+=n.y-z.y;
+
+                    }
+
+                }
+
+
+                const len=
+                    Math.hypot(dx,dy)||1;
+
+
+                dx/=len;
+                dy/=len;
+
+
+                const nx=
                     n.x+
-                    Math.cos(n.a)*1.9;
+                    dx*1.8;
 
-                const ny =
+                const ny=
                     n.y+
-                    Math.sin(n.a)*1.9;
+                    dy*1.8;
 
 
-                if(
-                    !blocked(
-                        nx,
-                        ny,
-                        10
-                    )
-                ){
+                if(!blocked(nx,ny,10)){
 
                     n.x=nx;
                     n.y=ny;
@@ -2476,140 +1945,62 @@ function updateNPCs(){
         }
 
 
-        /* SOLDIERS */
+        /* soldiers hunt zombies */
 
-        let target=null;
+        if(n.type==="soldier"){
 
+            let target=null;
 
-        if(
-            n.type === "soldier"
-        ){
-
-            target =
-                nearestZombie(
-                    n,
-                    500
-                );
-
-        }
+            let best=450;
 
 
-        /* BANDITS TARGET PLAYER */
+            for(const z of zombies){
 
-        if(
-            n.type === "bandit"
-        ){
+                const d=distance(n,z);
 
-            target=p;
+                if(d<best){
 
-        }
+                    best=d;
+                    target=z;
 
+                }
 
-        if(target){
-
-            const q =
-                distance(
-                    n,
-                    target
-                );
+            }
 
 
-            n.a =
-                Math.atan2(
+            if(target){
+
+                n.angle=Math.atan2(
+
                     target.y-n.y,
+
                     target.x-n.x
+
                 );
 
 
-            if(q>180){
+                if(best>150){
 
-                const nx =
-                    n.x+
-                    Math.cos(n.a)*n.speed;
+                    moveNPC(n);
 
-                const ny =
-                    n.y+
-                    Math.sin(n.a)*n.speed;
+                }else{
 
+                    n.cooldown--;
 
-                if(
-                    !blocked(
-                        nx,
-                        n.y,
-                        10
-                    )
-                )
-                    n.x=nx;
+                    if(n.cooldown<=0){
 
-
-                if(
-                    !blocked(
-                        n.x,
-                        ny,
-                        10
-                    )
-                )
-                    n.y=ny;
-
-            }else{
-
-                n.cool--;
-
-
-                if(n.cool<=0){
-
-                    n.cool =
-                        n.type === "soldier"
-                            ? 35
-                            : 55;
-
-
-                    if(
-                        target === p
-                    ){
-
-                        p.hp-=7;
-
-                        show(
-                            "🔻 คุณถูก Raider ยิง!"
-                        );
-
-                    }else{
+                        n.cooldown=38;
 
                         target.hp-=18;
 
+                        if(target.hp<=0){
 
-                        particles.push({
-
-                            x:target.x,
-                            y:target.y,
-
-                            vx:0,
-                            vy:0,
-
-                            life:12,
-
-                            t:"hit"
-
-                        });
-
-
-                        if(
-                            target.hp<=0
-                        ){
-
-                            const zi =
-                                zombies.indexOf(
-                                    target
-                                );
-
+                            const zi=
+                                zombies.indexOf(target);
 
                             if(zi>=0){
 
-                                zombies.splice(
-                                    zi,
-                                    1
-                                );
+                                zombies.splice(zi,1);
 
                             }
 
@@ -2619,11 +2010,61 @@ function updateNPCs(){
 
                 }
 
+            }else{
+
+                wander(n);
+
             }
 
-        }else{
+        }
 
-            wander(n);
+
+        /* bandits attack player */
+
+        if(n.type==="bandit"){
+
+            const d=
+                distance(n,player);
+
+
+            if(d<420){
+
+                n.angle=Math.atan2(
+
+                    player.y-n.y,
+
+                    player.x-n.x
+
+                );
+
+
+                if(d>170){
+
+                    moveNPC(n);
+
+                }else{
+
+                    n.cooldown--;
+
+                    if(n.cooldown<=0){
+
+                        n.cooldown=65;
+
+                        player.hp-=7;
+
+                        showMessage(
+                            "⚠ BANDIT ยิงคุณ!"
+                        );
+
+                    }
+
+                }
+
+            }else{
+
+                wander(n);
+
+            }
 
         }
 
@@ -2632,96 +2073,77 @@ function updateNPCs(){
 }
 
 
-/* =========================================================
-   NPC WANDER
-========================================================= */
+function moveNPC(n){
 
-function wander(n){
+    const nx=
+        n.x+
+        Math.cos(n.angle)*n.speed;
 
-    if(
-        Math.random()<.015
-    ){
+    const ny=
+        n.y+
+        Math.sin(n.angle)*n.speed;
 
-        n.a +=
-            (Math.random()-.5)*2;
+
+    if(!blocked(nx,n.y,10)){
+
+        n.x=nx;
 
     }
 
 
-    const nx =
-        n.x+
-        Math.cos(n.a)*n.speed;
+    if(!blocked(n.x,ny,10)){
 
-    const ny =
-        n.y+
-        Math.sin(n.a)*n.speed;
-
-
-    if(
-        !blocked(
-            nx,
-            ny,
-            10
-        )
-    ){
-
-        n.x=nx;
         n.y=ny;
-
-    }else{
-
-        n.a+=1.7;
 
     }
 
 }
 
 
+function wander(n){
+
+    if(Math.random()<.015){
+
+        n.angle+=
+            (Math.random()-.5)*2;
+
+    }
+
+
+    moveNPC(n);
+
+}
+
+
 /* =========================================================
    CARS
-========================================================= */
+   ========================================================= */
 
 function updateCars(){
 
     for(const c of cars){
 
         c.x+=c.vx;
-
         c.y+=c.vy;
 
 
-        if(
-            c.x > WORLD_W+80
-        )
-            c.x=-80;
+        if(c.x>WORLD_W+100)c.x=-100;
 
+        if(c.x<-100)c.x=WORLD_W+100;
 
-        if(
-            c.x < -80
-        )
-            c.x= WORLD_W+80;
+        if(c.y>WORLD_H+100)c.y=-100;
 
-
-        if(
-            c.y > WORLD_H+80
-        )
-            c.y=-80;
-
-
-        if(
-            c.y < -80
-        )
-            c.y= WORLD_H+80;
+        if(c.y<-100)c.y=WORLD_H+100;
 
 
         if(
             Math.hypot(
-                c.x-p.x,
-                c.y-p.y
-            ) < 30
+                c.x-player.x,
+                c.y-player.y
+            )<27
         ){
 
-            p.hp-=.05;
+            player.hp-=.05;
 
         }
 
@@ -2732,151 +2154,66 @@ function updateCars(){
 
 /* =========================================================
    INTERACTION
-========================================================= */
+   ========================================================= */
 
 function interact(){
 
-    let got=false;
+    if(!running)return;
 
 
-    for(
-        let i=items.length-1;
-        i>=0;
-        i--
-    ){
+    for(let i=items.length-1;i>=0;i--){
 
-        const item =
-            items[i];
+        const it=items[i];
 
 
-        if(
-            distance(
-                p,
-                item
-            ) < 60
-        ){
+        if(distance(player,it)<55){
 
-            if(
-                item.type === "food"
-            ){
+            if(it.type==="food"){
 
-                p.food++;
+                player.food++;
 
-                show(
-                    "🍞 เก็บอาหาร +1"
-                );
+                showMessage("🍞 FOOD +1");
 
             }
 
 
-            if(
-                item.type === "water"
-            ){
+            if(it.type==="water"){
 
-                p.water++;
+                player.water++;
 
-                show(
-                    "💧 เก็บน้ำ +1"
-                );
+                showMessage("💧 WATER +1");
 
             }
 
 
-            if(
-                item.type === "medkit"
-            ){
+            if(it.type==="medkit"){
 
-                p.med++;
+                player.medkits++;
 
-                show(
-                    "💊 เก็บ Medkit +1"
-                );
+                showMessage("💊 MEDKIT +1");
 
             }
 
 
-            if(
-                item.type === "vaccine"
-            ){
+            if(it.type==="vaccine"){
 
-                p.vaccine++;
+                player.vaccines++;
 
-                show(
-                    "💉 ได้รับวัคซีน +1"
-                );
+                showMessage("💉 VACCINE +1");
 
             }
 
 
-            if(
-                item.type === "ammo"
-            ){
+            if(it.type==="ammo"){
 
-                p.reserve+=18;
+                player.reserve+=18;
 
-                show(
-                    "📦 กระสุน +18"
-                );
+                showMessage("🔫 AMMO +18");
 
             }
 
 
-            items.splice(
-                i,
-                1
-            );
-
-            got=true;
-
-            break;
-
-        }
-
-    }
-
-
-    if(got)
-        return;
-
-
-    /* BUILDING */
-
-    for(
-        const b of buildings
-    ){
-
-        const cx =
-            b.x+b.w/2;
-
-        const cy =
-            b.y+b.h/2;
-
-
-        if(
-
-            Math.abs(
-                p.x-cx
-            )
-            <
-            b.w/2+55
-
-            &&
-
-            Math.abs(
-                p.y-cy
-            )
-            <
-            b.h/2+55
-
-        ){
-
-            show(
-                "🏙️ "+
-                b.name+
-                " — สำรวจพื้นที่แล้ว"
-            );
-
-            p.money+=2;
+            items.splice(i,1);
 
             return;
 
@@ -2885,261 +2222,256 @@ function interact(){
     }
 
 
-    show(
-        "ใกล้เกินไป ไม่มีของให้เก็บ"
-    );
+    for(const b of buildings){
+
+        const cx=b.x+b.w/2;
+        const cy=b.y+b.h/2;
+
+
+        if(
+            Math.abs(player.x-cx)<
+                b.w/2+45 &&
+            Math.abs(player.y-cy)<
+                b.h/2+45
+        ){
+
+            showMessage(
+                "🏢 "+b.name+" — สำรวจแล้ว"
+            );
+
+            player.money+=2;
+
+            return;
+
+        }
+
+    }
 
 }
 
 
 /* =========================================================
    CONSUMABLES
-========================================================= */
+   ========================================================= */
 
-function use(type){
+function useMedkit(){
 
     if(
-        type==="med" &&
-        p.med>0 &&
-        p.hp<100
-    ){
+        player.medkits<=0 ||
+        player.hp>=100
+    )return;
 
-        p.med--;
 
-        p.hp =
-            Math.min(
-                100,
-                p.hp+45
-            );
+    player.medkits--;
 
-        show(
-            "💊 MEDKIT USED"
+    player.hp=
+        Math.min(
+            100,
+            player.hp+40
         );
 
-    }
+    showMessage("💊 MEDKIT USED");
+
+}
 
 
-    else if(
-        type==="food" &&
-        p.food>0
-    ){
+function useFood(){
 
-        p.food--;
+    if(player.food<=0)return;
 
-        p.hunger =
-            Math.min(
-                100,
-                p.hunger+35
-            );
+    player.food--;
 
-        show(
-            "🍞 FOOD EATEN"
+    player.hunger=
+        Math.min(
+            100,
+            player.hunger+35
         );
 
-    }
+    showMessage("🍞 FOOD EATEN");
+
+}
 
 
-    else if(
-        type==="water" &&
-        p.water>0
-    ){
+function useWater(){
 
-        p.water--;
+    if(player.water<=0)return;
 
-        p.thirst =
-            Math.min(
-                100,
-                p.thirst+40
-            );
+    player.water--;
 
-        show(
-            "💧 WATER DRUNK"
+    player.thirst=
+        Math.min(
+            100,
+            player.thirst+40
         );
 
-    }
+    showMessage("💧 WATER DRUNK");
+
+}
 
 
-    else if(
-        type==="vaccine" &&
-        p.vaccine>0
-    ){
+function useVaccine(){
 
-        p.vaccine--;
+    if(player.vaccines<=0)return;
 
-        p.hp =
-            Math.min(
-                100,
-                p.hp+20
-            );
+    player.vaccines--;
 
-        show(
-            "💉 VACCINE USED"
+    player.hp=
+        Math.min(
+            100,
+            player.hp+20
         );
 
-    }
+    showMessage(
+        "💉 VACCINE ADMINISTERED"
+    );
 
 }
 
 
 /* =========================================================
    JOB SYSTEM
-========================================================= */
+   ========================================================= */
+
+const jobs=[
+
+    {
+        name:"SURVIVOR",
+        outfit:"URBAN"
+    },
+
+    {
+        name:"MEDIC",
+        outfit:"MEDIC"
+    },
+
+    {
+        name:"SOLDIER",
+        outfit:"MILITARY"
+    },
+
+    {
+        name:"SCAVENGER",
+        outfit:"SCAVENGER"
+    },
+
+    {
+        name:"MECHANIC",
+        outfit:"MECHANIC"
+    }
+
+];
+
 
 function changeJob(){
 
-    const jobs=[
-
-        "SURVIVOR",
-        "MEDIC",
-        "SOLDIER",
-        "SCAVENGER",
-        "MECHANIC"
-
-    ];
-
-
-    const index =
-        jobs.indexOf(
-            p.job
+    const index=
+        jobs.findIndex(
+            j=>j.name===player.job
         );
 
 
-    p.job =
+    const next=
         jobs[
-            (index+1)
-            %jobs.length
+            (index+1)%jobs.length
         ];
 
 
-    if(
-        p.job === "MEDIC"
-    ){
+    player.job=next.name;
 
-        p.hp =
+    player.outfit=next.outfit;
+
+
+    if(player.job==="MEDIC"){
+
+        player.hp=
             Math.min(
                 100,
-                p.hp+20
+                player.hp+20
             );
 
     }
 
 
-    if(
-        p.job === "SOLDIER"
-    ){
+    if(player.job==="SOLDIER"){
 
-        p.reserve+=30;
+        player.reserve+=30;
 
     }
 
 
-    show(
-        "JOB → "+p.job
+    showMessage(
+        "JOB → "+player.job
     );
 
 }
 
 
 /* =========================================================
-   INVENTORY
-========================================================= */
-
-function toggleInventory(){
-
-    invOpen=!invOpen;
-
-
-    document.getElementById(
-        "inv"
-    ).style.display =
-        invOpen
-            ? "block"
-            : "none";
-
-}
-
-
-/* =========================================================
    TIME
-========================================================= */
+   ========================================================= */
+
+let worldMinutes=8*60;
+let day=1;
+
 
 function updateTime(){
 
-    clock+=.035;
+    worldMinutes+=.045;
 
 
-    if(
-        clock>=1440
-    ){
+    if(worldMinutes>=1440){
 
-        clock=0;
+        worldMinutes=0;
 
         day++;
 
     }
 
 
-    const hour =
-        Math.floor(
-            clock/60
-        );
+    const h=
+        Math.floor(worldMinutes/60);
 
-    const minute =
-        Math.floor(
-            clock%60
-        );
+    const m=
+        Math.floor(worldMinutes%60);
 
 
-    document.getElementById(
-        "day"
-    ).textContent=day;
+    document.getElementById("dayText")
+        .textContent=day;
 
 
-    document.getElementById(
-        "time"
-    ).textContent=
-
-        String(hour)
-            .padStart(2,"0")
-        +":"
-        +
-        String(minute)
-            .padStart(2,"0");
+    document.getElementById("timeText")
+        .textContent=
+        String(h).padStart(2,"0")+
+        ":"+
+        String(m).padStart(2,"0");
 
 }
 
 
-/* =========================================================
-   NIGHT
-========================================================= */
+function nightAlpha(){
 
-function nightAmount(){
-
-    const hour =
-        clock/60;
+    const h=worldMinutes/60;
 
 
-    if(
-        hour>=19 ||
-        hour<6
-    )
-        return .64;
+    if(h>=20 || h<5){
+
+        return .62;
+
+    }
 
 
-    if(
-        hour>=17
-    )
-        return (
-            (hour-17)/2
-        )*.64;
+    if(h>=18){
+
+        return (h-18)/2*.62;
+
+    }
 
 
-    if(
-        hour<8
-    )
-        return (
-            (8-hour)/2
-        )*.64;
+    if(h<7){
+
+        return (7-h)/2*.62;
+
+    }
 
 
     return 0;
@@ -3149,26 +2481,47 @@ function nightAmount(){
 
 /* =========================================================
    CAMERA
-========================================================= */
+   ========================================================= */
 
 function updateCamera(){
 
-    cam.x =
+    const scale=
+        canvas.width/SW;
+
+
+    const viewW=
+        canvas.width;
+
+    const viewH=
+        canvas.height;
+
+
+    camera.x=
+        player.x-
+        viewW/2;
+
+
+    camera.y=
+        player.y-
+        viewH/2;
+
+
+    camera.x=
         Math.max(
             0,
             Math.min(
-                WORLD_W-W,
-                p.x-W/2
+                WORLD_W-viewW,
+                camera.x
             )
         );
 
 
-    cam.y =
+    camera.y=
         Math.max(
             0,
             Math.min(
-                WORLD_H-H,
-                p.y-H/2
+                WORLD_H-viewH,
+                camera.y
             )
         );
 
@@ -3176,43 +2529,50 @@ function updateCamera(){
 
 
 /* =========================================================
-   DRAW
-========================================================= */
+   PIXEL WORLD
+   ========================================================= */
 
-function draw(){
+function drawWorld(){
 
     ctx.clearRect(
         0,
         0,
-        W,
-        H
-    );
-
-
-    ctx.fillStyle="#6fbd74";
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
+        canvas.width,
+        canvas.height
     );
 
 
     ctx.save();
 
-
     ctx.translate(
-        -cam.x,
-        -cam.y
+        -Math.floor(camera.x),
+        -Math.floor(camera.y)
     );
 
 
-    drawGround();
+    /* grass base */
+
+    ctx.fillStyle="#70b85f";
+
+    ctx.fillRect(
+        camera.x,
+        camera.y,
+        canvas.width,
+        canvas.height
+    );
+
+
+    drawGrass();
+
+    drawParks();
 
     drawRoads();
 
     drawBuildings();
+
+    drawStreetLights();
+
+    drawTrees();
 
     drawCars();
 
@@ -3226,75 +2586,70 @@ function draw(){
 
     drawPlayer();
 
-    drawParticles();
-
+    drawLockTarget();
 
     ctx.restore();
 
 
     drawNight();
 
-    drawMinimap();
-
 }
 
 
 /* =========================================================
-   GROUND
-========================================================= */
+   GRASS PIXELS
+   ========================================================= */
 
-function drawGround(){
+function drawGrass(){
+
+    const startX=
+        Math.floor(camera.x/50)*50;
+
+    const startY=
+        Math.floor(camera.y/50)*50;
+
 
     for(
-        let x=0;
-        x<WORLD_W;
-        x+=90
+        let x=startX;
+        x<camera.x+canvas.width+60;
+        x+=50
     ){
 
         for(
-            let y=0;
-            y<WORLD_H;
-            y+=90
+            let y=startY;
+            y<camera.y+canvas.height+60;
+            y+=50
         ){
 
-            ctx.fillStyle =
-                (
-                    x/90+
-                    y/90
-                )%2
-
-                ? "rgba(255,255,255,.018)"
-
-                : "rgba(0,0,0,.018)";
+            const seed=
+                Math.abs(
+                    Math.sin(
+                        x*12.9898+
+                        y*78.233
+                    )
+                );
 
 
-            ctx.fillRect(
-                x,
-                y,
-                90,
-                90
-            );
-
-
-            if(
-                (x*3+y)%270===0
-            ){
+            if(seed>.55){
 
                 ctx.fillStyle=
-                    "#2d8c57aa";
+                    seed>.8
+                    ?"#4e9b55"
+                    :"#63aa57";
+
 
                 ctx.fillRect(
-                    x+20,
-                    y+30,
+                    x+8,
+                    y+13,
                     3,
-                    12
+                    7
                 );
 
                 ctx.fillRect(
-                    x+24,
-                    y+26,
+                    x+11,
+                    y+10,
                     3,
-                    16
+                    4
                 );
 
             }
@@ -3307,16 +2662,96 @@ function drawGround(){
 
 
 /* =========================================================
+   PARKS
+   ========================================================= */
+
+function drawParks(){
+
+    for(const p of parks){
+
+        ctx.fillStyle="#58a957";
+
+        ctx.fillRect(
+            p.x,
+            p.y,
+            p.w,
+            p.h
+        );
+
+
+        for(let i=0;i<8;i++){
+
+            const tx=
+                p.x+
+                30+
+                Math.random()*
+                Math.max(10,p.w-60);
+
+            const ty=
+                p.y+
+                30+
+                Math.random()*
+                Math.max(10,p.h-60);
+
+
+            drawTree(
+                tx,
+                ty,
+                1
+            );
+
+        }
+
+
+        /* benches */
+
+        for(
+            let x=p.x+70;
+            x<p.x+p.w-40;
+            x+=150
+        ){
+
+            ctx.fillStyle="#8b5938";
+
+            ctx.fillRect(
+                x,
+                p.y+p.h/2,
+                55,
+                8
+            );
+
+            ctx.fillStyle="#563928";
+
+            ctx.fillRect(
+                x+5,
+                p.y+p.h/2+8,
+                7,
+                12
+            );
+
+            ctx.fillRect(
+                x+43,
+                p.y+p.h/2+8,
+                7,
+                12
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
    ROADS
-========================================================= */
+   ========================================================= */
 
 function drawRoads(){
 
-    for(
-        const r of roads
-    ){
+    for(const r of roads){
 
-        ctx.fillStyle="#3e4b5c";
+        ctx.fillStyle="#4c5663";
 
         ctx.fillRect(
             r.x,
@@ -3326,12 +2761,11 @@ function drawRoads(){
         );
 
 
-        ctx.fillStyle="#566475";
+        /* road edges */
 
+        ctx.fillStyle="#39434f";
 
-        if(
-            r.w > r.h
-        ){
+        if(r.w>r.h){
 
             ctx.fillRect(
                 r.x,
@@ -3346,32 +2780,6 @@ function drawRoads(){
                 r.w,
                 8
             );
-
-
-            ctx.strokeStyle=
-                "#f5d77899";
-
-            ctx.lineWidth=4;
-
-            ctx.setLineDash(
-                [35,28]
-            );
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                r.x,
-                r.y+r.h/2
-            );
-
-            ctx.lineTo(
-                r.x+r.w,
-                r.y+r.h/2
-            );
-
-            ctx.stroke();
-
-            ctx.setLineDash([]);
 
         }else{
 
@@ -3389,15 +2797,35 @@ function drawRoads(){
                 r.h
             );
 
+        }
 
-            ctx.strokeStyle=
-                "#f5d77899";
 
-            ctx.lineWidth=4;
+        /* lane markings */
 
-            ctx.setLineDash(
-                [35,28]
+        ctx.strokeStyle="#d8d08b";
+
+        ctx.lineWidth=4;
+
+        ctx.setLineDash([35,30]);
+
+
+        if(r.w>r.h){
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                r.x,
+                r.y+r.h/2
             );
+
+            ctx.lineTo(
+                r.x+r.w,
+                r.y+r.h/2
+            );
+
+            ctx.stroke();
+
+        }else{
 
             ctx.beginPath();
 
@@ -3413,9 +2841,10 @@ function drawRoads(){
 
             ctx.stroke();
 
-            ctx.setLineDash([]);
-
         }
+
+
+        ctx.setLineDash([]);
 
     }
 
@@ -3423,53 +2852,80 @@ function drawRoads(){
 
 
 /* =========================================================
-   BUILDING DRAW
-========================================================= */
+   BUILDINGS
+   ========================================================= */
 
 function drawBuildings(){
 
-    for(
-        const b of buildings
-    ){
+    for(const b of buildings){
 
-        const body={
-
-            tower:"#607b9f",
-
-            mall:"#d98b55",
-
-            shop:"#e4c76f",
-
-            house:"#d8ad7c",
-
-            temple:"#f0d28a"
-
-        }[b.type];
+        let wall="#dfc9a2";
+        let roof="#9b4d4b";
 
 
-        const roof={
+        if(b.type==="tower"){
 
-            tower:"#263750",
+            wall="#6f8eaa";
+            roof="#283b57";
 
-            mall:"#8c405d",
+        }
 
-            shop:"#b94f5e",
 
-            house:"#914844",
+        if(b.type==="mall"){
 
-            temple:"#813c52"
+            wall="#e5a25b";
+            roof="#93415c";
 
-        }[b.type];
+        }
+
+
+        if(b.type==="shop"){
+
+            wall="#e4cf7d";
+            roof="#b54e51";
+
+        }
+
+
+        if(b.type==="house"){
+
+            wall="#d9b27e";
+            roof="#8e4843";
+
+        }
+
+
+        if(b.type==="temple"){
+
+            wall="#efd28b";
+            roof="#873e53";
+
+        }
+
+
+        if(b.type==="market"){
+
+            wall="#c98d5d";
+            roof="#713f3d";
+
+        }
+
+
+        if(b.type==="hospital"){
+
+            wall="#e7e9e5";
+            roof="#6598a6";
+
+        }
 
 
         /* shadow */
 
-        ctx.fillStyle=
-            "#24342c66";
+        ctx.fillStyle="rgba(30,45,38,.45)";
 
         ctx.fillRect(
-            b.x+18,
-            b.y+20,
+            b.x+16,
+            b.y+18,
             b.w,
             b.h
         );
@@ -3477,7 +2933,7 @@ function drawBuildings(){
 
         /* body */
 
-        ctx.fillStyle=body;
+        ctx.fillStyle=wall;
 
         ctx.fillRect(
             b.x,
@@ -3493,88 +2949,29 @@ function drawBuildings(){
 
         ctx.fillRect(
             b.x-12,
-            b.y-14,
+            b.y-12,
             b.w+24,
-            28
+            25
         );
 
 
-        /* windows */
+        /* facade lines */
 
-        const cols =
-            Math.max(
-                3,
-                Math.floor(
-                    b.w/72
-                )
-            );
+        if(b.type==="tower"){
 
-
-        const rows =
-            Math.max(
-                2,
-                Math.floor(
-                    b.h/72
-                )
-            );
-
-
-        for(
-            let ix=0;
-            ix<cols;
-            ix++
-        ){
+            ctx.fillStyle="rgba(255,255,255,.12)";
 
             for(
-                let iy=0;
-                iy<rows;
-                iy++
+                let x=b.x+15;
+                x<b.x+b.w;
+                x+=45
             ){
 
-                const wx =
-                    b.x+
-                    25+
-                    ix*
-                    (b.w-50)/
-                    Math.max(
-                        1,
-                        cols-1
-                    );
-
-
-                const wy =
-                    b.y+
-                    48+
-                    iy*
-                    (b.h-88)/
-                    Math.max(
-                        1,
-                        rows-1
-                    );
-
-
-                ctx.fillStyle =
-                    nightAmount()>0
-                        ? "#ffd66d"
-                        : "#8db9c8";
-
-
                 ctx.fillRect(
-                    wx,
-                    wy,
-                    18,
-                    25
-                );
-
-
-                ctx.fillStyle=
-                    "#203047";
-
-                ctx.fillRect(
-                    wx+3,
-                    wy+3,
-                    12,
-                    19
+                    x,
+                    b.y,
+                    5,
+                    b.h
                 );
 
             }
@@ -3582,59 +2979,156 @@ function drawBuildings(){
         }
 
 
-        /* door */
+        /* windows */
 
-        ctx.fillStyle=
-            "#2a2630";
+        const cols=
+            Math.max(
+                3,
+                Math.floor(b.w/65)
+            );
+
+        const rows=
+            Math.max(
+                2,
+                Math.floor(b.h/70)
+            );
+
+
+        for(let cx=0;cx<cols;cx++){
+
+            for(let cy=0;cy<rows;cy++){
+
+                const wx=
+                    b.x+
+                    25+
+                    cx*
+                    ((b.w-50)/
+                    Math.max(1,cols-1));
+
+
+                const wy=
+                    b.y+
+                    45+
+                    cy*
+                    ((b.h-80)/
+                    Math.max(1,rows-1));
+
+
+                const glow=
+                    nightAlpha()>.15 &&
+                    Math.random()>.35;
+
+
+                ctx.fillStyle=
+                    glow
+                    ?"#ffd86b"
+                    :"#3b526b";
+
+
+                ctx.fillRect(
+                    wx,
+                    wy,
+                    18,
+                    23
+                );
+
+
+                ctx.fillStyle=
+                    glow
+                    ?"#ffe99a"
+                    :"#223143";
+
+
+                ctx.fillRect(
+                    wx+3,
+                    wy+3,
+                    12,
+                    17
+                );
+
+            }
+
+        }
+
+
+        /* entrance */
+
+        ctx.fillStyle="#292a35";
 
         ctx.fillRect(
-            b.x+b.w/2-18,
-            b.y+b.h-48,
-            36,
-            48
+            b.x+b.w/2-20,
+            b.y+b.h-52,
+            40,
+            52
         );
 
 
-        /* name */
+        ctx.fillStyle="#8ed7e7";
 
-        ctx.fillStyle="#fff";
+        ctx.fillRect(
+            b.x+b.w/2-14,
+            b.y+b.h-43,
+            11,
+            30
+        );
 
-        ctx.font=
-            "bold 12px Arial";
+        ctx.fillRect(
+            b.x+b.w/2+3,
+            b.y+b.h-43,
+            11,
+            30
+        );
 
-        ctx.textAlign="center";
+
+        /* sign */
+
+        ctx.fillStyle="rgba(12,22,38,.8)";
+
+        ctx.fillRect(
+            b.x+18,
+            b.y+18,
+            Math.min(
+                b.w-36,
+                210
+            ),
+            25
+        );
+
+
+        ctx.fillStyle="#ffffff";
+
+        ctx.font="bold 11px Arial";
+
+        ctx.textAlign="left";
 
         ctx.fillText(
             b.name,
-            b.x+b.w/2,
-            b.y-21
+            b.x+28,
+            b.y+35
         );
 
 
-        /* temple */
+        /* temple decoration */
 
-        if(
-            b.type==="temple"
-        ){
+        if(b.type==="temple"){
 
-            ctx.fillStyle=
-                "#c78c32";
+            ctx.fillStyle="#d29b39";
 
             ctx.beginPath();
 
             ctx.moveTo(
                 b.x+b.w/2,
-                b.y-65
+                b.y-62
             );
 
             ctx.lineTo(
-                b.x+b.w/2-34,
-                b.y-18
+                b.x+b.w/2-38,
+                b.y-15
             );
 
             ctx.lineTo(
-                b.x+b.w/2+34,
-                b.y-18
+                b.x+b.w/2+38,
+                b.y-15
             );
 
             ctx.closePath();
@@ -3642,45 +3136,65 @@ function drawBuildings(){
             ctx.fill();
 
 
-            ctx.fillStyle=
-                "#ffe070";
+            ctx.fillStyle="#ffe27a";
 
             ctx.fillRect(
                 b.x+b.w/2-4,
-                b.y-78,
+                b.y-82,
                 8,
-                32
+                38
             );
 
         }
 
 
-        /* mall sign */
+        /* mall logo */
 
-        if(
-            b.type==="mall"
-        ){
+        if(b.type==="mall"){
 
-            ctx.fillStyle=
-                "#ff4f87";
+            ctx.fillStyle="#ff527a";
 
             ctx.fillRect(
-                b.x+18,
-                b.y+18,
-                b.w-36,
-                34
+                b.x+b.w/2-90,
+                b.y+58,
+                180,
+                35
             );
 
 
             ctx.fillStyle="#fff";
 
-            ctx.font=
-                "bold 15px Arial";
+            ctx.font="bold 17px Arial";
+
+            ctx.textAlign="center";
 
             ctx.fillText(
                 "MALL",
                 b.x+b.w/2,
-                b.y+41
+                b.y+82
+            );
+
+        }
+
+
+        /* hospital cross */
+
+        if(b.type==="hospital"){
+
+            ctx.fillStyle="#e95668";
+
+            ctx.fillRect(
+                b.x+b.w/2-10,
+                b.y+58,
+                20,
+                55
+            );
+
+            ctx.fillRect(
+                b.x+b.w/2-28,
+                b.y+76,
+                56,
+                20
             );
 
         }
@@ -3691,110 +3205,312 @@ function drawBuildings(){
 
 
 /* =========================================================
-   CAR DRAW
-========================================================= */
+   STREET LIGHTS
+   ========================================================= */
+
+function drawStreetLights(){
+
+    for(
+        let x=100;
+        x<WORLD_W;
+        x+=250
+    ){
+
+        for(const r of roads){
+
+            if(r.w<=r.h)continue;
+
+            const y=r.y-22;
+
+            drawLamp(x,y);
+
+        }
+
+    }
+
+
+    for(
+        let y=100;
+        y<WORLD_H;
+        y+=250
+    ){
+
+        for(const r of roads){
+
+            if(r.h<=r.w)continue;
+
+            const x=r.x-22;
+
+            drawLamp(x,y);
+
+        }
+
+    }
+
+}
+
+
+function drawLamp(x,y){
+
+    ctx.fillStyle="#343b43";
+
+    ctx.fillRect(
+        x-2,
+        y,
+        5,
+        25
+    );
+
+    ctx.fillStyle="#20262e";
+
+    ctx.fillRect(
+        x-8,
+        y-4,
+        16,
+        8
+    );
+
+
+    if(nightAlpha()>.15){
+
+        ctx.fillStyle="#ffe07a";
+
+        ctx.fillRect(
+            x-5,
+            y-3,
+            10,
+            6
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TREES
+   ========================================================= */
+
+function drawTrees(){
+
+    for(let i=0;i<75;i++){
+
+        const x=
+            ((i*827)%WORLD_W);
+
+        const y=
+            ((i*1391)%WORLD_H);
+
+
+        let nearRoad=false;
+
+        for(const r of roads){
+
+            if(
+                x>r.x-40 &&
+                x<r.x+r.w+40 &&
+                y>r.y-40 &&
+                y<r.y+r.h+40
+            ){
+
+                nearRoad=true;
+
+                break;
+
+            }
+
+        }
+
+
+        if(!nearRoad){
+
+            drawTree(
+                x,
+                y,
+                .8+
+                ((i*17)%30)/100
+            );
+
+        }
+
+    }
+
+}
+
+
+function drawTree(x,y,s){
+
+    ctx.save();
+
+    ctx.translate(x,y);
+
+    ctx.scale(s,s);
+
+
+    ctx.fillStyle="#754b35";
+
+    ctx.fillRect(
+        -5,
+        0,
+        10,
+        25
+    );
+
+
+    ctx.fillStyle="#347b4b";
+
+    ctx.fillRect(
+        -25,
+        -18,
+        50,
+        35
+    );
+
+
+    ctx.fillStyle="#469451";
+
+    ctx.fillRect(
+        -17,
+        -32,
+        34,
+        20
+    );
+
+
+    ctx.fillStyle="#59a957";
+
+    ctx.fillRect(
+        -9,
+        -40,
+        18,
+        15
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   CARS DRAW
+   ========================================================= */
 
 function drawCars(){
 
-    for(
-        const c of cars
-    ){
+    for(const c of cars){
 
         ctx.save();
 
         ctx.translate(
-            c.x,
-            c.y
+            Math.floor(c.x),
+            Math.floor(c.y)
         );
 
 
-        const vertical =
+        const vertical=
             Math.abs(c.vy)>0;
 
 
-        ctx.fillStyle=
-            "#151b25";
-
-
-        ctx.fillRect(
-
-            vertical
-                ? -10
-                : -22,
-
-            vertical
-                ? -24
-                : -10,
-
-            vertical
-                ? 20
-                : 44,
-
-            vertical
-                ? 48
-                : 20
-
-        );
-
-
-        ctx.fillStyle=c.c;
-
-
-        ctx.fillRect(
-
-            vertical
-                ? -7
-                : -18,
-
-            vertical
-                ? -20
-                : -7,
-
-            vertical
-                ? 14
-                : 36,
-
-            vertical
-                ? 40
-                : 14
-
-        );
-
-
-        ctx.fillStyle=
-            "#b8edff";
+        ctx.fillStyle="#20242b";
 
 
         if(vertical){
 
             ctx.fillRect(
-                -6,
+                -11,
+                -23,
+                22,
+                46
+            );
+
+        }else{
+
+            ctx.fillRect(
+                -23,
+                -11,
+                46,
+                22
+            );
+
+        }
+
+
+        ctx.fillStyle=c.color;
+
+
+        if(vertical){
+
+            ctx.fillRect(
+                -8,
+                -20,
+                16,
+                40
+            );
+
+        }else{
+
+            ctx.fillRect(
+                -20,
+                -8,
+                40,
+                16
+            );
+
+        }
+
+
+        ctx.fillStyle="#8dd9e7";
+
+
+        if(vertical){
+
+            ctx.fillRect(
+                -7,
                 -13,
-                12,
+                14,
                 8
             );
 
             ctx.fillRect(
-                -6,
+                -7,
                 5,
-                12,
+                14,
                 8
             );
 
         }else{
 
             ctx.fillRect(
-                -14,
-                -6,
-                9,
-                12
+                -13,
+                -7,
+                8,
+                14
             );
 
             ctx.fillRect(
                 5,
-                -6,
-                9,
-                12
+                -7,
+                8,
+                14
+            );
+
+        }
+
+
+        ctx.fillStyle="#fff0a0";
+
+
+        if(
+            (vertical && c.vy<0) ||
+            (!vertical && c.vx>0)
+        ){
+
+            ctx.fillRect(
+                vertical? -7:14,
+                vertical? -21:-7,
+                vertical?14:7,
+                vertical?5:14
             );
 
         }
@@ -3808,93 +3524,73 @@ function drawCars(){
 
 
 /* =========================================================
-   ITEM DRAW
-========================================================= */
+   ITEMS DRAW
+   ========================================================= */
 
 function drawItems(){
 
-    const icon={
+    const colors={
 
-        food:"🍞",
+        food:"#f1b83d",
 
-        water:"💧",
+        water:"#42c8ff",
 
-        medkit:"+",
+        medkit:"#ff5d7a",
 
-        vaccine:"V",
+        vaccine:"#bb7cff",
 
-        ammo:"▣"
-
-    };
-
-
-    const color={
-
-        food:"#ffc65b",
-
-        water:"#52d7ff",
-
-        medkit:"#ff6688",
-
-        vaccine:"#bd8cff",
-
-        ammo:"#e8e274"
+        ammo:"#e8dc6b"
 
     };
 
 
-    for(
-        const item of items
-    ){
+    for(const it of items){
+
+        it.pulse+=.05;
+
+
+        const bob=
+            Math.sin(it.pulse)*2;
+
 
         ctx.save();
 
         ctx.translate(
-            item.x,
-            item.y
+            it.x,
+            it.y+bob
         );
 
 
         ctx.fillStyle=
-            color[item.type];
+            "rgba(0,0,0,.3)";
 
-        ctx.shadowBlur=14;
+        ctx.fillRect(
+            -10,
+            8,
+            20,
+            5
+        );
 
-        ctx.shadowColor=
-            color[item.type];
+
+        ctx.fillStyle=
+            colors[it.type];
 
 
-        ctx.beginPath();
+        ctx.fillRect(
+            -8,
+            -8,
+            16,
+            16
+        );
 
-        ctx.arc(
-            0,
-            0,
+
+        ctx.fillStyle="#fff";
+
+        ctx.fillRect(
+            -5,
+            -5,
             10,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-
-        ctx.shadowBlur=0;
-
-        ctx.fillStyle=
-            "#182133";
-
-        ctx.font=
-            "bold 10px Arial";
-
-        ctx.textAlign="center";
-
-        ctx.textBaseline=
-            "middle";
-
-
-        ctx.fillText(
-            icon[item.type],
-            0,
-            1
+            3
         );
 
 
@@ -3907,107 +3603,131 @@ function drawItems(){
 
 /* =========================================================
    NPC DRAW
-========================================================= */
+   ========================================================= */
 
 function drawNPCs(){
 
-    for(
-        const n of npcs
-    ){
+    for(const n of npcs){
 
         ctx.save();
 
         ctx.translate(
-            n.x,
-            n.y
+            Math.floor(n.x),
+            Math.floor(n.y)
         );
 
-        ctx.rotate(n.a);
+
+        if(n.type==="civilian"){
+
+            ctx.fillStyle="#4daed9";
+
+        }
+
+        if(n.type==="soldier"){
+
+            ctx.fillStyle="#718d61";
+
+        }
+
+        if(n.type==="bandit"){
+
+            ctx.fillStyle="#c95362";
+
+        }
 
 
         /* shadow */
 
-        ctx.fillStyle="#0005";
+        ctx.fillStyle="rgba(0,0,0,.35)";
 
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            13,
-            15,
-            6,
-            0,
-            0,
-            Math.PI*2
+        ctx.fillRect(
+            -10,
+            10,
+            20,
+            6
         );
-
-        ctx.fill();
 
 
         /* body */
 
-        ctx.fillStyle =
+        if(n.type==="civilian"){
 
-            n.type==="civilian"
+            ctx.fillStyle="#4faad2";
 
-                ? "#4ec8ee"
+        }
 
-                : n.type==="soldier"
+        if(n.type==="soldier"){
 
-                    ? "#6f9568"
+            ctx.fillStyle="#687f5b";
 
-                    : "#d75b68";
+        }
+
+        if(n.type==="bandit"){
+
+            ctx.fillStyle="#b64d59";
+
+        }
 
 
         ctx.fillRect(
-            -9,
+            -8,
             -4,
-            18,
-            20
+            16,
+            19
         );
 
 
         /* head */
 
-        ctx.fillStyle=
-            "#e1ad88";
+        ctx.fillStyle="#d9a47e";
 
         ctx.fillRect(
-            -7,
-            -17,
-            14,
-            12
+            -6,
+            -15,
+            12,
+            11
         );
 
 
         /* hair */
 
-        ctx.fillStyle=
-            "#302633";
+        ctx.fillStyle="#35252a";
 
         ctx.fillRect(
-            -7,
-            -18,
-            14,
+            -6,
+            -16,
+            12,
             5
         );
 
 
         /* weapon */
 
-        if(
-            n.type!=="civilian"
-        ){
+        if(n.type!=="civilian"){
 
-            ctx.fillStyle=
-                "#222936";
+            ctx.save();
+
+            ctx.rotate(n.angle);
+
+            ctx.fillStyle="#242933";
 
             ctx.fillRect(
-                6,
+                5,
                 -2,
-                22,
-                5
+                20,
+                4
             );
+
+            ctx.fillStyle="#59636e";
+
+            ctx.fillRect(
+                15,
+                -3,
+                8,
+                2
+            );
+
+            ctx.restore();
 
         }
 
@@ -4021,113 +3741,156 @@ function drawNPCs(){
 
 /* =========================================================
    ZOMBIE DRAW
-========================================================= */
+   ========================================================= */
 
 function drawZombies(){
 
-    for(
-        const z of zombies
-    ){
+    for(const z of zombies){
 
         ctx.save();
 
         ctx.translate(
-            z.x,
-            z.y
+            Math.floor(z.x),
+            Math.floor(z.y)
         );
-
-        ctx.rotate(z.a);
 
 
         /* shadow */
 
-        ctx.fillStyle="#0005";
+        ctx.fillStyle="rgba(0,0,0,.35)";
 
-        ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            13,
-            16,
-            6,
-            0,
-            0,
-            Math.PI*2
+        ctx.fillRect(
+            -11,
+            10,
+            22,
+            6
         );
-
-        ctx.fill();
 
 
         /* body */
 
-        ctx.fillStyle =
-
+        ctx.fillStyle=
             z.type==="runner"
-
-                ? "#b26ce0"
-
-                : "#5c9f76";
+            ?"#a25bd0"
+            :"#57966d";
 
 
         ctx.fillRect(
             -10,
-            -6,
+            -5,
             20,
-            21
+            20
+        );
+
+
+        /* torn shirt */
+
+        ctx.fillStyle=
+            z.type==="runner"
+            ?"#7d42a5"
+            :"#407653";
+
+
+        ctx.fillRect(
+            -8,
+            8,
+            5,
+            8
+        );
+
+        ctx.fillRect(
+            3,
+            8,
+            5,
+            8
         );
 
 
         /* head */
 
-        ctx.fillStyle=
-            "#c8d69b";
+        ctx.fillStyle="#bdcf99";
 
         ctx.fillRect(
-            -8,
-            -18,
-            16,
+            -7,
+            -17,
+            14,
             12
+        );
+
+
+        /* hair */
+
+        ctx.fillStyle="#26312d";
+
+        ctx.fillRect(
+            -7,
+            -18,
+            14,
+            5
         );
 
 
         /* eyes */
 
-        ctx.fillStyle=
-            "#ff405f";
+        ctx.fillStyle="#ff3e55";
 
         ctx.fillRect(
             -5,
-            -14,
+            -13,
             3,
             3
         );
 
         ctx.fillRect(
-            3,
-            -14,
+            2,
+            -13,
             3,
             3
         );
 
 
-        /* legs */
+        /* arms */
 
-        ctx.fillStyle=
-            "#263229";
+        ctx.fillStyle="#9fb57c";
 
         ctx.fillRect(
-            -12,
-            11,
-            8,
-            5
+            -15,
+            -3,
+            7,
+            4
         );
 
         ctx.fillRect(
-            4,
-            11,
             8,
-            5
+            -3,
+            7,
+            4
         );
+
+
+        /* health */
+
+        if(z.hp<z.maxHp){
+
+            ctx.fillStyle="#1c2430";
+
+            ctx.fillRect(
+                -15,
+                -26,
+                30,
+                4
+            );
+
+            ctx.fillStyle="#ff536b";
+
+            ctx.fillRect(
+                -15,
+                -26,
+                30*(z.hp/z.maxHp),
+                4
+            );
+
+        }
 
 
         ctx.restore();
@@ -4138,31 +3901,21 @@ function drawZombies(){
 
 
 /* =========================================================
-   BULLET DRAW
-========================================================= */
+   BULLETS DRAW
+   ========================================================= */
 
 function drawBullets(){
 
-    for(
-        const b of bullets
-    ){
+    for(const b of bullets){
 
-        ctx.fillStyle=
-            "#ffe06a";
-
-        ctx.shadowBlur=8;
-
-        ctx.shadowColor=
-            "#ffe06a";
+        ctx.fillStyle="#ffe26b";
 
         ctx.fillRect(
             b.x-3,
-            b.y-2,
-            7,
-            4
+            b.y-3,
+            6,
+            6
         );
-
-        ctx.shadowBlur=0;
 
     }
 
@@ -4171,31 +3924,29 @@ function drawBullets(){
 
 /* =========================================================
    PLAYER DRAW
-========================================================= */
+   ========================================================= */
 
 function drawPlayer(){
 
     ctx.save();
 
     ctx.translate(
-        p.x,
-        p.y
+        Math.floor(player.x),
+        Math.floor(player.y)
     );
 
-    ctx.rotate(
-        p.angle
-    );
+    ctx.rotate(player.angle);
 
 
     /* shadow */
 
-    ctx.fillStyle="#0006";
+    ctx.fillStyle="rgba(0,0,0,.45)";
 
     ctx.beginPath();
 
     ctx.ellipse(
         0,
-        14,
+        15,
         17,
         7,
         0,
@@ -4206,29 +3957,77 @@ function drawPlayer(){
     ctx.fill();
 
 
-    /* body */
+    /* backpack */
 
-    ctx.fillStyle =
+    ctx.fillStyle="#37465e";
 
-        p.job==="SOLDIER"
+    ctx.fillRect(
+        -17,
+        -6,
+        8,
+        21
+    );
 
-            ? "#6e9369"
 
-            : "#5d75dc";
+    /* outfit */
+
+    let body="#526ad1";
+
+
+    if(player.outfit==="MILITARY"){
+
+        body="#627e59";
+
+    }
+
+    if(player.outfit==="MEDIC"){
+
+        body="#f0f1ed";
+
+    }
+
+    if(player.outfit==="SCAVENGER"){
+
+        body="#a8734c";
+
+    }
+
+    if(player.outfit==="MECHANIC"){
+
+        body="#d0833d";
+
+    }
+
+
+    ctx.fillStyle=body;
+
+    ctx.fillRect(
+        -10,
+        -7,
+        20,
+        24
+    );
+
+
+    /* shirt detail */
+
+    ctx.fillStyle=
+        player.outfit==="MEDIC"
+        ?"#e05263"
+        :"rgba(255,255,255,.2)";
 
 
     ctx.fillRect(
-        -11,
-        -7,
-        22,
-        24
+        -3,
+        -5,
+        6,
+        13
     );
 
 
     /* head */
 
-    ctx.fillStyle=
-        "#e2ac86";
+    ctx.fillStyle="#dfaa85";
 
     ctx.fillRect(
         -7,
@@ -4240,40 +4039,47 @@ function drawPlayer(){
 
     /* hair */
 
-    ctx.fillStyle=
-        "#2d2430";
+    ctx.fillStyle="#29232b";
 
     ctx.fillRect(
-        -8,
+        -7,
         -20,
-        16,
-        5
+        14,
+        6
     );
 
 
-    /* weapon */
+    /* gun */
 
-    ctx.fillStyle=
-        "#252a36";
+    ctx.fillStyle="#202733";
 
     ctx.fillRect(
         7,
         -2,
-        28,
+        27,
         5
     );
 
 
-    /* backpack */
-
-    ctx.fillStyle=
-        "#3e4d66";
+    ctx.fillStyle="#68727e";
 
     ctx.fillRect(
-        -16,
-        -6,
-        7,
-        20
+        24,
+        -3,
+        10,
+        2
+    );
+
+
+    /* muzzle */
+
+    ctx.fillStyle="#d9dfe5";
+
+    ctx.fillRect(
+        33,
+        -1,
+        4,
+        3
     );
 
 
@@ -4283,116 +4089,92 @@ function drawPlayer(){
 
 
 /* =========================================================
-   PARTICLES
-========================================================= */
+   LOCK TARGET DRAW
+   ========================================================= */
 
-function drawParticles(){
+function drawLockTarget(){
 
-    for(
-        let i=particles.length-1;
-        i>=0;
-        i--
-    ){
-
-        const q =
-            particles[i];
+    if(!lockedTarget)return;
 
 
-        q.x += q.vx;
+    ctx.save();
 
-        q.y += q.vy;
+    ctx.strokeStyle="#ff5275";
 
-        q.life--;
-
-
-        ctx.fillStyle =
-            q.t==="hit"
-                ? "#ff4f6e"
-                : "#ffe06a";
+    ctx.lineWidth=2;
 
 
-        ctx.globalAlpha =
-            Math.max(
-                0,
-                q.life/15
-            );
+    ctx.beginPath();
+
+    ctx.arc(
+        lockedTarget.x,
+        lockedTarget.y,
+        23,
+        0,
+        Math.PI*2
+    );
+
+    ctx.stroke();
 
 
-        ctx.fillRect(
-            q.x-2,
-            q.y-2,
-            4,
-            4
-        );
+    ctx.fillStyle="#ff5275";
+
+    ctx.font="bold 10px Arial";
+
+    ctx.textAlign="center";
+
+    ctx.fillText(
+        "LOCKED",
+        lockedTarget.x,
+        lockedTarget.y-30
+    );
 
 
-        ctx.globalAlpha=1;
-
-
-        if(q.life<=0){
-
-            particles.splice(
-                i,
-                1
-            );
-
-        }
-
-    }
+    ctx.restore();
 
 }
 
 
 /* =========================================================
    NIGHT
-========================================================= */
+   ========================================================= */
 
 function drawNight(){
 
-    const amount =
-        nightAmount();
+    const alpha=nightAlpha();
 
 
-    if(amount<=0)
-        return;
+    if(alpha<=0)return;
 
 
     ctx.fillStyle=
-        "rgba(7,14,45,"+
-        amount+
-        ")";
-
+        `rgba(5,10,38,${alpha})`;
 
     ctx.fillRect(
         0,
         0,
-        W,
-        H
+        canvas.width,
+        canvas.height
     );
 
 
-    if(amount>.3){
+    /* moon */
 
-        ctx.fillStyle=
-            "#fff0a0";
+    if(alpha>.3){
 
-        ctx.globalAlpha=.8;
-
+        ctx.fillStyle="#fff1a5";
 
         ctx.beginPath();
 
         ctx.arc(
-            W-110,
-            90,
-            28,
+            canvas.width-100,
+            85,
+            25,
             0,
             Math.PI*2
         );
 
         ctx.fill();
-
-
-        ctx.globalAlpha=1;
 
     }
 
@@ -4401,24 +4183,27 @@ function drawNight(){
 
 /* =========================================================
    MINIMAP
-========================================================= */
+   ========================================================= */
 
 function drawMinimap(){
 
-    const size=150;
+    const size=145;
 
-    const x =
-        W-size-16;
+    const x=
+        canvas.width-
+        size-
+        15;
 
-    const y =
-        H-size-16;
+    const y=
+        canvas.height-
+        size-
+        15;
 
 
     ctx.save();
 
 
-    ctx.fillStyle=
-        "#07101ddd";
+    ctx.fillStyle="rgba(5,10,18,.85)";
 
     ctx.fillRect(
         x,
@@ -4428,8 +4213,7 @@ function drawMinimap(){
     );
 
 
-    ctx.strokeStyle=
-        "#ffffff35";
+    ctx.strokeStyle="rgba(255,255,255,.25)";
 
     ctx.strokeRect(
         x,
@@ -4439,118 +4223,68 @@ function drawMinimap(){
     );
 
 
-    const sx =
-        size/WORLD_W;
-
-    const sy =
-        size/WORLD_H;
+    const sx=size/WORLD_W;
+    const sy=size/WORLD_H;
 
 
-    /* roads */
+    for(const r of roads){
 
-    for(
-        const r of roads
-    ){
+        ctx.fillStyle="#5d6671";
+
+        ctx.fillRect(
+            x+r.x*sx,
+            y+r.y*sy,
+            Math.max(1,r.w*sx),
+            Math.max(1,r.h*sy)
+        );
+
+    }
+
+
+    for(const b of buildings){
 
         ctx.fillStyle=
-            "#657181";
-
-        ctx.fillRect(
-
-            x+r.x*sx,
-
-            y+r.y*sy,
-
-            r.w*sx,
-
-            r.h*sy
-
-        );
-
-    }
-
-
-    /* buildings */
-
-    for(
-        const b of buildings
-    ){
-
-        ctx.fillStyle =
-
             b.type==="temple"
-
-                ? "#ffd76a"
-
-                : b.type==="mall"
-
-                    ? "#ff6688"
-
-                    : "#7894aa";
+            ?"#ffd65b"
+            :b.type==="mall"
+            ?"#ff6680"
+            :b.type==="hospital"
+            ?"#78e0e0"
+            :"#7792aa";
 
 
         ctx.fillRect(
-
             x+b.x*sx,
-
             y+b.y*sy,
-
-            Math.max(
-                2,
-                b.w*sx
-            ),
-
-            Math.max(
-                2,
-                b.h*sy
-            )
-
+            Math.max(2,b.w*sx),
+            Math.max(2,b.h*sy)
         );
 
     }
 
 
-    /* player */
+    for(const z of zombies){
 
-    ctx.fillStyle=
-        "#5ce9ff";
+        ctx.fillStyle="#ff4c68";
+
+        ctx.fillRect(
+            x+z.x*sx-1,
+            y+z.y*sy-1,
+            3,
+            3
+        );
+
+    }
+
+
+    ctx.fillStyle="#61e9ff";
 
     ctx.fillRect(
-
-        x+p.x*sx-3,
-
-        y+p.y*sy-3,
-
+        x+player.x*sx-3,
+        y+player.y*sy-3,
         6,
-
         6
-
     );
-
-
-    /* zombies */
-
-    ctx.fillStyle=
-        "#ff4f6e";
-
-
-    for(
-        const z of zombies
-    ){
-
-        ctx.fillRect(
-
-            x+z.x*sx-1,
-
-            y+z.y*sy-1,
-
-            3,
-
-            3
-
-        );
-
-    }
 
 
     ctx.restore();
@@ -4559,143 +4293,263 @@ function drawMinimap(){
 
 
 /* =========================================================
+   HUD
+   ========================================================= */
+
+function updateHUD(){
+
+    const hp=
+        Math.max(
+            0,
+            Math.min(100,player.hp)
+        );
+
+    const hunger=
+        Math.max(
+            0,
+            Math.min(100,player.hunger)
+        );
+
+    const thirst=
+        Math.max(
+            0,
+            Math.min(100,player.thirst)
+        );
+
+    const stamina=
+        Math.max(
+            0,
+            Math.min(100,player.stamina)
+        );
+
+
+    document.getElementById("hpFill")
+        .style.width=hp+"%";
+
+    document.getElementById("hungerFill")
+        .style.width=hunger+"%";
+
+    document.getElementById("thirstFill")
+        .style.width=thirst+"%";
+
+    document.getElementById("staminaFill")
+        .style.width=stamina+"%";
+
+
+    document.getElementById("hpText")
+        .textContent=Math.floor(hp);
+
+    document.getElementById("hungerText")
+        .textContent=Math.floor(hunger);
+
+    document.getElementById("thirstText")
+        .textContent=Math.floor(thirst);
+
+    document.getElementById("staminaText")
+        .textContent=Math.floor(stamina);
+
+
+    document.getElementById("ammoText")
+        .textContent=
+        player.ammo+
+        " / "+
+        player.reserve;
+
+
+    document.getElementById("moneyText")
+        .textContent=
+        player.money;
+
+
+    document.getElementById("killText")
+        .textContent=
+        player.kills;
+
+
+    document.getElementById("jobText")
+        .textContent=
+        player.job;
+
+
+    document.getElementById("medText")
+        .textContent=
+        player.medkits;
+
+
+    document.getElementById("vacText")
+        .textContent=
+        player.vaccines;
+
+
+    document.getElementById("foodText")
+        .textContent=
+        player.food;
+
+
+    document.getElementById("waterText")
+        .textContent=
+        player.water;
+
+}
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+let messageTimer=0;
+
+
+function showMessage(text){
+
+    const el=
+        document.getElementById("message");
+
+
+    el.textContent=text;
+
+    el.style.opacity="1";
+
+    messageTimer=130;
+
+}
+
+
+/* =========================================================
    QUEST
-========================================================= */
+   ========================================================= */
+
+let questStage=0;
+
 
 function updateQuest(){
 
-    let text =
-        "OBJECTIVE: ";
+    const q=
+        document.getElementById("quest");
 
 
-    if(quest===0){
+    if(questStage===0){
 
-        text +=
-            "เดินทางไปยัง MEGA CITY MALL";
-
-
-        if(
-
-            p.x>260 &&
-            p.x<1050 &&
-            p.y>250 &&
-            p.y<1000
-
-        ){
-
-            quest=1;
-
-            show(
-                "📍 พบ Mega City Mall — ภารกิจใหม่"
-            );
-
-        }
+        q.textContent=
+            "OBJECTIVE: เดินทางไปยัง MEGA CITY MALL";
 
     }
 
 
-    else if(quest===1){
+    if(questStage===1){
 
-        text +=
-            "ค้นหาวัคซีนในเมือง";
-
-
-        if(
-            items.filter(
-                x=>x.type==="vaccine"
-            ).length < 7
-        ){
-
-            quest=2;
-
-            show(
-                "💉 สัญญาณวัคซีนถูกพบ"
-            );
-
-        }
+        q.textContent=
+            "OBJECTIVE: ค้นหา Vaccine ในเมือง";
 
     }
 
 
-    else if(quest===2){
+    if(questStage===2){
 
-        text +=
-            "กลับสู่จุดกลางเมืองและเตรียมรับกลางคืน";
-
-
-        if(
-
-            p.x>2700 &&
-            p.x<3300 &&
-            p.y>1900 &&
-            p.y<2700
-
-        ){
-
-            quest=3;
-
-            show(
-                "🏠 SAFE ZONE REACHED"
-            );
-
-        }
+        q.textContent=
+            "OBJECTIVE: กลับไปยังจุดปลอดภัย";
 
     }
 
 
-    else {
+    if(questStage===3){
 
-        text +=
-            "เอาชีวิตรอดจนถึง 20:00";
-
-
-        if(
-            clock>=1200
-        ){
-
-            quest=4;
-
-            show(
-                "🌙 YOU SURVIVED THE FIRST NIGHT!"
-            );
-
-        }
+        q.textContent=
+            "OBJECTIVE: เอาชีวิตรอดจนถึงกลางคืน";
 
     }
 
 
-    if(quest===4){
+    const mall=buildings[0];
 
-        text =
-            "OBJECTIVE: เมืองยังไม่จบ — สำรวจต่อหรือหาทางออก";
+
+    if(
+        questStage===0 &&
+        player.x>mall.x-80 &&
+        player.x<mall.x+mall.w+80 &&
+        player.y>mall.y-80 &&
+        player.y<mall.y+mall.h+80
+    ){
+
+        questStage=1;
+
+        showMessage(
+            "📍 MEGA CITY MALL REACHED"
+        );
 
     }
 
 
-    document.getElementById(
-        "quest"
-    ).textContent=text;
+    if(
+        questStage===1 &&
+        player.vaccines>=2
+    ){
+
+        questStage=2;
+
+        showMessage(
+            "💉 VACCINE SECURED"
+        );
+
+    }
+
+
+    if(
+        questStage===2 &&
+        distance(
+            player,
+            {
+                x:3200,
+                y:2400
+            }
+        )<180
+    ){
+
+        questStage=3;
+
+        showMessage(
+            "🏠 SAFE ZONE"
+        );
+
+    }
+
+
+    if(
+        questStage===3 &&
+        worldMinutes>=20*60
+    ){
+
+        questStage=4;
+
+        q.textContent=
+            "OBJECTIVE COMPLETE — SURVIVE THE NIGHT";
+
+        showMessage(
+            "🌙 NIGHT SURVIVAL COMPLETE"
+        );
+
+    }
 
 }
 
 
 /* =========================================================
    RANDOM EVENTS
-========================================================= */
+   ========================================================= */
+
+let eventTimer=800;
+
 
 function randomEvent(){
 
     eventTimer--;
 
 
-    if(
-        eventTimer>0
-    )
-        return;
+    if(eventTimer>0)return;
 
 
-    eventTimer =
-        650+
+    eventTimer=
+        900+
         Math.random()*900;
 
 
@@ -4707,36 +4561,30 @@ function randomEvent(){
 
         "🪖 หน่วยทหารเข้าพื้นที่",
 
-        "🚗 รถกำลังพุ่งผ่านถนน",
+        "🚗 รถกำลังวิ่งผ่านถนน",
 
-        "📡 สัญญาณผู้รอดชีวิตถูกตรวจพบ",
+        "📡 พบสัญญาณผู้รอดชีวิต",
 
-        "💉 ตรวจพบสัญญาณวัคซีน"
+        "💉 พบสัญญาณ Vaccine"
 
     ];
 
 
-    show(
-        rand(events)
+    showMessage(
+        random(events)
     );
 
 
-    if(
-        Math.random()<.55
-    ){
+    if(Math.random()<.5){
 
-        for(
-            let i=0;
-            i<4;
-            i++
-        ){
+        for(let i=0;i<4;i++){
 
-            const q =
-                roadPoint();
+            const p=
+                randomRoadPoint();
 
             spawnZombie(
-                q.x,
-                q.y
+                p.x,
+                p.y
             );
 
         }
@@ -4747,148 +4595,188 @@ function randomEvent(){
 
 
 /* =========================================================
-   HUD
-========================================================= */
+   SAVE
+   ========================================================= */
 
-function updateHUD(){
+function saveGame(){
 
-    const bars=[
+    const data={
 
-        ["hp",p.hp],
+        player:{
+            ...player
+        },
 
-        ["food",p.hunger],
+        day,
 
-        ["water",p.thirst],
+        worldMinutes,
 
-        ["stam",p.stamina]
+        questStage
 
-    ];
+    };
 
 
-    for(
-        const [id,value] of bars
-    ){
+    localStorage.setItem(
+        "LAST_LIGHT_SAVE",
+        JSON.stringify(data)
+    );
 
-        document.getElementById(id)
-            .style.width =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    value
-                )
-            )+"%";
+
+    showMessage("💾 GAME SAVED");
+
+}
+
+
+function loadGame(){
+
+    const raw=
+        localStorage.getItem(
+            "LAST_LIGHT_SAVE"
+        );
+
+
+    if(!raw){
+
+        showMessage(
+            "ไม่มี Save"
+        );
+
+        return;
 
     }
 
 
-    document.getElementById(
-        "hpT"
-    ).textContent =
-        Math.max(
-            0,
-            p.hp|0
+    try{
+
+        const data=
+            JSON.parse(raw);
+
+
+        Object.assign(
+            player,
+            data.player
         );
 
 
-    document.getElementById(
-        "foodT"
-    ).textContent =
-        Math.max(
-            0,
-            p.hunger|0
+        day=data.day;
+
+        worldMinutes=
+            data.worldMinutes;
+
+        questStage=
+            data.questStage;
+
+
+        showMessage(
+            "💾 SAVE LOADED"
         );
 
 
-    document.getElementById(
-        "waterT"
-    ).textContent =
-        Math.max(
-            0,
-            p.thirst|0
+    }catch(e){
+
+        showMessage(
+            "Save เสียหาย"
         );
 
-
-    document.getElementById(
-        "stamT"
-    ).textContent =
-        Math.max(
-            0,
-            p.stamina|0
-        );
-
-
-    document.getElementById(
-        "ammo"
-    ).textContent =
-        p.ammo+
-        " / "+
-        p.reserve;
-
-
-    document.getElementById(
-        "money"
-    ).textContent =
-        p.money;
-
-
-    document.getElementById(
-        "kills"
-    ).textContent =
-        p.kills;
-
-
-    document.getElementById(
-        "job"
-    ).textContent =
-        p.job;
-
-
-    document.getElementById(
-        "med"
-    ).textContent =
-        p.med;
-
-
-    document.getElementById(
-        "vac"
-    ).textContent =
-        p.vaccine;
-
-
-    document.getElementById(
-        "fcount"
-    ).textContent =
-        p.food;
-
-
-    document.getElementById(
-        "wcount"
-    ).textContent =
-        p.water;
-
-
-    document.getElementById(
-        "acount"
-    ).textContent =
-        p.reserve;
+    }
 
 }
 
 
 /* =========================================================
-   MAIN UPDATE
-========================================================= */
+   START
+   ========================================================= */
+
+function startGame(){
+
+    running=true;
+
+    document.getElementById("menu")
+        .style.display="none";
+
+
+    document.getElementById("crosshair")
+        .style.display="block";
+
+
+    showMessage(
+        "🌆 WELCOME TO BANGKOK"
+    );
+
+}
+
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        startGame
+    );
+
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+function gameOver(){
+
+    running=false;
+
+    document.getElementById("crosshair")
+        .style.display="none";
+
+
+    const menu=
+        document.getElementById("menu");
+
+
+    menu.style.display="flex";
+
+
+    menu.innerHTML=`
+
+        <div class="menu">
+
+            <h1>YOU DIED</h1>
+
+            <h2>LAST LIGHT</h2>
+
+            <p>
+                กรุงเทพฯ ยังไม่จบ<br>
+                แต่เรื่องราวของคุณจบลงที่นี่
+            </p>
+
+            <p>
+                Zombie eliminated:
+                <b>${player.kills}</b>
+            </p>
+
+            <button
+                class="start"
+                onclick="location.reload()">
+
+                TRY AGAIN
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   UPDATE
+   ========================================================= */
 
 function update(){
 
-    if(!running)
-        return;
+    if(!running)return;
 
 
     updatePlayer();
 
-    updateAim();
+    aimAtMouse();
 
     updateBullets();
 
@@ -4898,29 +4786,39 @@ function update(){
 
     updateCars();
 
-    updateTime();
-
     updateCamera();
+
+    updateTime();
 
     updateQuest();
 
     randomEvent();
 
 
-    if(mouse.down)
+    if(mouse.down){
+
         shoot();
 
-
-    if(msgTimer>0){
-
-        msgTimer--;
+    }
 
 
-        if(msgTimer===0){
+    if(player.hp<=0){
+
+        gameOver();
+
+    }
+
+
+    if(messageTimer>0){
+
+        messageTimer--;
+
+
+        if(messageTimer<=0){
 
             document.getElementById(
-                "msg"
-            ).style.opacity=0;
+                "message"
+            ).style.opacity="0";
 
         }
 
@@ -4929,166 +4827,74 @@ function update(){
 
     updateHUD();
 
+}
 
-    if(
-        p.hp<=0
-    ){
 
-        gameOver();
+/* =========================================================
+   DRAW LOOP
+   ========================================================= */
 
-    }
+function draw(){
+
+    drawWorld();
+
+    drawMinimap();
+
+    requestAnimationFrame(draw);
+
+}
+
+
+function loop(){
+
+    update();
+
+    requestAnimationFrame(loop);
 
 }
 
 
 /* =========================================================
-   GAME OVER
-========================================================= */
+   MOBILE
+   ========================================================= */
 
-function gameOver(){
+function bindMove(button,key){
 
-    running=false;
-
-    mouse.down=false;
-
-
-    document.getElementById(
-        "cross"
-    ).style.display="none";
+    const el=
+        document.getElementById(button);
 
 
-    document.getElementById(
-        "finalKills"
-    ).textContent =
-        p.kills;
+    el.addEventListener(
+        "touchstart",
+        e=>{
 
+            e.preventDefault();
 
-    document.getElementById(
-        "over"
-    ).style.display="flex";
+            keys[key]=true;
 
-}
-
-
-/* =========================================================
-   START GAME
-========================================================= */
-
-function startGame(){
-
-    document.getElementById(
-        "start"
-    ).style.display="none";
-
-
-    document.getElementById(
-        "cross"
-    ).style.display="block";
-
-
-    running=true;
-
-
-    show(
-        "🌆 WELCOME TO BANGKOK — เดินสำรวจได้ทั่วทั้งแผนที่"
-    );
-
-}
-
-
-/* =========================================================
-   RESTART
-========================================================= */
-
-function restartGame(){
-
-    location.reload();
-
-}
-
-
-/* =========================================================
-   START BUTTON
-   ใช้ addEventListener แทน onclick
-========================================================= */
-
-document
-    .getElementById("startBtn")
-    .addEventListener(
-        "click",
-        startGame
+        },
+        {passive:false}
     );
 
 
-document
-    .getElementById("restart")
-    .addEventListener(
-        "click",
-        restartGame
+    el.addEventListener(
+        "touchend",
+        e=>{
+
+            e.preventDefault();
+
+            keys[key]=false;
+
+        },
+        {passive:false}
     );
 
 
-/* =========================================================
-   MOBILE CONTROLS
-========================================================= */
+    el.addEventListener(
+        "touchcancel",
+        e=>{
 
-const mobileButtons =
-    document.querySelectorAll(
-        ".touch[data-key]"
-    );
-
-
-for(
-    const button of mobileButtons
-){
-
-    button.addEventListener(
-        "pointerdown",
-        event => {
-
-            event.preventDefault();
-
-            keys[
-                button.dataset.key
-            ]=true;
-
-        }
-    );
-
-
-    button.addEventListener(
-        "pointerup",
-        event => {
-
-            event.preventDefault();
-
-            keys[
-                button.dataset.key
-            ]=false;
-
-        }
-    );
-
-
-    button.addEventListener(
-        "pointercancel",
-        () => {
-
-            keys[
-                button.dataset.key
-            ]=false;
-
-        }
-    );
-
-
-    button.addEventListener(
-        "pointerleave",
-        () => {
-
-            keys[
-                button.dataset.key
-            ]=false;
+            keys[key]=false;
 
         }
     );
@@ -5096,74 +4902,101 @@ for(
 }
 
 
-/* MOBILE FIRE */
+bindMove("up","w");
+
+bindMove("down","s");
+
+bindMove("left","a");
+
+bindMove("right","d");
+
 
 document
     .getElementById("fire")
     .addEventListener(
-        "pointerdown",
-        event => {
+        "touchstart",
+        e=>{
 
-            event.preventDefault();
+            e.preventDefault();
 
             mouse.down=true;
 
             shoot();
 
-        }
+        },
+        {passive:false}
     );
 
 
 document
     .getElementById("fire")
     .addEventListener(
-        "pointerup",
-        () => {
+        "touchend",
+        e=>{
+
+            e.preventDefault();
 
             mouse.down=false;
 
-        }
+        },
+        {passive:false}
     );
 
 
-/* MOBILE USE */
-
 document
-    .getElementById("use")
+    .getElementById("interact")
     .addEventListener(
-        "pointerdown",
-        event => {
+        "touchstart",
+        e=>{
 
-            event.preventDefault();
+            e.preventDefault();
 
             interact();
 
-        }
+        },
+        {passive:false}
     );
 
 
-/* =========================================================
-   GAME LOOP
-========================================================= */
+document
+    .getElementById("lock")
+    .addEventListener(
+        "touchstart",
+        e=>{
 
-function frame(){
+            e.preventDefault();
 
-    update();
+            lockTarget();
 
-    draw();
+        },
+        {passive:false}
+    );
 
-    requestAnimationFrame(frame);
 
-}
+document
+    .getElementById("job")
+    .addEventListener(
+        "touchstart",
+        e=>{
+
+            e.preventDefault();
+
+            changeJob();
+
+        },
+        {passive:false}
+    );
 
 
 /* =========================================================
    INITIALIZE
-========================================================= */
+   ========================================================= */
 
 updateHUD();
 
-frame();
+draw();
+
+loop();
 
 </script>
 
