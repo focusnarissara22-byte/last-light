@@ -1,319 +1,487 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>LAST LIGHT</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LAST LIGHT — Pixel City</title>
 
 <style>
-* {
-    box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#080b16;
+    color:#fff;
+    font-family:'Press Start 2P',monospace;
 }
 
-body {
-    margin: 0;
-    background: #090b0d;
-    color: #e7e1d2;
-    font-family: "Courier New", monospace;
+body{
+    image-rendering:pixelated;
 }
 
-button {
-    font-family: inherit;
+#game{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:#111827;
 }
 
-#game {
-    min-height: 100vh;
-    max-width: 1100px;
-    margin: auto;
-    padding: 18px;
+/* WORLD */
+#world{
+    position:absolute;
+    width:2200px;
+    height:1500px;
+    left:0;
+    top:0;
+    background:#202637;
 }
 
-/* HEADER */
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #343a3d;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+/* ground blocks */
+.ground{
+    position:absolute;
+    background:#252d40;
 }
 
-.logo {
-    font-size: 28px;
-    letter-spacing: 5px;
-    color: #f0e8d4;
+.road{
+    position:absolute;
+    background:#454b5c;
 }
 
-.day {
-    color: #8c9694;
-    font-size: 13px;
+.road:before,
+.road:after{
+    content:"";
+    position:absolute;
+    background:#d8d6c9;
 }
 
-/* STATUS */
-
-.status {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 15px;
+.road.horizontal:after{
+    width:100%;
+    height:5px;
+    top:50%;
+    left:0;
+    transform:translateY(-50%);
+    background:repeating-linear-gradient(
+        to right,
+        #d8d6c9 0 45px,
+        transparent 45px 90px
+    );
 }
 
-.stat {
-    background: #111518;
-    border: 1px solid #292f32;
-    padding: 10px;
-    text-align: center;
+.road.vertical:after{
+    height:100%;
+    width:5px;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    background:repeating-linear-gradient(
+        to bottom,
+        #d8d6c9 0 45px,
+        transparent 45px 90px
+    );
 }
 
-.stat-name {
-    font-size: 11px;
-    color: #7f8987;
+/* buildings */
+.building{
+    position:absolute;
+    border:7px solid #171b2b;
+    background:#596174;
+    box-shadow:12px 12px 0 #121625;
 }
 
-.stat-value {
-    font-size: 18px;
-    margin-top: 5px;
-}
-
-/* MAIN */
-
-.screen {
-    background: #111416;
-    border: 1px solid #303638;
-    min-height: 480px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* PIXEL CITY */
-
-.scene {
-    height: 270px;
-    position: relative;
+.building:before{
+    content:"";
+    position:absolute;
+    inset:12px;
     background:
-        linear-gradient(
-            rgba(0,0,0,.35),
-            rgba(0,0,0,.65)
-        ),
-        linear-gradient(
-            #242b2d 0 55%,
-            #171b1d 55% 100%
-        );
-    overflow: hidden;
+      repeating-linear-gradient(
+        to right,
+        #ffd86b 0 22px,
+        transparent 22px 43px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        #ffd86b 0 20px,
+        transparent 20px 39px
+      );
+    opacity:.75;
 }
 
-.moon {
-    position: absolute;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: #d5d0bc;
-    right: 12%;
-    top: 25px;
-    box-shadow: 0 0 35px rgba(220,215,190,.18);
+.b1{left:80px;top:80px;width:330px;height:270px;background:#596276}
+.b2{left:540px;top:70px;width:380px;height:300px;background:#684f69}
+.b3{left:1050px;top:100px;width:300px;height:250px;background:#486174}
+.b4{left:1510px;top:60px;width:430px;height:310px;background:#69545e}
+.b5{left:90px;top:620px;width:370px;height:290px;background:#4e6470}
+.b6{left:600px;top:650px;width:310px;height:250px;background:#695a68}
+.b7{left:1080px;top:600px;width:400px;height:300px;background:#536276}
+.b8{left:1610px;top:620px;width:330px;height:270px;background:#6a5964}
+.b9{left:80px;top:1120px;width:360px;height:260px;background:#596779}
+.b10{left:580px;top:1100px;width:390px;height:280px;background:#675b72}
+.b11{left:1120px;top:1080px;width:350px;height:300px;background:#536979}
+.b12{left:1600px;top:1100px;width:360px;height:270px;background:#705b62}
+
+/* signs */
+.sign{
+    position:absolute;
+    padding:12px 16px;
+    background:#f05b75;
+    color:white;
+    border:4px solid #191d2b;
+    box-shadow:5px 5px 0 #10131f;
+    font-size:11px;
+    z-index:4;
 }
 
-.building {
-    position: absolute;
-    bottom: 55px;
-    background: #101416;
-    border: 2px solid #202729;
+.s1{left:140px;top:280px}
+.s2{left:650px;top:300px;background:#54c6c0}
+.s3{left:1160px;top:290px;background:#f2a65a}
+.s4{left:1660px;top:300px;background:#b276e8}
+.s5{left:680px;top:850px;background:#ef6f61}
+.s6{left:1260px;top:850px;background:#55a9e8}
+.s7{left:1700px;top:850px;background:#e7c65c}
+
+/* neon */
+.neon{
+    position:absolute;
+    width:100px;
+    height:10px;
+    background:#63e6ff;
+    box-shadow:0 0 15px #63e6ff;
+    z-index:3;
 }
 
-.b1 {
-    left: 4%;
-    width: 120px;
-    height: 125px;
+.n1{left:470px;top:450px}
+.n2{left:970px;top:500px;background:#ff62cf;box-shadow:0 0 15px #ff62cf}
+.n3{left:1480px;top:470px;background:#b77cff;box-shadow:0 0 15px #b77cff}
+
+/* trees */
+.tree{
+    position:absolute;
+    width:55px;
+    height:80px;
+    z-index:5;
 }
 
-.b2 {
-    left: 18%;
-    width: 95px;
-    height: 165px;
+.tree:before{
+    content:"";
+    position:absolute;
+    width:45px;
+    height:45px;
+    left:5px;
+    top:0;
+    background:#3f936d;
+    border:5px solid #17251f;
+    border-radius:12px;
+    box-shadow:
+      18px 10px 0 #34765b,
+      -10px 15px 0 #34765b;
 }
 
-.b3 {
-    right: 20%;
-    width: 140px;
-    height: 140px;
+.tree:after{
+    content:"";
+    position:absolute;
+    width:12px;
+    height:38px;
+    left:22px;
+    top:42px;
+    background:#725044;
+    border:3px solid #2a2020;
 }
 
-.b4 {
-    right: 3%;
-    width: 100px;
-    height: 190px;
+.t1{left:480px;top:200px}
+.t2{left:980px;top:250px}
+.t3{left:1450px;top:220px}
+.t4{left:500px;top:800px}
+.t5{left:1000px;top:780px}
+.t6{left:1530px;top:820px}
+.t7{left:470px;top:1250px}
+.t8{left:1020px;top:1250px}
+.t9{left:1510px;top:1240px}
+
+/* cars */
+.car{
+    position:absolute;
+    width:90px;
+    height:42px;
+    background:#d94d61;
+    border:5px solid #171b29;
+    border-radius:8px;
+    z-index:6;
 }
 
-.window {
-    position: absolute;
-    width: 8px;
-    height: 10px;
-    background: #7d765c;
+.car:before{
+    content:"";
+    position:absolute;
+    width:38px;
+    height:18px;
+    left:21px;
+    top:-18px;
+    background:#82a7c7;
+    border:5px solid #171b29;
 }
 
-.w1 { left: 15px; top: 20px; }
-.w2 { left: 45px; top: 45px; }
-.w3 { left: 75px; top: 20px; }
-.w4 { left: 30px; top: 80px; }
-.w5 { left: 65px; top: 100px; }
-
-.street {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 58px;
-    background: #0d1012;
-    border-top: 2px solid #292e30;
+.car:after{
+    content:"●   ●";
+    position:absolute;
+    bottom:-17px;
+    left:10px;
+    color:#10131d;
+    font-size:18px;
+    letter-spacing:28px;
 }
 
-.road-line {
-    position: absolute;
-    width: 80px;
-    height: 3px;
-    background: #454746;
-    top: 27px;
+.c1{left:300px;top:500px}
+.c2{left:1200px;top:470px;background:#4ea9d7}
+.c3{left:1750px;top:500px;background:#e3a74f}
+.c4{left:700px;top:980px;background:#b56ee4}
+
+/* player */
+#player{
+    position:absolute;
+    width:38px;
+    height:50px;
+    z-index:20;
+    transform:translate(-50%,-50%);
 }
 
-.r1 { left: 8%; }
-.r2 { left: 32%; }
-.r3 { left: 56%; }
-.r4 { left: 80%; }
-
-.zombie {
-    position: absolute;
-    bottom: 58px;
-    right: 38%;
-    font-size: 42px;
-    filter: grayscale(1);
+#player .head{
+    position:absolute;
+    width:30px;
+    height:28px;
+    left:4px;
+    top:0;
+    background:#f1c29b;
+    border:4px solid #171b29;
 }
 
-/* STORY */
-
-.story {
-    padding: 25px;
+#player .hair{
+    position:absolute;
+    width:30px;
+    height:11px;
+    left:4px;
+    top:0;
+    background:#33252a;
+    border:4px solid #171b29;
+    z-index:2;
 }
 
-.location {
-    color: #929b97;
-    font-size: 12px;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+#player .body{
+    position:absolute;
+    width:32px;
+    height:25px;
+    left:3px;
+    top:25px;
+    background:#e56b91;
+    border:4px solid #171b29;
 }
 
-h1 {
-    margin: 0 0 15px;
-    font-size: 25px;
-    letter-spacing: 2px;
+#player .leg{
+    position:absolute;
+    width:9px;
+    height:13px;
+    background:#292d42;
+    bottom:0;
+    border:3px solid #171b29;
 }
 
-.story-text {
-    color: #c4c0b5;
-    line-height: 1.8;
-    font-size: 15px;
-    min-height: 85px;
+#player .l1{left:5px}
+#player .l2{right:5px}
+
+/* NPC */
+.npc{
+    position:absolute;
+    width:32px;
+    height:48px;
+    z-index:15;
 }
 
-/* CHOICES */
-
-.choices {
-    display: grid;
-    gap: 9px;
-    margin-top: 18px;
+.npc .nh{
+    position:absolute;
+    width:25px;
+    height:24px;
+    left:3px;
+    background:#eab78f;
+    border:4px solid #171b29;
 }
 
-.choice {
-    background: #181d20;
-    color: #ded8ca;
-    border: 1px solid #394043;
-    padding: 14px;
-    text-align: left;
-    cursor: pointer;
-    transition: .15s;
+.npc .nb{
+    position:absolute;
+    width:28px;
+    height:25px;
+    left:2px;
+    bottom:0;
+    background:#58a6d8;
+    border:4px solid #171b29;
 }
 
-.choice:hover {
-    background: #242b2d;
-    border-color: #aaa38e;
-    transform: translateX(3px);
+.npc1{left:470px;top:500px}
+.npc2{left:1030px;top:470px}
+.npc3{left:1510px;top:520px}
+.npc4{left:850px;top:950px}
+.npc5{left:1370px;top:980px}
+
+/* UI */
+#ui{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:100;
+    width:330px;
+    background:rgba(11,14,27,.93);
+    border:4px solid #e7d9b1;
+    padding:15px;
+    box-shadow:8px 8px 0 rgba(0,0,0,.5);
 }
 
-.choice small {
-    display: block;
-    color: #747e7c;
-    margin-top: 5px;
+#ui h1{
+    font-size:14px;
+    margin:0 0 14px;
+    color:#ffd86b;
 }
 
-/* INVENTORY */
-
-.inventory {
-    margin-top: 15px;
-    border: 1px solid #292f32;
-    background: #101315;
-    padding: 15px;
+.stat{
+    margin:7px 0;
+    font-size:9px;
 }
 
-.inventory-title {
-    color: #8e9794;
-    font-size: 12px;
-    margin-bottom: 10px;
+.bar{
+    height:13px;
+    margin-top:5px;
+    background:#272b3b;
+    border:2px solid #111522;
 }
 
-.items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.fill{
+    height:100%;
 }
 
-.item {
-    background: #1b2022;
-    border: 1px solid #303638;
-    padding: 7px 10px;
-    font-size: 12px;
+.hp{background:#ef6675;width:78%}
+.food{background:#e7a84d;width:62%}
+.water{background:#58b7e8;width:71%}
+.energy{background:#8fd35f;width:88%}
+
+#money{
+    margin-top:10px;
+    color:#ffd86b;
 }
 
-/* FOOTER */
-
-footer {
-    text-align: center;
-    color: #505958;
-    font-size: 10px;
-    padding: 18px;
-    letter-spacing: 1px;
+#objective{
+    position:fixed;
+    top:15px;
+    right:15px;
+    z-index:100;
+    width:360px;
+    background:rgba(12,15,28,.94);
+    border:4px solid #e7d9b1;
+    padding:16px;
+    font-size:10px;
+    line-height:1.8;
 }
 
-/* MOBILE */
+#controls{
+    position:fixed;
+    bottom:15px;
+    left:15px;
+    z-index:100;
+    background:rgba(10,13,25,.9);
+    border:3px solid #777f98;
+    padding:12px;
+    font-size:8px;
+    line-height:1.8;
+}
 
-@media (max-width: 700px) {
+#inventory{
+    position:fixed;
+    bottom:15px;
+    right:15px;
+    z-index:100;
+    background:rgba(10,13,25,.94);
+    border:4px solid #e7d9b1;
+    padding:14px;
+    width:260px;
+}
 
-    #game {
-        padding: 10px;
-    }
+#inventory h2{
+    font-size:10px;
+    color:#ffd86b;
+    margin:0 0 12px;
+}
 
-    .status {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.item{
+    display:flex;
+    justify-content:space-between;
+    font-size:8px;
+    margin:8px 0;
+}
 
-    .scene {
-        height: 220px;
-    }
+#message{
+    position:fixed;
+    left:50%;
+    bottom:90px;
+    transform:translateX(-50%);
+    z-index:150;
+    background:#111626;
+    border:3px solid #ffd86b;
+    padding:14px 20px;
+    font-size:9px;
+    opacity:0;
+    transition:.2s;
+}
 
-    .logo {
-        font-size: 21px;
-    }
+#message.show{
+    opacity:1;
+}
 
-    h1 {
-        font-size: 20px;
-    }
+#night{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    pointer-events:none;
+    background:rgba(13,16,38,.22);
+}
 
-    .story {
-        padding: 18px;
-    }
+/* interaction */
+#interact{
+    position:fixed;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%);
+    z-index:120;
+    background:#171c2e;
+    border:4px solid #ffd86b;
+    padding:16px;
+    width:360px;
+    display:none;
+    text-align:center;
+}
 
-    .story-text {
-        font-size: 14px;
-    }
+#interact h3{
+    color:#ffd86b;
+    font-size:11px;
+}
+
+#interact p{
+    font-size:8px;
+    line-height:1.8;
+}
+
+button{
+    font-family:'Press Start 2P',monospace;
+    font-size:8px;
+    border:3px solid #111522;
+    padding:10px;
+    margin:4px;
+    background:#ffd86b;
+    cursor:pointer;
+}
+
+button:hover{
+    transform:translateY(-2px);
 }
 </style>
 </head>
@@ -322,415 +490,327 @@ footer {
 
 <div id="game">
 
-<header>
-    <div class="logo">LAST LIGHT</div>
-    <div class="day" id="day">DAY 01 — 21:47</div>
-</header>
+<div id="world">
 
-<div class="status">
+    <!-- roads -->
+    <div class="road horizontal" style="left:0;top:410px;width:2200px;height:150px"></div>
+    <div class="road horizontal" style="left:0;top:930px;width:2200px;height:150px"></div>
+    <div class="road vertical" style="left:430px;top:0;width:150px;height:1500px"></div>
+    <div class="road vertical" style="left:970px;top:0;width:150px;height:1500px"></div>
+    <div class="road vertical" style="left:1480px;top:0;width:150px;height:1500px"></div>
 
-    <div class="stat">
-        <div class="stat-name">HEALTH</div>
-        <div class="stat-value" id="health">100</div>
-    </div>
+    <!-- buildings -->
+    <div class="building b1"></div>
+    <div class="building b2"></div>
+    <div class="building b3"></div>
+    <div class="building b4"></div>
+    <div class="building b5"></div>
+    <div class="building b6"></div>
+    <div class="building b7"></div>
+    <div class="building b8"></div>
+    <div class="building b9"></div>
+    <div class="building b10"></div>
+    <div class="building b11"></div>
+    <div class="building b12"></div>
 
-    <div class="stat">
-        <div class="stat-name">HUNGER</div>
-        <div class="stat-value" id="hunger">82</div>
-    </div>
+    <!-- signs -->
+    <div class="sign s1">NIGHT MARKET</div>
+    <div class="sign s2">CAFE 24H</div>
+    <div class="sign s3">CLINIC</div>
+    <div class="sign s4">ARCADE</div>
+    <div class="sign s5">RAMEN</div>
+    <div class="sign s6">MINI MART</div>
+    <div class="sign s7">HOTEL</div>
 
-    <div class="stat">
-        <div class="stat-name">THIRST</div>
-        <div class="stat-value" id="thirst">76</div>
-    </div>
+    <!-- neon -->
+    <div class="neon n1"></div>
+    <div class="neon n2"></div>
+    <div class="neon n3"></div>
 
-    <div class="stat">
-        <div class="stat-name">SANITY</div>
-        <div class="stat-value" id="sanity">91</div>
-    </div>
+    <!-- trees -->
+    <div class="tree t1"></div>
+    <div class="tree t2"></div>
+    <div class="tree t3"></div>
+    <div class="tree t4"></div>
+    <div class="tree t5"></div>
+    <div class="tree t6"></div>
+    <div class="tree t7"></div>
+    <div class="tree t8"></div>
+    <div class="tree t9"></div>
 
-    <div class="stat">
-        <div class="stat-name">AMMO</div>
-        <div class="stat-value" id="ammo">6</div>
-    </div>
+    <!-- cars -->
+    <div class="car c1"></div>
+    <div class="car c2"></div>
+    <div class="car c3"></div>
+    <div class="car c4"></div>
 
-</div>
+    <!-- NPC -->
+    <div class="npc npc1"><div class="nh"></div><div class="nb"></div></div>
+    <div class="npc npc2"><div class="nh"></div><div class="nb"></div></div>
+    <div class="npc npc3"><div class="nh"></div><div class="nb"></div></div>
+    <div class="npc npc4"><div class="nh"></div><div class="nb"></div></div>
+    <div class="npc npc5"><div class="nh"></div><div class="nb"></div></div>
 
-<div class="screen">
-
-    <div class="scene">
-
-        <div class="moon"></div>
-
-        <div class="building b1">
-            <div class="window w1"></div>
-            <div class="window w2"></div>
-            <div class="window w3"></div>
-            <div class="window w4"></div>
-        </div>
-
-        <div class="building b2">
-            <div class="window w1"></div>
-            <div class="window w2"></div>
-            <div class="window w3"></div>
-            <div class="window w5"></div>
-        </div>
-
-        <div class="building b3">
-            <div class="window w1"></div>
-            <div class="window w2"></div>
-            <div class="window w3"></div>
-            <div class="window w4"></div>
-        </div>
-
-        <div class="building b4">
-            <div class="window w1"></div>
-            <div class="window w2"></div>
-            <div class="window w3"></div>
-            <div class="window w5"></div>
-        </div>
-
-        <div class="zombie">🧟</div>
-
-        <div class="street">
-            <div class="road-line r1"></div>
-            <div class="road-line r2"></div>
-            <div class="road-line r3"></div>
-            <div class="road-line r4"></div>
-        </div>
-
-    </div>
-
-    <div class="story">
-
-        <div class="location" id="location">
-            BANGKOK — UNKNOWN DISTRICT
-        </div>
-
-        <h1 id="title">
-            THE LAST NIGHT
-        </h1>
-
-        <div class="story-text" id="text">
-            ฝนหยุดตกเมื่อหนึ่งชั่วโมงก่อน
-
-            เมืองทั้งเมืองเงียบผิดปกติ
-
-            ไม่มีรถ ไม่มีเสียงผู้คน มีเพียงเสียงไซเรน
-            ที่ดังขึ้นเป็นครั้งคราวจากที่ไหนสักแห่งในความมืด
-
-            คุณอยู่คนเดียวในอพาร์ตเมนต์ชั้น 17
-
-            แบตเตอรี่โทรศัพท์เหลือ 12%
-
-            และเมื่อเวลา 21:47 น.
-            เสียงบางอย่างดังขึ้นจากทางเดินหน้าห้อง
-
-            สามครั้ง
-
-            กึก...
-
-            กึก...
-
-            กึก...
-
-            แล้วทุกอย่างก็เงียบลง
-        </div>
-
-        <div class="choices" id="choices">
-
-            <button class="choice" onclick="choose(1)">
-                ตรวจดูประตู
-                <small>คุณอาจได้รู้ว่าเกิดอะไรขึ้นด้านนอก</small>
-            </button>
-
-            <button class="choice" onclick="choose(2)">
-                ปิดไฟและซ่อนตัว
-                <small>บางทีสิ่งที่อยู่ข้างนอกอาจมองไม่เห็นคุณ</small>
-            </button>
-
-            <button class="choice" onclick="choose(3)">
-                เตรียมกระเป๋าแล้วออกทางบันไดหนีไฟ
-                <small>เสี่ยงมาก แต่การอยู่ที่นี่ก็อาจไม่ปลอดภัย</small>
-            </button>
-
-        </div>
-
+    <!-- player -->
+    <div id="player">
+        <div class="head"></div>
+        <div class="hair"></div>
+        <div class="body"></div>
+        <div class="leg l1"></div>
+        <div class="leg l2"></div>
     </div>
 
 </div>
 
-<div class="inventory">
+<div id="night"></div>
 
-    <div class="inventory-title">
-        INVENTORY
-    </div>
+<!-- UI -->
+<div id="ui">
+    <h1>♥ LAST LIGHT</h1>
 
-    <div class="items" id="items">
+    <div class="stat">HEALTH</div>
+    <div class="bar"><div class="fill hp"></div></div>
 
-        <div class="item">🔦 Flashlight</div>
-        <div class="item">📱 Phone 12%</div>
-        <div class="item">🔪 Kitchen Knife</div>
-        <div class="item">🥫 Canned Food ×2</div>
-        <div class="item">💧 Water ×1</div>
+    <div class="stat">HUNGER</div>
+    <div class="bar"><div class="fill food"></div></div>
 
-    </div>
+    <div class="stat">THIRST</div>
+    <div class="bar"><div class="fill water"></div></div>
 
+    <div class="stat">ENERGY</div>
+    <div class="bar"><div class="fill energy"></div></div>
+
+    <div id="money">💰 $ 120</div>
 </div>
 
-<footer>
-    LAST LIGHT // SURVIVAL IS NOT GUARANTEED
-</footer>
+<div id="objective">
+    <b>OBJECTIVE</b><br><br>
+    Find water and food before nightfall.
+    <br><br>
+    Explore the city and talk to people.
+</div>
+
+<div id="controls">
+    WASD / ARROW KEYS — MOVE<br>
+    E — INTERACT<br>
+    I — INVENTORY
+</div>
+
+<div id="inventory">
+    <h2>🎒 INVENTORY</h2>
+    <div class="item"><span>💧 Water</span><span id="waterCount">1</span></div>
+    <div class="item"><span>🍜 Food</span><span id="foodCount">0</span></div>
+    <div class="item"><span>💊 Medicine</span><span>0</span></div>
+    <div class="item"><span>🔑 Old Key</span><span>1</span></div>
+</div>
+
+<div id="message"></div>
+
+<div id="interact">
+    <h3 id="interactTitle">CITY</h3>
+    <p id="interactText"></p>
+    <button onclick="closeInteract()">CLOSE</button>
+</div>
 
 </div>
 
 <script>
 
-let health = 100;
-let hunger = 82;
-let thirst = 76;
-let sanity = 91;
-let ammo = 6;
+const world = document.getElementById("world");
+const player = document.getElementById("player");
+const message = document.getElementById("message");
+const interact = document.getElementById("interact");
+const interactTitle = document.getElementById("interactTitle");
+const interactText = document.getElementById("interactText");
 
-let day = 1;
-let hour = 21;
-let minute = 47;
+let px = 1120;
+let py = 520;
 
-function updateStats() {
+let speed = 5;
+let keys = {};
 
-    document.getElementById("health").textContent = health;
-    document.getElementById("hunger").textContent = hunger;
-    document.getElementById("thirst").textContent = thirst;
-    document.getElementById("sanity").textContent = sanity;
-    document.getElementById("ammo").textContent = ammo;
+let money = 120;
+let water = 1;
+let food = 0;
 
-    document.getElementById("day").textContent =
-        "DAY " +
-        String(day).padStart(2,"0") +
-        " — " +
-        String(hour).padStart(2,"0") +
-        ":" +
-        String(minute).padStart(2,"0");
+let gameTime = 18;
+
+document.addEventListener("keydown", e => {
+    keys[e.key.toLowerCase()] = true;
+
+    if(e.key.toLowerCase() === "e"){
+        interactNearby();
+    }
+
+    if(e.key.toLowerCase() === "i"){
+        document.getElementById("inventory").style.display =
+        document.getElementById("inventory").style.display === "none"
+        ? "block"
+        : "none";
+    }
+});
+
+document.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+function move(){
+
+    let dx = 0;
+    let dy = 0;
+
+    if(keys["w"] || keys["arrowup"]) dy -= speed;
+    if(keys["s"] || keys["arrowdown"]) dy += speed;
+    if(keys["a"] || keys["arrowleft"]) dx -= speed;
+    if(keys["d"] || keys["arrowright"]) dx += speed;
+
+    px += dx;
+    py += dy;
+
+    px = Math.max(25,Math.min(2175,px));
+    py = Math.max(25,Math.min(1475,py));
+
+    player.style.left = px + "px";
+    player.style.top = py + "px";
+
+    camera();
+
+    if(dx || dy){
+        gameTime += .003;
+        if(gameTime >= 24) gameTime = 0;
+        updateNight();
+    }
+
+    requestAnimationFrame(move);
 }
 
-function advanceTime(minutes) {
+function camera(){
 
-    minute += minutes;
+    let x = window.innerWidth/2 - px;
+    let y = window.innerHeight/2 - py;
 
-    while (minute >= 60) {
-        minute -= 60;
-        hour++;
+    x = Math.min(0,Math.max(window.innerWidth-2200,x));
+    y = Math.min(0,Math.max(window.innerHeight-1500,y));
 
-        if (hour >= 24) {
-            hour = 0;
-            day++;
+    world.style.transform =
+        `translate(${x}px,${y}px)`;
+}
+
+function updateNight(){
+
+    let darkness = 0;
+
+    if(gameTime >= 19 || gameTime < 6){
+        darkness = .48;
+    }else if(gameTime >= 17){
+        darkness = .25;
+    }else{
+        darkness = .12;
+    }
+
+    document.getElementById("night").style.background =
+        `rgba(10,13,38,${darkness})`;
+}
+
+function distance(x,y){
+    return Math.sqrt(
+        Math.pow(px-x,2)+
+        Math.pow(py-y,2)
+    );
+}
+
+function interactNearby(){
+
+    let found = false;
+
+    const npcs = [
+        [470,500,"Street Vendor",
+        "คืนนี้คนเยอะกว่าปกติ... ถ้าหิวนะ ร้าน RAMEN ตรงหัวมุมยังเปิดอยู่"],
+
+        [1030,470,"Old Man",
+        "เมืองนี้เปลี่ยนไปมากตั้งแต่คืนที่ไฟดับครั้งแรก..."],
+
+        [1510,520,"Girl with Backpack",
+        "ถ้าคุณกำลังหาน้ำ ลองไปที่ MINI MART ดูสิ"],
+
+        [850,950,"Delivery Worker",
+        "ฉันเห็นบางอย่างแปลก ๆ แถวโรงแรมเมื่อคืน..."],
+
+        [1370,980,"Musician",
+        "บางครั้งเมืองที่ไม่หลับ ก็มีความลับที่ไม่อยากให้ใครรู้"]
+    ];
+
+    for(const n of npcs){
+
+        if(distance(n[0],n[1]) < 80){
+
+            openInteract(n[2],n[3]);
+            found = true;
+            break;
         }
     }
 
-    hunger = Math.max(0, hunger - Math.floor(minutes / 30));
-    thirst = Math.max(0, thirst - Math.floor(minutes / 20));
+    if(!found){
 
-    if (hunger < 20) health -= 2;
-    if (thirst < 20) health -= 3;
+        if(distance(1260,850)<100){
 
-    updateStats();
+            if(money >= 10){
+
+                money -= 10;
+                food++;
+
+                document.getElementById("foodCount").textContent = food;
+
+                showMessage("🍜 ซื้ออาหารแล้ว! -$10");
+            }else{
+                showMessage("เงินไม่พอ...");
+            }
+
+            return;
+        }
+
+        if(distance(1260,850)<180){
+
+            openInteract(
+                "MINI MART",
+                "ร้านเล็ก ๆ ที่ยังเปิดไฟอยู่ท่ามกลางเมืองยามค่ำคืน."
+            );
+
+            return;
+        }
+
+        showMessage("ไม่มีอะไรให้ทำตรงนี้...");
+    }
 }
 
-function setStory(location, title, text, choices) {
+function openInteract(title,text){
 
-    document.getElementById("location").textContent = location;
-    document.getElementById("title").textContent = title;
-    document.getElementById("text").innerHTML = text;
+    interactTitle.textContent = title;
+    interactText.textContent = text;
 
-    const box = document.getElementById("choices");
-
-    box.innerHTML = "";
-
-    choices.forEach((choice, index) => {
-
-        const button = document.createElement("button");
-
-        button.className = "choice";
-
-        button.innerHTML =
-            choice.text +
-            "<small>" +
-            choice.sub +
-            "</small>";
-
-        button.onclick = function() {
-            choose(index + 10);
-        };
-
-        box.appendChild(button);
-
-    });
-
+    interact.style.display = "block";
 }
 
-function choose(option) {
-
-    if (option === 1) {
-
-        advanceTime(5);
-
-        sanity -= 3;
-
-        setStory(
-            "APARTMENT 17F",
-            "SOMETHING IS OUT THERE",
-            "คุณค่อย ๆ เดินไปที่ประตูและแนบหูกับมัน<br><br>" +
-            "มีเสียงหายใจ<br>" +
-            "ช้า... หนัก... และผิดจังหวะ<br><br>" +
-            "จากนั้นเสียงเล็บก็ลากผ่านประตูเบา ๆ",
-            [
-                {
-                    text: "มองผ่านช่องตาแมว",
-                    sub: "อยากรู้ว่ามันคืออะไร"
-                },
-                {
-                    text: "ถอยออกมา",
-                    sub: "บางสิ่งไม่ควรถูกมองเห็น"
-                }
-            ]
-        );
-
-    }
-
-    else if (option === 2) {
-
-        advanceTime(30);
-
-        sanity -= 8;
-
-        setStory(
-            "APARTMENT 17F",
-            "DON'T MAKE A SOUND",
-            "คุณปิดไฟทั้งหมดและนั่งลงกับพื้น<br><br>" +
-            "เสียงฝีเท้าค่อย ๆ เดินผ่านหน้าห้อง<br><br>" +
-            "หนึ่งก้าว<br>" +
-            "สองก้าว<br>" +
-            "สามก้าว<br><br>" +
-            "แล้วหยุดลงตรงหน้าประตูของคุณ",
-            [
-                {
-                    text: "อยู่นิ่ง ๆ",
-                    sub: "อย่าทำเสียงแม้แต่นิดเดียว"
-                },
-                {
-                    text: "เตรียมมีด",
-                    sub: "เผื่อมันเข้ามา"
-                }
-            ]
-        );
-
-    }
-
-    else if (option === 3) {
-
-        advanceTime(15);
-
-        setStory(
-            "STAIRWELL",
-            "NO WAY BACK",
-            "คุณสะพายกระเป๋าและเปิดประตูบันไดหนีไฟ<br><br>" +
-            "กลิ่นเหม็นเน่าลอยขึ้นมาจากชั้นล่าง<br><br>" +
-            "ไฟฉุกเฉินกระพริบเป็นจังหวะ<br><br>" +
-            "และบนผนังมีรอยเลือดลากยาวลงไปหลายชั้น",
-            [
-                {
-                    text: "ลงไปชั้น 16",
-                    sub: "อาจมีทางออก"
-                },
-                {
-                    text: "กลับเข้าห้อง",
-                    sub: "นี่อาจเป็นความคิดที่แย่"
-                }
-            ]
-        );
-
-    }
-
-    else if (option === 10) {
-
-        advanceTime(10);
-
-        setStory(
-            "APARTMENT 17F",
-            "THE EYE",
-            "คุณค่อย ๆ มองผ่านช่องตาแมว<br><br>" +
-            "ทางเดินว่างเปล่า<br><br>" +
-            "ไม่มีใครอยู่ตรงนั้น<br><br>" +
-            "แต่เมื่อคุณกำลังจะถอยออกมา..." +
-            "<br><br><b>มีดวงตาคู่หนึ่งปรากฏขึ้นตรงช่องตาแมว</b>",
-            [
-                {
-                    text: "ถอยทันที",
-                    sub: "อย่าให้มันรู้ว่าคุณอยู่ตรงนี้"
-                },
-                {
-                    text: "เปิดประตู",
-                    sub: "เผชิญหน้ากับมัน"
-                }
-            ]
-        );
-
-    }
-
-    else {
-
-        advanceTime(5);
-
-        sanity -= 5;
-
-        setStory(
-            "APARTMENT 17F",
-            "WAIT",
-            "คุณยืนนิ่งอยู่ในความมืด<br><br>" +
-            "ผ่านไปเกือบหนึ่งนาที<br><br>" +
-            "เสียงนั้นหายไปแล้ว<br><br>" +
-            "แต่โทรศัพท์ของคุณสั่นขึ้นมา<br><br>" +
-            "<b>UNKNOWN NUMBER</b><br><br>" +
-            "มีข้อความใหม่หนึ่งข้อความ",
-            [
-                {
-                    text: "เปิดอ่านข้อความ",
-                    sub: "ใครส่งข้อความมาตอนนี้?"
-                },
-                {
-                    text: "ปิดโทรศัพท์",
-                    sub: "คุณไม่ไว้ใจสิ่งที่เกิดขึ้น"
-                }
-            ]
-        );
-
-    }
-
-    if (health <= 0) {
-
-        setStory(
-            "DAY " + day,
-            "YOU DIED",
-            "โลกภายนอกกลืนคุณไปแล้ว<br><br>" +
-            "แต่เรื่องราวของคุณยังไม่จบ",
-            [
-                {
-                    text: "เริ่มเกมใหม่",
-                    sub: "กลับไปคืนแรก"
-                }
-            ]
-        );
-
-        document.getElementById("choices")
-            .querySelector("button")
-            .onclick = function() {
-                location.reload();
-            };
-    }
-
+function closeInteract(){
+    interact.style.display = "none";
 }
 
-updateStats();
+function showMessage(text){
+
+    message.textContent = text;
+    message.classList.add("show");
+
+    setTimeout(()=>{
+        message.classList.remove("show");
+    },2200);
+}
+
+player.style.left = px+"px";
+player.style.top = py+"px";
+
+updateNight();
+camera();
+move();
 
 </script>
 
